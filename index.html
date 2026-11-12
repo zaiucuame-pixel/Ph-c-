@@ -120,6 +120,12 @@ body.touch #hint{display:none}
 .big{padding:14px 30px;font-size:19px;border-radius:16px;border:none;background:linear-gradient(180deg,#ffd447,#f2a705);color:#3b2600;font-weight:800;box-shadow:0 6px 0 #a86f00}
 .big:disabled{opacity:.6}
 .ctl{font-size:12.5px;opacity:.85;margin-top:14px;line-height:1.6}
+.profs{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:4px 0 6px}
+.plbl{width:100%;font-size:12.5px;opacity:.85}
+.prof{display:inline-flex;align-items:center;gap:4px;background:rgba(255,255,255,.12);border:2px solid rgba(242,183,5,.6);border-radius:20px;padding:5px 6px 5px 11px;font-size:13px;cursor:pointer}
+.prof.sel{background:#f2b705;color:#3b2600}
+.px{border:none;background:rgba(0,0,0,.25);color:inherit;border-radius:14px;padding:3px 8px;font-size:12px;font-weight:700}
+.sbox input.err{border-color:#ff6b6b;animation:shake .3s}
 .note{font-size:11.5px;opacity:.7;margin-top:8px}
 .cert{width:min(640px,100%);background:var(--cream);color:#2b1d00;border:6px double #b8860b;border-radius:18px;padding:20px 18px;text-align:center;box-shadow:0 14px 40px rgba(0,0,0,.5)}
 .cert h2{margin:2px 0;color:#9d1c1c;font-size:clamp(22px,5vw,32px)}
@@ -146,7 +152,7 @@ body.touch #hint{display:none}
 <div id="hud" class="panel hidden"><div class="hd"><div class="ch" id="chName"></div><span class="tg" id="chProg"></span></div><ul id="quests"></ul></div>
 <div id="guide" class="panel hidden"><span class="ar" id="gArrow">➤</span><span id="gText"></span></div>
 <div id="mapWrap" class="panel hidden"><canvas id="mini"></canvas></div>
-<div id="topBtns" class="hidden"><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
+<div id="topBtns" class="hidden"><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="nightBtn">🌙 Ban đêm</button><button class="rbtn" id="userBtn">👤 ⇄</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
 <div id="stats" class="panel hidden"><div style="font-weight:800;color:var(--gold);margin-bottom:2px">Chỉ số phố cổ</div>
  <div class="row"><span class="lb">🏛️ Bảo tồn</span><span class="bar"><i id="bB" style="background:#f2b705"></i></span><span class="v" id="vB">50</span></div>
  <div class="row"><span class="lb">🏠 Sinh kế</span><span class="bar"><i id="bS" style="background:#2a9d8f"></i></span><span class="v" id="vS">50</span></div>
@@ -154,7 +160,7 @@ body.touch #hint{display:none}
 </div>
 <div id="joyZone"></div><div id="joy"><div class="knob"></div></div>
 <button id="act" class="hidden">💬 Nói chuyện<small id="actWho"></small></button>
-<div id="hint" class="hidden">WASD / mũi tên: đi · Shift: chạy · Kéo chuột: xoay camera · Lăn chuột: zoom · E: nói chuyện</div>
+<div id="hint" class="hidden">WASD / mũi tên: đi · Shift: chạy · Kéo chuột: xoay camera · Lăn chuột: zoom · E: nói chuyện · N: ngày/đêm · F: toàn màn hình</div>
 <div id="banner"><div class="t" id="bnT"></div><div class="s" id="bnS"></div></div>
 <div id="toast"></div>
 <div id="dlg" class="hidden"><div class="dcard" id="dcard"></div></div>
@@ -168,9 +174,10 @@ body.touch #hint{display:none}
   <div><b>Chặng 2</b>Giá trị phố cổ<br>“Sưu tầm thẻ giá trị”</div>
   <div><b>Chặng 3</b>Bảo tồn<br>“Trưởng ban quản lý”</div>
  </div>
+ <div id="profiles" class="profs hidden"></div>
  <input id="pname" maxlength="30" placeholder="Nhập tên của bạn (hoặc tên nhóm)">
+ <div id="nameErr" class="hidden" style="color:#ffb3b3;font-weight:700;font-size:13px;margin:-6px 0 8px">✍️ Hãy nhập tên để game lưu tiến trình riêng cho bạn nhé!</div>
  <br><button class="big" id="startBtn" disabled>Đang dựng phố…</button><button class="big hidden" id="newBtn" style="margin-left:8px;background:linear-gradient(180deg,#9ad1ff,#3a86ff);box-shadow:0 6px 0 #1d4f9c;color:#fff">Chơi mới</button>
- <div id="saveInfo" class="note hidden" style="font-size:13px;opacity:.9"></div>
  <div id="loadErr" class="hidden">Không tải được thư viện 3D. Hãy kiểm tra kết nối mạng rồi tải lại trang.</div>
  <div class="ctl">📱 Điện thoại: cần điều khiển bên trái để đi, vuốt màn hình để xoay, bấm nút vàng để nói chuyện.<br>💻 Máy tính: WASD / mũi tên để đi, kéo chuột để xoay, phím E để nói chuyện.</div>
  <div class="note">Bản đồ đã được cách điệu và thu nhỏ; vị trí các phố, công trình chỉ mang tính tương đối. Các nhân vật là nhân vật hư cấu.</div>
@@ -202,7 +209,7 @@ const scene=new THREE.Scene();
 scene.background=new THREE.Color('#bfe0f5');
 scene.fog=new THREE.Fog('#d3e8f4',70,240);
 const camera=new THREE.PerspectiveCamera(60,1,0.3,600);
-scene.add(new THREE.HemisphereLight('#ffffff','#8d7b62',0.88));
+const hemi=new THREE.HemisphereLight('#ffffff','#8d7b62',0.88);scene.add(hemi);
 const sun=new THREE.DirectionalLight('#fff0d0',0.72); sun.position.set(-60,100,40); scene.add(sun);
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
 addEventListener('resize',resize); resize();
@@ -272,6 +279,7 @@ const RES=[
 const reserved=(x,z)=>RES.some(r=>x>r.x0&&x<r.x1&&z>r.z0&&z<r.z1);
 const COL=[]; // colliders {x0,x1,z0,z1,h}
 const W=new Batch();
+const GLOW=new Batch(),HALO=[];let WATER_MAT=null;
 
 const FACADE=['#efc86a','#f3d98f','#e2a84b','#f2e6c9','#cfe0b4','#a9cbe0','#eab8a0','#f5dd9b','#d9c8a6','#f0b7b3','#bfe3d3','#f6c453'];
 const AWN=['#d62828','#1d70b8','#2a9d8f','#f77f00','#7b2cbf','#e63946','#0081a7','#3a86ff'];
@@ -280,19 +288,21 @@ const SHUT=['#2f7d5b','#3a6ea5','#6b4226','#2e8b57','#3c8d93'];
 const ROOF=['#8d3b2b','#7b3f2a','#9c4a32','#6e3524','#874030'];
 
 function house(B,ox,oz,ry,w,d,o={}){
+ const G=B===W?makePut(GLOW,ox,oz,ry):null;
  const floors=o.floors||(rnd()<.5?2:3),fh=3.1,h=floors*fh;
  const wall=o.wall||P(FACADE);const put=makePut(B,ox,oz,ry);
  put(BOX,0,h/2,-d/2,w-.06,h,d,wall);
  put(BOX,0,fh-.05,.08,w,.18,.25,o.trim||'#efe7d6');
  if(!o.noShop){
   put(BOX,0,1.3,.04,w*.8,2.45,.06,'#3b2b22');
+  if(G)G(BOX,0,1.3,.08,w*.74,2.25,.02,P(['#ffcf7a','#ffd98f','#ffc061','#ffe2a6']));
   for(let k=0;k<2;k++) put(BOX,(k?1:-1)*w*.2,.75+rnd()*.4,.14,w*.26,.9+rnd()*.5,.22,o.goods?P(o.goods):P(AWN));
   if(!o.noAwning) put(BOX,0,2.75,.6,w*.96,.08,1.25,o.awn||P(AWN),.28);
-  put(BOX,0,3.45,.1,w*.74,.55,.1,o.sign||P(SIGN));
+  {const sgc=o.sign||P(SIGN);put(BOX,0,3.45,.1,w*.74,.55,.1,sgc);if(G&&rnd()<.5)G(BOX,0,3.45,.165,w*.74,.55,.02,lighten(sgc,.3));}
  }
  for(let f=1;f<floors;f++){
   const y=f*fh+1.55,n=w>4.4?2:1,sc=o.shut||P(SHUT);
-  for(let k=0;k<n;k++){const lx=n===1?0:(k?w*.23:-w*.23);put(BOX,lx,y,.04,.95,1.75,.1,'#2b2420');put(BOX,lx-.25,y,.1,.42,1.7,.08,sc);put(BOX,lx+.25,y,.1,.42,1.7,.08,sc);}
+  for(let k=0;k<n;k++){const lx=n===1?0:(k?w*.23:-w*.23);put(BOX,lx,y,.04,.95,1.75,.1,'#2b2420');put(BOX,lx-.25,y,.1,.42,1.7,.08,sc);put(BOX,lx+.25,y,.1,.42,1.7,.08,sc);if(G&&rnd()<.55)G(BOX,lx,y,.155,.16,1.5,.02,'#ffd27a');}
   if(f===1&&(o.balcony||(!o.noBalcony&&rnd()<.5))){put(BOX,0,fh+.1,.5,w*.92,.14,1,'#ddd3c0');put(BOX,0,fh+.55,.98,w*.92,.75,.05,'#33302c');if(rnd()<.7)put(ICO,w*.3,fh+.6,.6,.38,.38,.38,'#3f8f3f');}
  }
  const rt=o.roof||(rnd()<.62?'tile':'flat');
@@ -333,9 +343,9 @@ function buildBlocks(){
  W.add(BOX,-115,4,-20,18,8,130,'#a89a85');W.add(BOX,115,4,-20,18,8,130,'#a89a85');W.add(BOX,0,4,-112,250,8,26,'#a89a85');
  // street wires (dây điện chằng chịt) + Hàng Mã lanterns
  for(const x of [-60,-50,-40]) lanternString(x,-80);
- for(const x of [-70,-62,-54,-46,-38]){W.add(BOX,x,6.0,-80,.05,.05,10,'#222');} for(const x of [-70,-62,-54,-46,-38]) for(let z=-84;z<=-76;z+=2.2) W.add(BOX,x,5.6,z,.45,.6,.45,P(['#e63946','#ffbe0b','#fb5607','#ff006e']));
+ for(const x of [-70,-62,-54,-46,-38]){W.add(BOX,x,6.0,-80,.05,.05,10,'#222');} for(const x of [-70,-62,-54,-46,-38]) for(let z=-84;z<=-76;z+=2.2) {const lc=P(['#e63946','#ffbe0b','#fb5607','#ff006e']);W.add(BOX,x,5.6,z,.45,.6,.45,lc);GLOW.add(BOX,x,5.6,z,.47,.62,.47,lighten(lc,.25));HALO.push([x,5.6,z,lc]);}
 }
-function lanternString(x,zc){W.add(BOX,x,6.3,zc,.05,.05,10,'#222');for(let z=zc-4;z<=zc+4;z+=1.3){W.add(BOX,x,5.75,z,.6,.8,.6,'#d62828');W.add(BOX,x,5.75,z,.66,.12,.66,'#f2b705');}}
+function lanternString(x,zc){W.add(BOX,x,6.3,zc,.05,.05,10,'#222');for(let z=zc-4;z<=zc+4;z+=1.3){W.add(BOX,x,5.75,z,.6,.8,.6,'#d62828');GLOW.add(BOX,x,5.75,z,.62,.82,.62,'#ff5a4a');HALO.push([x,5.75,z,'#ff3b2f']);W.add(BOX,x,5.75,z,.66,.12,.66,'#f2b705');}}
 
 /* ---------- landmarks ---------- */
 const LABELS=[];
@@ -377,6 +387,7 @@ function buildTemple(cx,fz,ry,w,depth,wallC,sign){
  const ry2=4.8+Math.sin(a)*L+.15;put(BOX,0,ry2,-(hz+hd/2),w-1.2,.4,.5,'#3e2a20');
  put(BOX,-(w/2-.6),ry2+.35,-(hz+hd/2),.6,.7,.45,'#3e2a20',0,.6);put(BOX,w/2-.6,ry2+.35,-(hz+hd/2),.6,.7,.45,'#3e2a20',0,-.6);
  put(BOX,-1.6,3.6,-.1,.5,.7,.5,'#d62828');put(BOX,1.6,3.6,-.1,.5,.7,.5,'#d62828');
+ {const gp=makePut(GLOW,cx,fz,ry);gp(BOX,-1.6,3.6,-.1,.52,.72,.52,'#ff5a4a');gp(BOX,1.6,3.6,-.1,.52,.72,.52,'#ff5a4a');gp(BOX,0,1.7,-(6.2-.06),w-6.2,3,.02,'#ffcf7a');const c=Math.cos(ry),s=Math.sin(ry);for(const lx of [-1.6,1.6])HALO.push([cx+lx*c-.1*s,3.6,fz-lx*s-.1*c,'#ff4a3a']);}
  const c=Math.cos(ry),s=Math.sin(ry);
  if(sign){const t=addPlaneSign(sign,{bg:'#7a1e1e',border:'#f2b705',fs:40,bw:4},cx+.5*s,4.1,fz+.5*c,ry,.75,false);}
 }
@@ -386,6 +397,7 @@ function buildMaMay(){
  const put=makePut(W,ox,oz,ry);
  for(let k=-3;k<=3;k++)put(BOX,k*1.1,4.6,.09,.12,2.6,.08,'#3e2a1e');
  put(BOX,-2.6,2.3,.6,.5,.7,.5,'#d62828');put(BOX,2.6,2.3,.6,.5,.7,.5,'#d62828');
+ {const gp=makePut(GLOW,ox,oz,ry);gp(BOX,-2.6,2.3,.6,.52,.72,.52,'#ff5a4a');gp(BOX,2.6,2.3,.6,.52,.72,.52,'#ff5a4a');HALO.push([ox-.6,2.3,oz-2.6,'#ff4a3a'],[ox-.6,2.3,oz+2.6,'#ff4a3a']);}
  addPlaneSign('NHÀ CỔ · 87 MÃ MÂY',{bg:'#3e2723',border:'#f2b705',fs:40,bw:4},ox-.3,3.45,oz,ry,.62,false);
  label('Nhà cổ 87 Mã Mây',ox+4,11.5,oz,{bg:'#5d4037'});
 }
@@ -393,14 +405,15 @@ function buildLake(){
  const park=new THREE.Mesh(new THREE.PlaneGeometry(260,140),lam('#86b55a'));park.rotation.x=-PI/2;park.position.set(0,.03,45+70);scene.add(park);
  const plaza=new THREE.Mesh(new THREE.PlaneGeometry(190,7),lam('#cbbd9f'));plaza.rotation.x=-PI/2;plaza.position.set(0,.05,48.5);scene.add(plaza);
  const ring=new THREE.Mesh(new THREE.RingGeometry(1.02,1.14,72),lam('#d8c9a8'));ring.rotation.x=-PI/2;ring.scale.set(LAKE.rx,LAKE.rz,1);ring.position.set(LAKE.cx,.07,LAKE.cz);scene.add(ring);
- const water=new THREE.Mesh(new THREE.CircleGeometry(1,72),new THREE.MeshLambertMaterial({color:'#5aa39a'}));water.rotation.x=-PI/2;water.scale.set(LAKE.rx,LAKE.rz,1);water.position.set(LAKE.cx,.09,LAKE.cz);scene.add(water);
+ const water=new THREE.Mesh(new THREE.CircleGeometry(1,72),(WATER_MAT=new THREE.MeshLambertMaterial({color:'#5aa39a'})));water.rotation.x=-PI/2;water.scale.set(LAKE.rx,LAKE.rz,1);water.position.set(LAKE.cx,.09,LAKE.cz);scene.add(water);
  W.add(CYL,ISLAND.x,.2,ISLAND.z,ISLAND.r,.4,ISLAND.r,'#7cb342');
  buildTemple(8,68,PI,7,8,'#e0c27a','ĐỀN NGỌC SƠN');
  COL.push({x0:4.6,x1:11.4,z0:68.6,z1:76.2,h:6});
- for(let k=0;k<=10;k++){const z=56+k*1.1,y=.25+1.2*Math.sin(PI*k/10);W.add(BOX,8,y,z,3,.3,1.2,'#c62828');W.add(BOX,6.55,y+.55,z,.15,.8,1.15,'#e53935');W.add(BOX,9.45,y+.55,z,.15,.8,1.15,'#e53935');}
+ for(let k=0;k<=10;k++){const z=56+k*1.1,y=.25+1.2*Math.sin(PI*k/10);W.add(BOX,8,y,z,3,.3,1.2,'#c62828');W.add(BOX,6.55,y+.55,z,.15,.8,1.15,'#e53935');W.add(BOX,9.45,y+.55,z,.15,.8,1.15,'#e53935');GLOW.add(BOX,6.55,y+.55,z,.17,.82,1.17,'#ff4040');GLOW.add(BOX,9.45,y+.55,z,.17,.82,1.17,'#ff4040');if(k%2===0)HALO.push([6.55,y+1.1,z,'#ff2a2a'],[9.45,y+1.1,z,'#ff2a2a']);}
  W.add(CYL,-12,.2,118,3.5,.5,3.5,'#7cb342');
  W.add(BOX,-12,1.6,118,3,2.6,2.4,'#d8cbb0');W.add(BOX,-12,3.8,118,2.4,1.8,2,'#d8cbb0');W.add(BOX,-12,5.3,118,1.7,1.2,1.5,'#d8cbb0');
  for(const y of [1.5,3.7])W.add(BOX,-12,y,116.75,.9,1.3,.1,'#5b4a3a');
+ GLOW.add(BOX,-12,1.6,118,3.05,2.62,2.45,'#f3d79a');GLOW.add(BOX,-12,3.8,118,2.45,1.82,2.05,'#f3d79a');GLOW.add(BOX,-12,5.3,118,1.75,1.22,1.55,'#f3d79a');HALO.push([-12,2,115.5,'#ffd27a'],[-12,4.5,116.6,'#ffd27a'],[-12,2,120.5,'#ffd27a']);
  W.add(CONE4,-12,6.4,118,1.4,1,1.4,'#7a5a40',PI/4);
  label('Hồ Gươm',LAKE.cx,10,95,{bg:'#2a9d8f'},2.8);label('Tháp Rùa',-12,10,118,{bg:'#2a9d8f'},2);label('Đền Ngọc Sơn · Cầu Thê Húc',8,11,70,{bg:'#b71c1c'},2);
  // trees
@@ -472,7 +485,8 @@ function makeBike(){const g=new THREE.Group();const c=P(['#d62828','#1d70b8','#2
  const b=new THREE.Mesh(new THREE.BoxGeometry(.5,.55,1.7),lam(c));b.position.y=.7;g.add(b);const s=new THREE.Mesh(new THREE.BoxGeometry(.45,.15,.8),lam('#222'));s.position.set(0,1.05,-.2);g.add(s);
  const hb=new THREE.Mesh(new THREE.BoxGeometry(.9,.08,.08),lam('#555'));hb.position.set(0,1.35,.75);g.add(hb);
  for(const z of [-.75,.8]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,.18,12),lam('#111'));w.rotation.z=PI/2;w.position.set(0,.35,z);g.add(w);}
- const r=makePerson({hat:Math.random()<.5?'cap':null,capC:P(['#fff','#e63946','#1d70b8']),scale:.72});r.position.set(0,.55,-.1);r.userData.legs.forEach(l=>l.rotation.x=-1.2);g.add(r);return g;}
+ const r=makePerson({hat:Math.random()<.5?'cap':null,capC:P(['#fff','#e63946','#1d70b8']),scale:.72});r.position.set(0,.55,-.1);r.userData.legs.forEach(l=>l.rotation.x=-1.2);g.add(r);
+ const hl=new THREE.Mesh(new THREE.BoxGeometry(.32,.22,.08),new THREE.MeshBasicMaterial({color:'#fff6c0'}));hl.position.set(0,1.15,.92);hl.visible=false;g.add(hl);g.hl=hl;return g;}
 
 /* ---------- game data ---------- */
 const S={chang:0,asked:0,notes:[],firstTry:0,quizTotal:0,cards:[],stats:{B:50,S:50,D:50},dec:{},name:'',busy:false,timelineFirst:null,free:false};
@@ -636,6 +650,12 @@ obj({id:'dibo',ch:3,pos:[-50,52],title:'Không gian đi bộ – Hồ Gươm',wh
 /* ---------- build everything ---------- */
 const NPCS=[];
 let player, walkers=[], bikes=[];
+function buildLamps(){
+ const lamp=(x,z)=>{W.add(BOX,x,2.6,z,.16,5.2,.16,'#2f3b33');W.add(BOX,x,.15,z,.4,.3,.4,'#2f3b33');W.add(BOX,x,5.32,z,.56,.14,.56,'#2f3b33');W.add(BOX,x,4.95,z,.42,.55,.42,'#d9d2b8');GLOW.add(BOX,x,4.95,z,.44,.57,.44,'#fff1c4');HALO.push([x,4.95,z,'#ffd890']);};
+ for(const x of XS){let i=0;for(let z=-72;z<40;z+=17,i++)lamp(x+(i%2?6.2:-6.2),z);}
+ for(const z of ZS){let i=0;for(let x=-82;x<92;x+=17,i++)lamp(x,z+(i%2?6.2:-6.2));}
+ for(let a=0;a<PI*2;a+=.26){const x=LAKE.cx+LAKE.rx*1.12*Math.cos(a),z=LAKE.cz+LAKE.rz*1.12*Math.sin(a);if(z<53||(Math.abs(x-8)<4&&z<64)||Math.abs(x)>92)continue;lamp(x,z);}
+}
 function buildWorld(){
  const g=new THREE.Mesh(new THREE.PlaneGeometry(420,420),lam('#8a847b'));g.rotation.x=-PI/2;g.position.set(0,0,30);scene.add(g);
  for(const x of XS)W.add(BOX,x,.02,-20,.25,.02,120,'#d9d2c3');
@@ -644,7 +664,9 @@ function buildWorld(){
  buildTemple(26,-47,0,16,14,'#e3c27a','ĐỀN BẠCH MÃ');label('Đền Bạch Mã',26,12,-54,{bg:'#b71c1c'});
  buildTemple(29,7,PI,14,13,'#e8cf8f','ĐÌNH KIM NGÂN');label('Đình Kim Ngân',29,12,14,{bg:'#7b2cbf'});
  buildMaMay();buildLake();buildBanners();
+ buildLamps();
  scene.add(W.mesh());
+ buildNightFX();
  buildVariants();
  label('Phố Tạ Hiện',10,9,-20,{bg:'#e76f51',fs:40},1.8);
  // NPCs & markers
@@ -768,7 +790,7 @@ $('notesBtn').onclick=()=>{if(S.busy)return;openD();
 $('cardsBtn').onclick=()=>{if(S.busy)return;const all=OBJ.filter(o=>o.card);openD();
  dc.innerHTML=`<div class="q">🎴 Bộ sưu tập Thẻ giá trị (${S.cards.length}/6)</div><div class="gal">${all.map(o=>S.cards.includes(o.id)?`<div class="mini"><span class="cat" style="background:${CATS[o.card.cat][1]};color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:800">${CATS[o.card.cat][0]}</span><b>${CATS[o.card.cat][2]} ${o.card.t}</b>${o.card.x}</div>`:`<div class="mini lock"><b>🔒 ${o.title}</b>Tìm và trả lời đúng để mở thẻ.</div>`).join('')}</div><div class="btns"><button class="go">Đóng</button></div>`;
  dc.querySelector('.go').onclick=closeD;};
-$('helpBtn').onclick=()=>{if(S.busy)return;S.busy=true;info('❔ Hướng dẫn',`<b>Mục tiêu:</b> đi theo <b>mũi tên vàng</b> ở trên cùng và các <b>cột sáng</b> để tìm nhân vật có dấu <b>!</b> hoặc <b>?</b>.<br><br>📱 <b>Điện thoại:</b> kéo cần điều khiển bên trái để đi · vuốt màn hình để xoay góc nhìn · bấm nút vàng để nói chuyện.<br>💻 <b>Máy tính:</b> WASD / mũi tên để đi · Shift để chạy · kéo chuột để xoay · lăn chuột để phóng to/thu nhỏ · E để nói chuyện.<br><br>🗺️ Bản đồ nhỏ góc phải: chấm vàng là mục tiêu, tam giác đỏ là bạn.<br>🏮 Bạn có thể tự do dạo phố bất cứ lúc nào!`,'Đã hiểu').then(()=>{closeD();S.busy=false;});};
+$('helpBtn').onclick=()=>{if(S.busy)return;S.busy=true;info('❔ Hướng dẫn',`<b>Mục tiêu:</b> đi theo <b>mũi tên vàng</b> ở trên cùng và các <b>cột sáng</b> để tìm nhân vật có dấu <b>!</b> hoặc <b>?</b>.<br><br>📱 <b>Điện thoại:</b> kéo cần điều khiển bên trái để đi · vuốt màn hình để xoay góc nhìn · bấm nút vàng để nói chuyện.<br>💻 <b>Máy tính:</b> WASD / mũi tên để đi · Shift để chạy · kéo chuột để xoay · lăn chuột để phóng to/thu nhỏ · E để nói chuyện · N bật/tắt ban đêm · F toàn màn hình.<br>🌙 Nút <b>Ban đêm</b> ở góc phải: phố cổ lên đèn lồng, đèn đường, cửa hiệu sáng rực!<br>👤 Nút có tên bạn: đổi người chơi (tiến trình lưu theo tên).<br><br>🗺️ Bản đồ nhỏ góc phải: chấm vàng là mục tiêu, tam giác đỏ là bạn.<br>🏮 Bạn có thể tự do dạo phố bất cứ lúc nào!`,'Đã hiểu').then(()=>{closeD();S.busy=false;});};
 
 /* ---------- interaction & progression ---------- */
 let near=null;
@@ -830,7 +852,7 @@ function showEnd(){
  <div class="btns" style="justify-content:center;flex-wrap:wrap"><button class="go sec" style="background:#1d3557" id="freeBtn">🗺️ Tiếp tục dạo phố</button><button class="go" id="againBtn">🔄 Chơi lại</button></div>`;
  $('end').classList.remove('hidden');endOpen=true;
  $('freeBtn').onclick=()=>{$('end').classList.add('hidden');endOpen=false;S.free=true;$('stats').classList.remove('hidden');refreshHUD();saveGame();};
- $('againBtn').onclick=()=>{clearSave();location.reload();};
+ $('againBtn').onclick=()=>{clearSave(PKEY);location.reload();};
 }
 
 /* ---------- minimap ---------- */
@@ -846,6 +868,44 @@ function drawMapBase(){const c=mbase.getContext('2d');c.scale(2,2);c.fillStyle='
 function drawMini(t){mctx.clearRect(0,0,MW,MH);mctx.drawImage(mbase,0,0,MW,MH);
  for(const o of OBJ){if(!o.marker.visible)continue;mctx.fillStyle=o.ch===1?'#ffd166':o.ch===2?'#c77dff':'#ff9f1c';mctx.strokeStyle='#14213d';mctx.lineWidth=1.2;mctx.beginPath();mctx.arc(mx(o.pos[0]),mz(o.pos[1]),3.2+Math.sin(t*5)*.8,0,PI*2);mctx.fill();mctx.stroke();}
  const px=mx(player.position.x),pz=mz(player.position.z),a=player.rotation.y;mctx.save();mctx.translate(px,pz);mctx.rotate(-a+PI);mctx.fillStyle='#e63946';mctx.strokeStyle='#fff';mctx.lineWidth=1.3;mctx.beginPath();mctx.moveTo(0,-6);mctx.lineTo(4.5,5);mctx.lineTo(-4.5,5);mctx.closePath();mctx.fill();mctx.stroke();mctx.restore();}
+
+/* ---------- ngày / đêm ---------- */
+let nightK=0,nightTarget=0,glowMesh=null,halo=null,haloMat=null,stars=null,moon=null;
+const GLOW_MAT=new THREE.MeshBasicMaterial({vertexColors:true,transparent:true,opacity:0,depthWrite:false});
+const plight=new THREE.PointLight('#ffc477',0,34,1.6);scene.add(plight);
+const DAYC={bg:new THREE.Color('#bfe0f5'),fog:new THREE.Color('#d3e8f4'),sky:new THREE.Color('#ffffff'),gr:new THREE.Color('#8d7b62'),sun:new THREE.Color('#fff0d0'),water:new THREE.Color('#5aa39a')};
+const NIGHTC={bg:new THREE.Color('#081128'),fog:new THREE.Color('#0d1836'),sky:new THREE.Color('#6f84c9'),gr:new THREE.Color('#2a2235'),sun:new THREE.Color('#a9bcff'),water:new THREE.Color('#14323d')};
+function glowTex(inner,outer){const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');const g=x.createRadialGradient(32,32,0,32,32,32);g.addColorStop(0,inner);g.addColorStop(.25,outer);g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(0,0,64,64);return new THREE.CanvasTexture(c);}
+function buildNightFX(){
+ glowMesh=GLOW.mesh();glowMesh.material=GLOW_MAT;glowMesh.visible=false;glowMesh.renderOrder=2;scene.add(glowMesh);
+ const g=new THREE.BufferGeometry(),pos=[],col=[],c=new THREE.Color();
+ for(const h of HALO){pos.push(h[0],h[1],h[2]);c.set(h[3]);col.push(c.r,c.g,c.b);}
+ g.setAttribute('position',new THREE.Float32BufferAttribute(pos,3));g.setAttribute('color',new THREE.Float32BufferAttribute(col,3));
+ haloMat=new THREE.PointsMaterial({size:4.6,map:glowTex('rgba(255,255,255,1)','rgba(255,255,255,.45)'),vertexColors:true,transparent:true,opacity:0,depthWrite:false,blending:THREE.AdditiveBlending,sizeAttenuation:true});
+ halo=new THREE.Points(g,haloMat);halo.visible=false;halo.renderOrder=3;scene.add(halo);
+ const sg=new THREE.BufferGeometry(),sp=[];for(let i=0;i<600;i++){const th=Math.random()*PI*2,ph=Math.acos(Math.random()*.92+.08),r=330;sp.push(r*Math.sin(ph)*Math.cos(th),r*Math.cos(ph),r*Math.sin(ph)*Math.sin(th));}
+ sg.setAttribute('position',new THREE.Float32BufferAttribute(sp,3));
+ stars=new THREE.Points(sg,new THREE.PointsMaterial({color:'#ffffff',size:1.7,sizeAttenuation:false,transparent:true,opacity:0,fog:false,depthWrite:false}));stars.visible=false;scene.add(stars);
+ moon=new THREE.Sprite(new THREE.SpriteMaterial({map:glowTex('rgba(255,252,235,1)','rgba(235,240,255,.9)'),transparent:true,opacity:0,fog:false,depthWrite:false}));moon.scale.set(34,34,1);moon.visible=false;scene.add(moon);
+}
+function applyNight(k){
+ scene.background.copy(DAYC.bg).lerp(NIGHTC.bg,k);scene.fog.color.copy(DAYC.fog).lerp(NIGHTC.fog,k);scene.fog.near=70-20*k;scene.fog.far=240-40*k;
+ hemi.color.copy(DAYC.sky).lerp(NIGHTC.sky,k);hemi.groundColor.copy(DAYC.gr).lerp(NIGHTC.gr,k);hemi.intensity=.88-.5*k;
+ sun.color.copy(DAYC.sun).lerp(NIGHTC.sun,k);sun.intensity=.72-.5*k;
+ if(WATER_MAT)WATER_MAT.color.copy(DAYC.water).lerp(NIGHTC.water,k);
+ const on=k>.01;GLOW_MAT.opacity=Math.min(1,k*1.15);if(glowMesh)glowMesh.visible=on;
+ if(haloMat){haloMat.opacity=.95*k;halo.visible=on;}
+ if(stars){stars.material.opacity=k;stars.visible=on;moon.material.opacity=k;moon.visible=on;}
+ plight.intensity=2.2*k;for(const b of bikes)if(b.hl)b.hl.visible=k>.4;
+ $('nightBtn').textContent=nightTarget?'☀️ Ban ngày':'🌙 Ban đêm';
+}
+function setNight(on){nightTarget=on?1:0;$('nightBtn').textContent=on?'☀️ Ban ngày':'🌙 Ban đêm';try{localStorage.setItem('phoco3d_night',on?'1':'0');}catch(e){}}
+$('nightBtn').onclick=()=>{setNight(!nightTarget);toast(nightTarget?'🌙 Phố cổ lên đèn...':'☀️ Trời sáng rồi!');};
+addEventListener('keydown',e=>{if(e.code==='KeyN'&&!dlgOpen&&!(e.target.matches&&e.target.matches('input'))&&started)$('nightBtn').click();});
+function nightTick(dt){const prev=nightK;nightK+=(nightTarget-nightK)*Math.min(1,dt*1.4);if(Math.abs(nightTarget-nightK)<.002)nightK=nightTarget;if(nightK!==prev)applyNight(nightK);
+ if(nightK>0.01&&player){plight.position.set(player.position.x,player.position.y+7,player.position.z);stars.position.copy(camera.position);moon.position.set(camera.position.x-140,camera.position.y+170,camera.position.z-200);}}
+function initNight(){let pref=null;try{pref=localStorage.getItem('phoco3d_night');}catch(e){}const h=new Date().getHours();
+ nightTarget=pref===null?((h>=18||h<6)?1:0):(pref==='1'?1:0);nightK=nightTarget;applyNight(nightK);}
 
 /* ---------- main loop ---------- */
 const clock=new THREE.Clock();let started=false;
@@ -921,7 +981,7 @@ function update(dt,t){
 }
 // Tự giảm độ phân giải nếu máy yếu để giữ chuyển động mượt
 let pr=renderer.getPixelRatio(),fpsAcc=0,fpsN=0,fpsT=0;
-function loop(){requestAnimationFrame(loop);const raw=clock.getDelta(),dt=Math.min(raw,.05),t=clock.elapsedTime;update(dt,t);renderer.render(scene,camera);
+function loop(){requestAnimationFrame(loop);const raw=clock.getDelta(),dt=Math.min(raw,.05),t=clock.elapsedTime;update(dt,t);nightTick(dt);renderer.render(scene,camera);
  if(started&&t-mapT>.1){mapT=t;drawMini(t);}
  if(started&&t-saveT>4){saveT=t;saveGame();}
  if(started){fpsAcc+=raw;fpsN++;if(t-fpsT>2.5){const avg=fpsAcc/fpsN;fpsAcc=0;fpsN=0;fpsT=t;if(avg>1/38&&pr>.75){pr=Math.max(.75,pr-.2);renderer.setPixelRatio(pr);resize();}}}}
@@ -930,20 +990,47 @@ function loop(){requestAnimationFrame(loop);const raw=clock.getDelta(),dt=Math.m
 async function boot(){
  try{await Promise.race([document.fonts.load('800 40px "Be Vietnam Pro"'),new Promise(r=>setTimeout(r,1800))]);}catch(e){}
  buildWorld();drawMapBase();updStats();
- camera.position.set(-30,8,68);camera.lookAt(-30,2,40);
+ camera.position.set(-30,8,68);camera.lookAt(-30,2,40);initNight();
  $('startBtn').disabled=false;$('startBtn').textContent='▶ Bắt đầu khám phá';
- {const sv=loadSave();if(sv){$('startBtn').textContent='▶ Chơi tiếp';$('newBtn').classList.remove('hidden');if(sv.S.name)$('pname').value=sv.S.name;const ch=sv.S.chang>=4?'đã hoàn thành':'đang ở Chặng '+sv.S.chang;$('saveInfo').textContent='💾 Đã có tiến trình lưu ('+ch+'). Bấm “Chơi tiếp” để chơi tiếp hoặc “Chơi mới” để làm lại từ đầu.';$('saveInfo').classList.remove('hidden');}}
+ {const st=readStore();const lp=st.profiles[st.last];if(lp)$('pname').value=lp.name;}bootDone=true;renderProfiles();updateStartBtn();
  loop();
 }
-/* ---------- lưu tiến trình + toàn màn hình ---------- */
-const SAVE_KEY='phoco3d_save_v1';
+/* ---------- lưu tiến trình theo tên + toàn màn hình ---------- */
+const SAVE_KEY='phoco3d_saves_v2',OLD_KEY='phoco3d_save_v1';
 const VARMAP={tower:'tower',nhaco:'nhaco',viahe:'viahe',hangbac2:'hangbac',dibo:'dibo'};
-function saveGame(){if(!started||!player)return;try{localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,S:{chang:S.chang,asked:S.asked,notes:S.notes,firstTry:S.firstTry,quizTotal:S.quizTotal,cards:S.cards,stats:S.stats,dec:S.dec,name:S.name,timelineFirst:S.timelineFirst,free:S.free},done:OBJ.filter(o=>o.done).map(o=>o.id),p:[player.position.x,player.position.z,player.rotation.y],yaw}));}catch(e){}}
-function loadSave(){try{const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');return d&&d.v===1&&d.S?d:null;}catch(e){return null;}}
-function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
+const cleanName=n=>(n||'').normalize('NFC').trim().replace(/\s+/g,' ');
+const nkey=n=>cleanName(n).toLowerCase();
+let PKEY='';
+function writeStore(st){try{localStorage.setItem(SAVE_KEY,JSON.stringify(st));}catch(e){}}
+function readStore(){let st=null;try{st=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');}catch(e){}
+ if(!st||typeof st!=='object')st={profiles:{},last:''};if(!st.profiles)st.profiles={};
+ try{const old=JSON.parse(localStorage.getItem(OLD_KEY)||'null');if(old&&old.v===1&&old.S){const nm=cleanName(old.S.name)||'Người chơi',k=nkey(nm);if(!st.profiles[k])st.profiles[k]={name:nm,t:Date.now(),data:old};st.last=st.last||k;localStorage.removeItem(OLD_KEY);writeStore(st);}}catch(e){}
+ return st;}
+function snapshot(){return {v:1,S:{chang:S.chang,asked:S.asked,notes:S.notes,firstTry:S.firstTry,quizTotal:S.quizTotal,cards:S.cards,stats:S.stats,dec:S.dec,name:S.name,timelineFirst:S.timelineFirst,free:S.free},done:OBJ.filter(o=>o.done).map(o=>o.id),p:[player.position.x,player.position.z,player.rotation.y],yaw};}
+function saveGame(){if(!started||!player||!PKEY)return;const st=readStore();st.profiles[PKEY]={name:S.name,t:Date.now(),data:snapshot()};st.last=PKEY;writeStore(st);}
+function loadSave(k){if(!k)return null;const p=readStore().profiles[k];return p&&p.data&&p.data.v===1&&p.data.S?p.data:null;}
+function clearSave(k){const st=readStore();delete st.profiles[k];writeStore(st);}
 function resumeFrom(d){Object.assign(S,d.S);for(const id of d.done){const o=OBJ.find(x=>x.id===id);if(o)o.done=true;}
  for(const id in S.dec)if(VARMAP[id])applyVar(VARMAP[id],S.dec[id]);
  if(d.p){player.position.set(d.p[0],0,d.p[1]);player.rotation.y=d.p[2];}yaw=d.yaw||0;camInit=false;updStats();}
+// ---- màn hình chọn người chơi ----
+const escH=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function profStatus(d){if(!d||!d.S)return'';if(d.S.free||d.S.chang>=4)return'🏆 Hoàn thành';return'Chặng '+(d.S.chang||1);}
+function renderProfiles(){const st=readStore();const list=Object.entries(st.profiles).sort((a,b)=>(b[1].t||0)-(a[1].t||0));const box=$('profiles');
+ if(!list.length){box.classList.add('hidden');return;}box.classList.remove('hidden');
+ const cur=nkey($('pname').value);
+ box.innerHTML='<div class="plbl">👥 Người chơi đã lưu trên máy này (chạm để chọn):</div>'+list.map(([k,p])=>`<span class="prof${k===cur?' sel':''}" data-k="${escH(k)}"><b>👤 ${escH(p.name)}</b> · ${profStatus(p.data)}<button class="px" data-k="${escH(k)}" title="Xóa">✕</button></span>`).join('');
+ box.querySelectorAll('.prof').forEach(el=>el.onclick=e=>{if(e.target.classList.contains('px'))return;const p=readStore().profiles[el.dataset.k];if(p){$('pname').value=p.name;updateStartBtn();}});
+ box.querySelectorAll('.px').forEach(b=>b.onclick=e=>{e.stopPropagation();if(b.dataset.armed){clearSave(b.dataset.k);renderProfiles();updateStartBtn();return;}b.dataset.armed='1';b.textContent='Xóa? bấm lần nữa';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='✕';}},3000);});}
+let bootDone=false;
+function updateStartBtn(){if(!bootDone)return;const nm=cleanName($('pname').value),k=nkey(nm),d=loadSave(k);
+ $('nameErr').classList.add('hidden');$('pname').classList.remove('err');
+ if(d){$('startBtn').textContent='▶ Chơi tiếp ('+nm+')';$('newBtn').classList.remove('hidden');$('newBtn').textContent='↺ Chơi lại từ đầu';delete $('newBtn').dataset.armed;}
+ else{$('startBtn').textContent='▶ Bắt đầu khám phá';$('newBtn').classList.add('hidden');}
+ document.querySelectorAll('#profiles .prof').forEach(el=>el.classList.toggle('sel',el.dataset.k===k));}
+$('pname').addEventListener('input',updateStartBtn);
+$('pname').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();$('startBtn').click();}});
+// ---- toàn màn hình ----
 function fsFail(){toast(/iPhone|iPad|iPod/.test(navigator.userAgent)?'iPhone: bấm Chia sẻ → “Thêm vào MH chính” rồi mở từ đó để chơi toàn màn hình':'Trình duyệt chưa cho phép toàn màn hình ở đây');}
 function isFS(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
 function toggleFS(){const d=document,el=d.documentElement;
@@ -955,23 +1042,26 @@ document.addEventListener('fullscreenchange',fsLabel);document.addEventListener(
 $('fsBtn').onclick=toggleFS;
 addEventListener('keydown',e=>{if(e.code==='KeyF'&&!dlgOpen&&!(e.target.matches&&e.target.matches('input'))&&started)toggleFS();});
 addEventListener('pagehide',saveGame);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGame();});
+$('userBtn').onclick=()=>{if(S.busy)return;saveGame();location.reload();};
+// ---- bắt đầu ----
 function beginGame(resume){
- const d=resume?loadSave():null;if(!resume)clearSave();
- const typed=$('pname').value.trim();
+ const nm=cleanName($('pname').value);
+ if(!nm){$('nameErr').classList.remove('hidden');$('pname').classList.add('err');$('pname').focus();return;}
+ PKEY=nkey(nm);const d=resume?loadSave(PKEY):null;if(!resume)clearSave(PKEY);
  $('start').classList.add('hidden');['hud','mapWrap','topBtns'].forEach(id=>$(id).classList.remove('hidden'));if(!touchMode)$('hint').classList.remove('hidden');
- $('topBtns').style.top=(MH+28)+'px';started=true;
+ $('topBtns').style.top=(MH+28)+'px';started=true;$('userBtn').textContent='👤 '+nm+' ⇄';
  if(touchMode&&!isFS())toggleFS();
- if(d){resumeFrom(d);S.name=typed||S.name||'';
+ if(d){resumeFrom(d);S.name=nm;
   if(S.free){refreshHUD();$('stats').classList.remove('hidden');}
   else if(S.chang>=4){showEnd();}
   else{startChang(S.chang);const list=OBJ.filter(o=>o.ch===S.chang);
    if(list.every(o=>o.done)){S.busy=true;checkChang().finally(()=>{closeD();S.busy=false;saveGame();});}}
-  setTimeout(()=>toast('✓ Đã tải tiến trình đã lưu'),400);}
- else{S.name=typed;startChang(1);}
+  setTimeout(()=>toast('✓ Chào '+nm+'! Đã tải tiến trình của bạn'),400);}
+ else{S.name=nm;startChang(1);}
  saveGame();
  setTimeout(()=>{if(!touchMode)setTimeout(()=>$('hint').classList.add('hidden'),12000);},0);}
-$('startBtn').onclick=()=>beginGame(!!loadSave());
-$('newBtn').onclick=()=>beginGame(false);
+$('startBtn').onclick=()=>beginGame(!!loadSave(nkey($('pname').value)));
+$('newBtn').onclick=()=>{const b=$('newBtn');if(!b.dataset.armed){b.dataset.armed='1';b.textContent='Xóa tiến trình cũ? Bấm lần nữa';return;}beginGame(false);};
 setTimeout(boot,30);
 window.__game={S,OBJ,get player(){return player;},get near(){return near;}};
 })();

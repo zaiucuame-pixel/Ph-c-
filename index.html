@@ -197,7 +197,7 @@ body.cine #hud,body.cine #mapWrap,body.cine #topBtns,body.cine #guide,body.cine 
 <div id="flash"></div>
 <div id="phoneOv" class="hidden"><div class="phone"><div class="notch"></div><div class="pscreen">
  <div class="ptop"><span>📱 VietTravel</span><span>🔋 87%</span></div>
- <div class="pvid"><video id="vid" class="hidden" playsinline preload="metadata"></video><div id="slides"></div></div>
+ <div class="pvid" id="pvidBox"><video id="vid" class="hidden" playsinline preload="metadata"></video><div id="slides"></div></div>
  <div class="pinfo"><b>Khám phá Phố cổ Hà Nội</b><small>VietTravel · Cẩm nang cho du khách</small></div>
  <div class="pbar" id="pbarWrap"><i id="pprog"></i></div>
  <div class="pctl"><button id="pPlay">⏸</button><span id="ptime">0:00</span><button id="pTts" class="hidden">🔇 Giọng đọc</button><button id="pMute" class="hidden">🔈 Bật tiếng</button><button id="pSkip">Bỏ qua ⏭</button></div>
@@ -734,7 +734,7 @@ const KM={KeyW:'f',ArrowUp:'f',KeyS:'b',ArrowDown:'b',KeyA:'l',ArrowLeft:'l',Key
 const clearKeys=()=>{for(const k in keys)keys[k]=false;};
 addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input'))return;
  const c=e.code,a=KM[c];
- if(dlgOpen){if(c==='Enter'||c==='NumpadEnter'||c==='Space'){e.preventDefault();if(!e.repeat){const b=document.querySelector('#dcard .go:not(.sec)');if(b)b.click();}}return;}
+ if(dlgOpen){if(c==='Enter'||c==='NumpadEnter'||c==='Space'){e.preventDefault();if(!e.repeat){const b=document.querySelector('#dcard .btns .go:not(.sec)');if(b)b.click();}}return;}
  if(a){keys[a]=true;e.preventDefault();}
  if(c==='Space')e.preventDefault();
  if((c==='KeyE'||c==='Enter'||c==='NumpadEnter')&&!e.repeat&&near&&!S.busy)interact(near);});
@@ -809,9 +809,12 @@ function refreshHUD(){
  $('cardsBtn').textContent=`🎴 Thẻ ${S.cards.length}/6`;
  for(const o of OBJ){const act=isActive(o);o.marker.visible=act;o.beacon.visible=act;}
 }
+const NOTE_SLIDE={'🐉 Thăng Long – Kẻ Chợ':1,'🧵 Phố Hàng Đào':5,'💍 Phố Hàng Bạc':6,'⛵ Phố Hàng Buồm':7,'🏮 Phố Hàng Mã':8,'🏛️ Chợ Đồng Xuân & thời Pháp':9};
 $('notesBtn').onclick=()=>{if(S.busy)return;openD();
- dc.innerHTML=`<div class="q">📒 Sổ tay phố cổ (${S.notes.length} trang)</div>${S.notes.length?S.notes.map(n=>`<div class="vcard" style="max-width:none;margin:8px 0"><h3 style="margin-top:0">${n.t}</h3><p>${n.x}</p></div>`).join(''):'<div class="txt">Chưa có gì. Hãy trò chuyện với mọi người để ghi chép nhé!</div>'}<div class="btns"><button class="go">Đóng</button></div>`;
- dc.querySelector('.go').onclick=closeD;};
+ const vcard=`<div class="vcard" style="max-width:none;margin:8px 0;background:linear-gradient(135deg,#1d3557,#c1272d);color:#fff;border-color:#f2b705"><h3 style="margin-top:0">🎬 Video giới thiệu phố cổ</h3><p>Video bạn đã xem trên điện thoại ở đầu chuyến đi. Xem lại toàn bộ hoặc từng đoạn bên dưới.</p><button class="go" data-s="0">▶ Xem toàn bộ video</button></div>`;
+ dc.innerHTML=`<div class="q">📒 Sổ tay phố cổ (${S.notes.length} trang)</div>${vcard}${S.notes.length?S.notes.map(n=>`<div class="vcard" style="max-width:none;margin:8px 0"><h3 style="margin-top:0">${n.t}</h3><p>${n.x}</p>${NOTE_SLIDE[n.t]!=null?`<button class="go sec nvid" data-s="${NOTE_SLIDE[n.t]}" style="color:#1d3557;border-color:#1d3557;padding:6px 12px;font-size:13px">▶ Xem đoạn video này</button>`:''}</div>`).join(''):'<div class="txt">Chưa có trang nào. Hãy xem video và trò chuyện với mọi người nhé!</div>'}<div class="btns"><button class="go" id="nbClose">Đóng</button></div>`;
+ dc.querySelectorAll('[data-s]').forEach(b=>b.onclick=()=>watchVideo(+b.dataset.s));
+ $('nbClose').onclick=closeD;};
 $('cardsBtn').onclick=()=>{if(S.busy)return;const all=OBJ.filter(o=>o.card);openD();
  dc.innerHTML=`<div class="q">🎴 Bộ sưu tập Thẻ giá trị (${S.cards.length}/6)</div><div class="gal">${all.map(o=>S.cards.includes(o.id)?`<div class="mini"><span class="cat" style="background:${CATS[o.card.cat][1]};color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:800">${CATS[o.card.cat][0]}</span><b>${CATS[o.card.cat][2]} ${o.card.t}</b>${o.card.x}</div>`:`<div class="mini lock"><b>🔒 ${o.title}</b>Tìm và trả lời đúng để mở thẻ.</div>`).join('')}</div><div class="btns"><button class="go">Đóng</button></div>`;
  dc.querySelector('.go').onclick=closeD;};
@@ -1025,6 +1028,8 @@ async function boot(){
 /* ---------- VIDEO giới thiệu trên điện thoại ---------- */
 // Khi có file video thật: đặt vào thư mục video/ với tên gioi-thieu.mp4 -> game tự phát file đó.
 const VIDEO_SRC='video/gioi-thieu.mp4';
+// Hoặc nhúng video YouTube: điền mã video (phần sau watch?v=), ví dụ 'abc123XYZ'. Để trống nếu không dùng.
+const VIDEO_YT='';
 const SLIDES=[
  {e:'🏙️',bg:'linear-gradient(135deg,#1d3557,#457b9d)',t:'Chào mừng đến Hà Nội!',x:'Xin chào! Bạn sắp bước vào <b>Phố cổ Hà Nội</b>, khu buôn bán lâu đời nằm ở <b>phía Bắc Hồ Gươm</b>. Cùng xem phố cổ đã hình thành và phát triển thế nào nhé!'},
  {e:'🐉',y:'1010',bg:'linear-gradient(135deg,#7a1e1e,#c1272d)',t:'Thăng Long ra đời',x:'Năm <b>1010</b>, vua <b>Lý Thái Tổ</b> dời đô từ Hoa Lư về thành Đại La, đặt tên mới là <b>Thăng Long</b>, nghĩa là “rồng bay lên”.'},
@@ -1046,28 +1051,35 @@ function speak(html){if(!VP||!VP.tts)return;try{speechSynthesis.cancel();const u
 function probeVideo(){return new Promise(res=>{const v=$('vid');let done=false;const fin=ok=>{if(done)return;done=true;res(ok);};
  v.onloadedmetadata=()=>fin(true);v.onerror=()=>fin(false);setTimeout(()=>fin(false),3500);v.src=VIDEO_SRC;v.load();});}
 function addVideoNotes(){let n=0;for(const note of NOTES1)if(!S.notes.some(x=>x.t===note.t)){S.notes.push(note);n++;}if(n&&S.chang)refreshHUD();return n;}
-function playVideo(){return new Promise(async res=>{
+function keyPointsHTML(){return '<div class="pst">📌 Ý chính trong video</div>'+NOTES1.map(n=>`<div style="margin:8px 0"><b>${n.t}</b><br>${n.x}</div>`).join('');}
+function slideStart(i){let acc=0;for(let k=0;k<i&&k<SLIDES.length;k++)acc+=SLIDES[k].d;return acc;}
+function playVideo(start=0){return new Promise(async res=>{
  const ov=$('phoneOv'),ph=ov.querySelector('.phone');ov.classList.remove('hidden');ph.classList.remove('out');void ph.offsetWidth;
- VP={t:0,playing:true,real:false,tts:false,idx:-1,res,ended:false};
+ VP={t:slideStart(start),playing:true,real:false,mode:'slides',tts:false,idx:-1,res,ended:false};
  $('slides').innerHTML=SLIDES.map((s,i)=>`<div class="slide" data-i="${i}" style="background:${s.bg}"><div class="emo">${s.e}</div>${s.y?`<div class="yr">${s.y}</div>`:''}<div class="st">${s.t}</div></div>`).join('');
- $('psub').innerHTML='<i style="opacity:.7">Đang tải video…</i>';
- const real=await probeVideo();VP.real=real;const v=$('vid');
- if(real){$('slides').classList.add('hidden');v.classList.remove('hidden');$('pTts').classList.add('hidden');
-  $('psub').innerHTML='🎬 Đang phát video giới thiệu phố cổ.<br><br>Những ý chính sẽ được lưu vào <b>📒 Sổ tay</b> để bạn ôn lại.';
+ $('psub').innerHTML='<i style="opacity:.7">Đang tải video…</i>';['pbarWrap','pPlay','ptime'].forEach(id=>$(id).classList.remove('hidden'));
+ const v=$('vid');
+ if(VIDEO_YT&&!start){VP.mode='yt';v.classList.add('hidden');$('slides').classList.add('hidden');$('pTts').classList.add('hidden');['pbarWrap','pPlay','ptime'].forEach(id=>$(id).classList.add('hidden'));
+  const f=document.createElement('iframe');f.id='ytf';f.src='https://www.youtube-nocookie.com/embed/'+encodeURIComponent(VIDEO_YT)+'?autoplay=1&playsinline=1&rel=0&modestbranding=1';f.allow='autoplay; encrypted-media; picture-in-picture';f.allowFullscreen=true;f.style.cssText='position:absolute;inset:0;width:100%;height:100%;border:0';$('pvidBox').appendChild(f);
+  $('psub').innerHTML='<div style="font-size:13px;opacity:.8;margin-bottom:6px">Xem xong bấm <b>“Bỏ qua ⏭”</b> để tiếp tục. Không xem được video? <button class="go sec" id="ytAlt" style="padding:4px 10px;font-size:12px">Xem video hoạt hình</button></div>'+keyPointsHTML();
+  $('ytAlt').onclick=()=>{f.remove();VP.mode='slides';VP.t=0;VP.idx=-1;$('slides').classList.remove('hidden');['pbarWrap','pPlay','ptime'].forEach(id=>$(id).classList.remove('hidden'));$('pTts').classList.toggle('hidden',!('speechSynthesis' in window));};
+ }else if(!start&&await probeVideo()){VP.mode='mp4';VP.real=true;$('slides').classList.add('hidden');v.classList.remove('hidden');$('pTts').classList.add('hidden');
+  $('psub').innerHTML=keyPointsHTML();
   v.onended=()=>endVideo();v.currentTime=0;
   try{await v.play();}catch(e){v.muted=true;try{await v.play();}catch(_){} $('pMute').classList.remove('hidden');}
  }else{v.classList.add('hidden');v.removeAttribute('src');$('slides').classList.remove('hidden');
   $('pTts').classList.toggle('hidden',!('speechSynthesis' in window));$('pTts').textContent='🔇 Giọng đọc';}
  $('pPlay').textContent='⏸';VP.last=performance.now();const vp=VP;requestAnimationFrame(n=>vTick(n,vp));});}
 function vTick(now,vp){if(!vp||vp!==VP||VP.ended)return;const dt=(now-VP.last)/1000;VP.last=now;
- if(VP.real){const v=$('vid');const d=v.duration||1;$('pprog').style.width=(100*v.currentTime/d)+'%';$('ptime').textContent=fmtT(v.currentTime)+' / '+fmtT(d);}
+ if(VP.mode==='yt'){}
+ else if(VP.real){const v=$('vid');const d=v.duration||1;$('pprog').style.width=(100*v.currentTime/d)+'%';$('ptime').textContent=fmtT(v.currentTime)+' / '+fmtT(d);}
  else{if(VP.playing)VP.t+=dt;if(VP.t>=VTOTAL){endVideo();return;}
   let acc=0,i=0;for(;i<SLIDES.length;i++){if(VP.t<acc+SLIDES[i].d)break;acc+=SLIDES[i].d;}
   if(i!==VP.idx){VP.idx=i;document.querySelectorAll('#slides .slide').forEach(el=>el.classList.toggle('on',+el.dataset.i===i));$('psub').innerHTML=`<div class="pst">${SLIDES[i].t}</div>${SLIDES[i].x}`;$('psub').scrollTop=0;speak(SLIDES[i].x);}
   $('pprog').style.width=(100*VP.t/VTOTAL)+'%';$('ptime').textContent=fmtT(VP.t)+' / '+fmtT(VTOTAL);}
  requestAnimationFrame(n=>vTick(n,vp));}
 function endVideo(skipped){if(!VP||VP.ended)return;VP.ended=true;try{speechSynthesis.cancel();}catch(e){}
- const v=$('vid');try{v.pause();}catch(e){}
+ const v=$('vid');try{v.pause();}catch(e){}const yf=$('ytf');if(yf)setTimeout(()=>yf.remove(),450);
  const ph=$('phoneOv').querySelector('.phone');ph.classList.add('out');
  const r=VP.res;setTimeout(()=>{$('phoneOv').classList.add('hidden');const n=addVideoNotes();if(n)toast('📒 Kiến thức trong video đã được lưu vào Sổ tay');r(!!skipped);},430);}
 $('pPlay').onclick=()=>{if(!VP)return;if(VP.real){const v=$('vid');if(v.paused){v.play().catch(()=>{});$('pPlay').textContent='⏸';}else{v.pause();$('pPlay').textContent='▶';}}else{VP.playing=!VP.playing;$('pPlay').textContent=VP.playing?'⏸':'▶';if(!VP.playing)try{speechSynthesis.pause();}catch(e){}else try{speechSynthesis.resume();}catch(e){}}};
@@ -1075,7 +1087,8 @@ $('pSkip').onclick=()=>endVideo(true);
 $('pMute').onclick=()=>{const v=$('vid');v.muted=false;$('pMute').classList.add('hidden');};
 $('pTts').onclick=()=>{if(!VP)return;VP.tts=!VP.tts;$('pTts').textContent=VP.tts?'🔊 Giọng đọc':'🔇 Giọng đọc';if(VP.tts){if(!viVoice())toast('Máy chưa có giọng đọc tiếng Việt, sẽ dùng giọng mặc định');if(VP.idx>=0)speak(SLIDES[VP.idx].x);}else try{speechSynthesis.cancel();}catch(e){}};
 $('pbarWrap').onclick=e=>{if(!VP)return;const r=e.currentTarget.getBoundingClientRect(),k=clamp((e.clientX-r.left)/r.width,0,1);if(VP.real){const v=$('vid');if(v.duration)v.currentTime=k*v.duration;}else{VP.t=k*VTOTAL;VP.idx=-1;}};
-$('vidBtn').onclick=async()=>{if(S.busy||dlgOpen)return;S.busy=true;document.body.classList.add('cine');await playVideo();document.body.classList.remove('cine');S.busy=false;lastAct='?';};
+async function watchVideo(start=0){if(S.busy)return;if(dlgOpen)closeD();S.busy=true;document.body.classList.add('cine');await playVideo(start);document.body.classList.remove('cine');S.busy=false;lastAct='?';}
+$('vidBtn').onclick=()=>{if(!dlgOpen)watchVideo(0);};
 
 /* ---------- CẢNH MỞ ĐẦU (cinematic) ---------- */
 let cineCam=false,cineSkip=false,phoneMesh=null;

@@ -3,6 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#14213d">
 <title>Phiêu lưu Phố cổ Hà Nội 3D</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet">
@@ -101,7 +105,7 @@ body.touch #hint{display:none}
 #banner .s{font-size:clamp(14px,3vw,20px);font-weight:600;text-shadow:0 2px 8px rgba(0,0,0,.8);margin-top:6px}
 #banner.show{animation:bn 3.6s ease forwards}
 @keyframes bn{0%{opacity:0;transform:translate(-50%,-40%) scale(.9)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
-#toast{position:fixed;left:50%;top:58px;transform:translateX(-50%);z-index:16;padding:8px 16px;border-radius:12px;background:#2a9d8f;border:2px solid #fff;font-weight:700;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast{position:fixed;left:50%;top:58px;transform:translateX(-50%);z-index:16;padding:8px 16px;white-space:normal!important;max-width:90vw;text-align:center;border-radius:12px;background:#2a9d8f;border:2px solid #fff;font-weight:700;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 #toast.on{opacity:1}
 /* start + end */
 .over{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto;background:radial-gradient(circle at 30% 20%,#c1272d 0,#7a1e1e 30%,#1d3557 75%,#14213d 100%);touch-action:pan-y}
@@ -142,7 +146,7 @@ body.touch #hint{display:none}
 <div id="hud" class="panel hidden"><div class="hd"><div class="ch" id="chName"></div><span class="tg" id="chProg"></span></div><ul id="quests"></ul></div>
 <div id="guide" class="panel hidden"><span class="ar" id="gArrow">➤</span><span id="gText"></span></div>
 <div id="mapWrap" class="panel hidden"><canvas id="mini"></canvas></div>
-<div id="topBtns" class="hidden"><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
+<div id="topBtns" class="hidden"><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
 <div id="stats" class="panel hidden"><div style="font-weight:800;color:var(--gold);margin-bottom:2px">Chỉ số phố cổ</div>
  <div class="row"><span class="lb">🏛️ Bảo tồn</span><span class="bar"><i id="bB" style="background:#f2b705"></i></span><span class="v" id="vB">50</span></div>
  <div class="row"><span class="lb">🏠 Sinh kế</span><span class="bar"><i id="bS" style="background:#2a9d8f"></i></span><span class="v" id="vS">50</span></div>
@@ -165,7 +169,8 @@ body.touch #hint{display:none}
   <div><b>Chặng 3</b>Bảo tồn<br>“Trưởng ban quản lý”</div>
  </div>
  <input id="pname" maxlength="30" placeholder="Nhập tên của bạn (hoặc tên nhóm)">
- <br><button class="big" id="startBtn" disabled>Đang dựng phố…</button>
+ <br><button class="big" id="startBtn" disabled>Đang dựng phố…</button><button class="big hidden" id="newBtn" style="margin-left:8px;background:linear-gradient(180deg,#9ad1ff,#3a86ff);box-shadow:0 6px 0 #1d4f9c;color:#fff">Chơi mới</button>
+ <div id="saveInfo" class="note hidden" style="font-size:13px;opacity:.9"></div>
  <div id="loadErr" class="hidden">Không tải được thư viện 3D. Hãy kiểm tra kết nối mạng rồi tải lại trang.</div>
  <div class="ctl">📱 Điện thoại: cần điều khiển bên trái để đi, vuốt màn hình để xoay, bấm nút vàng để nói chuyện.<br>💻 Máy tính: WASD / mũi tên để đi, kéo chuột để xoay, phím E để nói chuyện.</div>
  <div class="note">Bản đồ đã được cách điệu và thu nhỏ; vị trí các phố, công trình chỉ mang tính tương đối. Các nhân vật là nhân vật hư cấu.</div>
@@ -776,7 +781,7 @@ async function interact(o){
   if(o.note&&ex&&ex.after.every(id=>id===o.id||OBJ.find(x=>x.id===id).done)){closeD();await info('🔓 Đã mở khóa bài đố!','Bạn đã nghe đủ chuyện của mọi người và có <b>'+S.notes.length+' trang Sổ tay</b>.<br><br>👉 Bấm <b>📒 Sổ tay</b> (góc phải) để ôn lại, rồi <b>quay về Bờ Hồ</b> làm bài đố của ông đồ nhé!','Đi thôi!');}
   o.done=true;closeD();refreshHUD();toast('✓ Hoàn thành: '+o.title);
   await checkChang();
- }finally{closeD();S.busy=false;}
+ }finally{closeD();S.busy=false;saveGame();}
 }
 async function checkChang(){
  if(S.free)return;
@@ -816,7 +821,7 @@ function ending(){const {B,S:s,D}=S.stats;
  if(D<40)return['🌙 Phố cổ lặng lẽ','Phố được giữ gìn nhưng ít người biết tới, kinh tế khó khăn. Bảo tồn cần đi cùng với <b>phát huy giá trị</b>.','Đại sứ Phố cổ'];
  return['🌱 Phố cổ đang chuyển mình','Phố cổ còn nhiều thử thách, nhưng đang đi đúng hướng. Hãy thử chơi lại để tìm cách cân bằng tốt hơn!','Đại sứ Phố cổ'];}
 function showEnd(){
- const e=ending();S.chang=4;
+ const e=ending();S.chang=4;setTimeout(saveGame,0);
  $('certBox').innerHTML=`<div style="font-size:30px">🏮🎖️🏮</div><h2>GIẤY CHỨNG NHẬN</h2><div style="font-size:14px">Danh hiệu <b>${e[2]}</b> được trao cho</div><div class="nm2">${S.name||'Nhà thám hiểm phố cổ'}</div>
  <div class="mets"><span class="met">Câu đúng ngay lần đầu <b>${S.firstTry}/${S.quizTotal}</b></span><span class="met">Thẻ giá trị <b>${S.cards.length}/6</b></span><span class="met">🔍 Câu hỏi thêm <b>${S.asked}</b></span><span class="met">Dòng thời gian <b>${S.timelineFirst?'✓':'↻'}</b></span></div>
  <div class="mets"><span class="met">🏛️ Bảo tồn <b>${S.stats.B}</b></span><span class="met">🏠 Sinh kế <b>${S.stats.S}</b></span><span class="met">🧳 Du lịch <b>${S.stats.D}</b></span></div>
@@ -824,8 +829,8 @@ function showEnd(){
  <div class="sum"><b>📌 Tổng kết dự án</b><br><b>1. Hình thành &amp; phát triển:</b> Kẻ Chợ phía Đông kinh thành Thăng Long (từ 1010) → phường nghề thành phố “Hàng” thời Lê → biến đổi thời Pháp (chợ Đồng Xuân 1889) → Di tích lịch sử quốc gia (2004).<br><b>2. Giá trị:</b> kiến trúc (nhà ống, đình, đền, cửa ô), lịch sử, văn hóa nghề, ẩm thực – nếp sống (phi vật thể), kinh tế – du lịch.<br><b>3. Bảo tồn:</b> giữ cảnh quan và chiều cao công trình, tu bổ đúng kiến trúc gốc, giãn dân, giữ nghề truyền thống, quản lý vỉa hè, phát triển du lịch bền vững.</div>
  <div class="btns" style="justify-content:center;flex-wrap:wrap"><button class="go sec" style="background:#1d3557" id="freeBtn">🗺️ Tiếp tục dạo phố</button><button class="go" id="againBtn">🔄 Chơi lại</button></div>`;
  $('end').classList.remove('hidden');endOpen=true;
- $('freeBtn').onclick=()=>{$('end').classList.add('hidden');endOpen=false;S.free=true;$('stats').classList.remove('hidden');refreshHUD();};
- $('againBtn').onclick=()=>location.reload();
+ $('freeBtn').onclick=()=>{$('end').classList.add('hidden');endOpen=false;S.free=true;$('stats').classList.remove('hidden');refreshHUD();saveGame();};
+ $('againBtn').onclick=()=>{clearSave();location.reload();};
 }
 
 /* ---------- minimap ---------- */
@@ -849,7 +854,7 @@ const expK=(k,dt)=>1-Math.exp(-k*dt);
 const wrapA=a=>{while(a>PI)a-=PI*2;while(a<-PI)a+=PI*2;return a;};
 const okPos=(x,z)=>!(inLake(x,z,.8)&&!onBridge(x,z)&&!onIsland(x,z));
 const WALK=8.5,RUN=14;
-let lastAct='',guideT=0,mapT=0,camInit=false;
+let lastAct='',guideT=0,mapT=0,saveT=0,camInit=false;
 function moveStep(dx,dz){const p=player.position;np.set(p.x+dx,0,p.z+dz);
  if(!okPos(np.x,np.z)){if(okPos(np.x,p.z))np.z=p.z;else if(okPos(p.x,np.z))np.x=p.x;else return;}
  resolve(np,.75);p.x=np.x;p.z=np.z;}
@@ -918,6 +923,7 @@ function update(dt,t){
 let pr=renderer.getPixelRatio(),fpsAcc=0,fpsN=0,fpsT=0;
 function loop(){requestAnimationFrame(loop);const raw=clock.getDelta(),dt=Math.min(raw,.05),t=clock.elapsedTime;update(dt,t);renderer.render(scene,camera);
  if(started&&t-mapT>.1){mapT=t;drawMini(t);}
+ if(started&&t-saveT>4){saveT=t;saveGame();}
  if(started){fpsAcc+=raw;fpsN++;if(t-fpsT>2.5){const avg=fpsAcc/fpsN;fpsAcc=0;fpsN=0;fpsT=t;if(avg>1/38&&pr>.75){pr=Math.max(.75,pr-.2);renderer.setPixelRatio(pr);resize();}}}}
 
 /* ---------- boot ---------- */
@@ -926,11 +932,46 @@ async function boot(){
  buildWorld();drawMapBase();updStats();
  camera.position.set(-30,8,68);camera.lookAt(-30,2,40);
  $('startBtn').disabled=false;$('startBtn').textContent='▶ Bắt đầu khám phá';
+ {const sv=loadSave();if(sv){$('startBtn').textContent='▶ Chơi tiếp';$('newBtn').classList.remove('hidden');if(sv.S.name)$('pname').value=sv.S.name;const ch=sv.S.chang>=4?'đã hoàn thành':'đang ở Chặng '+sv.S.chang;$('saveInfo').textContent='💾 Đã có tiến trình lưu ('+ch+'). Bấm “Chơi tiếp” để chơi tiếp hoặc “Chơi mới” để làm lại từ đầu.';$('saveInfo').classList.remove('hidden');}}
  loop();
 }
-$('startBtn').onclick=()=>{S.name=$('pname').value.trim();$('start').classList.add('hidden');['hud','mapWrap','topBtns'].forEach(id=>$(id).classList.remove('hidden'));if(!isTouch)$('hint').classList.remove('hidden');
- $('topBtns').style.top=(MH+28)+'px';started=true;startChang(1);
- setTimeout(()=>{if(!touchMode)setTimeout(()=>$('hint').classList.add('hidden'),12000);},0);};
+/* ---------- lưu tiến trình + toàn màn hình ---------- */
+const SAVE_KEY='phoco3d_save_v1';
+const VARMAP={tower:'tower',nhaco:'nhaco',viahe:'viahe',hangbac2:'hangbac',dibo:'dibo'};
+function saveGame(){if(!started||!player)return;try{localStorage.setItem(SAVE_KEY,JSON.stringify({v:1,S:{chang:S.chang,asked:S.asked,notes:S.notes,firstTry:S.firstTry,quizTotal:S.quizTotal,cards:S.cards,stats:S.stats,dec:S.dec,name:S.name,timelineFirst:S.timelineFirst,free:S.free},done:OBJ.filter(o=>o.done).map(o=>o.id),p:[player.position.x,player.position.z,player.rotation.y],yaw}));}catch(e){}}
+function loadSave(){try{const d=JSON.parse(localStorage.getItem(SAVE_KEY)||'null');return d&&d.v===1&&d.S?d:null;}catch(e){return null;}}
+function clearSave(){try{localStorage.removeItem(SAVE_KEY);}catch(e){}}
+function resumeFrom(d){Object.assign(S,d.S);for(const id of d.done){const o=OBJ.find(x=>x.id===id);if(o)o.done=true;}
+ for(const id in S.dec)if(VARMAP[id])applyVar(VARMAP[id],S.dec[id]);
+ if(d.p){player.position.set(d.p[0],0,d.p[1]);player.rotation.y=d.p[2];}yaw=d.yaw||0;camInit=false;updStats();}
+function fsFail(){toast(/iPhone|iPad|iPod/.test(navigator.userAgent)?'iPhone: bấm Chia sẻ → “Thêm vào MH chính” rồi mở từ đó để chơi toàn màn hình':'Trình duyệt chưa cho phép toàn màn hình ở đây');}
+function isFS(){return !!(document.fullscreenElement||document.webkitFullscreenElement);}
+function toggleFS(){const d=document,el=d.documentElement;
+ try{if(isFS()){(d.exitFullscreen||d.webkitExitFullscreen).call(d);return;}
+  const fn=el.requestFullscreen||el.webkitRequestFullscreen;if(!fn){fsFail();return;}
+  const r=fn.call(el);if(r&&r.catch)r.catch(fsFail);}catch(e){fsFail();}}
+function fsLabel(){$('fsBtn').textContent=isFS()?'⛶ Thoát toàn màn hình':'⛶ Toàn màn hình';setTimeout(resize,120);}
+document.addEventListener('fullscreenchange',fsLabel);document.addEventListener('webkitfullscreenchange',fsLabel);
+$('fsBtn').onclick=toggleFS;
+addEventListener('keydown',e=>{if(e.code==='KeyF'&&!dlgOpen&&!(e.target.matches&&e.target.matches('input'))&&started)toggleFS();});
+addEventListener('pagehide',saveGame);document.addEventListener('visibilitychange',()=>{if(document.hidden)saveGame();});
+function beginGame(resume){
+ const d=resume?loadSave():null;if(!resume)clearSave();
+ const typed=$('pname').value.trim();
+ $('start').classList.add('hidden');['hud','mapWrap','topBtns'].forEach(id=>$(id).classList.remove('hidden'));if(!touchMode)$('hint').classList.remove('hidden');
+ $('topBtns').style.top=(MH+28)+'px';started=true;
+ if(touchMode&&!isFS())toggleFS();
+ if(d){resumeFrom(d);S.name=typed||S.name||'';
+  if(S.free){refreshHUD();$('stats').classList.remove('hidden');}
+  else if(S.chang>=4){showEnd();}
+  else{startChang(S.chang);const list=OBJ.filter(o=>o.ch===S.chang);
+   if(list.every(o=>o.done)){S.busy=true;checkChang().finally(()=>{closeD();S.busy=false;saveGame();});}}
+  setTimeout(()=>toast('✓ Đã tải tiến trình đã lưu'),400);}
+ else{S.name=typed;startChang(1);}
+ saveGame();
+ setTimeout(()=>{if(!touchMode)setTimeout(()=>$('hint').classList.add('hidden'),12000);},0);}
+$('startBtn').onclick=()=>beginGame(!!loadSave());
+$('newBtn').onclick=()=>beginGame(false);
 setTimeout(boot,30);
 window.__game={S,OBJ,get player(){return player;},get near(){return near;}};
 })();

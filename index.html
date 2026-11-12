@@ -107,6 +107,36 @@ body.touch #hint{display:none}
 @keyframes bn{0%{opacity:0;transform:translate(-50%,-40%) scale(.9)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
 #toast{position:fixed;left:50%;top:58px;transform:translateX(-50%);z-index:16;padding:8px 16px;white-space:normal!important;max-width:90vw;text-align:center;border-radius:12px;background:#2a9d8f;border:2px solid #fff;font-weight:700;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
 #toast.on{opacity:1}
+#cine .cbar{position:fixed;left:0;right:0;height:10vh;background:#000;z-index:25}
+#cineCap{position:fixed;left:50%;bottom:12vh;transform:translateX(-50%);z-index:26;font-size:clamp(15px,2.6vw,22px);font-weight:700;text-align:center;width:90vw;text-shadow:0 2px 10px #000,0 0 3px #000;opacity:0;transition:opacity .4s;line-height:1.45}
+#cineSkip{position:fixed;right:14px;top:calc(10vh + 10px);z-index:27;background:rgba(0,0,0,.55);color:#fff;border:2px solid #fff;border-radius:20px;padding:8px 16px;font-weight:800;font-size:14px}
+body.cine #hud,body.cine #mapWrap,body.cine #topBtns,body.cine #guide,body.cine #act,body.cine #joy,body.cine #joyZone,body.cine #stats,body.cine #hint{display:none!important}
+#flash{position:fixed;inset:0;background:#fff;z-index:28;opacity:0;pointer-events:none;transition:opacity .3s}
+#phoneOv{position:fixed;inset:0;z-index:29;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle,#1d3557,#050a18)}
+.phone{height:min(94vh,880px);aspect-ratio:9/19;max-width:96vw;background:#0b0b0b;border-radius:44px;padding:11px;box-shadow:0 0 0 3px #3a3a3a,0 24px 70px rgba(0,0,0,.7);position:relative;animation:phIn .65s cubic-bezier(.2,.9,.3,1.15)}
+@keyframes phIn{from{transform:scale(.18);opacity:0}}
+.phone.out{animation:phOut .43s forwards}@keyframes phOut{to{transform:scale(.18);opacity:0}}
+.notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:32%;height:22px;background:#0b0b0b;border-radius:0 0 14px 14px;z-index:2}
+.pscreen{width:100%;height:100%;border-radius:34px;overflow:hidden;background:#0f1b33;display:flex;flex-direction:column}
+.ptop{padding:30px 16px 8px;font-size:12px;opacity:.85;display:flex;justify-content:space-between;font-weight:600}
+.pvid{position:relative;width:100%;aspect-ratio:16/9;background:#000;overflow:hidden;flex:none}
+.pvid video{width:100%;height:100%;object-fit:contain;display:block;background:#000}
+#slides{position:absolute;inset:0}
+.slide{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .7s}
+.slide.on{opacity:1}
+.slide .emo{font-size:clamp(46px,9vh,86px);animation:kb 7s ease-in-out infinite alternate;filter:drop-shadow(0 6px 10px rgba(0,0,0,.35))}
+@keyframes kb{from{transform:scale(1) translate(-6%,3%)}to{transform:scale(1.22) translate(6%,-3%)}}
+.slide .st{position:absolute;left:0;right:0;bottom:0;padding:22px 12px 8px;background:linear-gradient(transparent,rgba(0,0,0,.78));font-weight:800;font-size:15px}
+.slide .yr{position:absolute;top:8px;left:8px;background:#f2b705;color:#3b2600;font-weight:800;border-radius:8px;padding:2px 9px;font-size:13px}
+.pinfo{padding:10px 14px 2px}.pinfo b{display:block;font-size:15px}.pinfo small{opacity:.7;font-size:12px}
+.pbar{height:16px;margin:2px 14px;display:flex;align-items:center;cursor:pointer;position:relative}
+.pbar::before{content:"";position:absolute;left:0;right:0;height:5px;background:rgba(255,255,255,.22);border-radius:4px}
+.pbar i{position:relative;display:block;height:5px;width:0;background:#e63946;border-radius:4px}
+.pctl{display:flex;gap:6px;align-items:center;padding:2px 12px;font-size:12px;flex-wrap:wrap}
+.pctl button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:16px;padding:6px 11px;font-weight:700;font-size:12.5px}
+#pSkip{margin-left:auto;background:#f2b705;color:#3b2600;border:none}
+.psub{flex:1;overflow:auto;margin:10px 12px 16px;padding:12px 13px;background:rgba(255,255,255,.07);border-radius:14px;font-size:15px;line-height:1.6;touch-action:pan-y}
+.psub b{color:#ffd166}.psub .pst{font-weight:800;font-size:16px;color:#fff;margin-bottom:4px}
 /* start + end */
 .over{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto;background:radial-gradient(circle at 30% 20%,#c1272d 0,#7a1e1e 30%,#1d3557 75%,#14213d 100%);touch-action:pan-y}
 .sbox{width:min(600px,100%);text-align:center;padding:22px 18px;background:rgba(20,33,61,.75);border:3px solid var(--gold);border-radius:22px;box-shadow:0 14px 40px rgba(0,0,0,.5)}
@@ -152,7 +182,7 @@ body.touch #hint{display:none}
 <div id="hud" class="panel hidden"><div class="hd"><div class="ch" id="chName"></div><span class="tg" id="chProg"></span></div><ul id="quests"></ul></div>
 <div id="guide" class="panel hidden"><span class="ar" id="gArrow">➤</span><span id="gText"></span></div>
 <div id="mapWrap" class="panel hidden"><canvas id="mini"></canvas></div>
-<div id="topBtns" class="hidden"><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="nightBtn">🌙 Ban đêm</button><button class="rbtn" id="userBtn">👤 ⇄</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
+<div id="topBtns" class="hidden"><button class="rbtn" id="vidBtn">📱 Video</button><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="nightBtn">🌙 Ban đêm</button><button class="rbtn" id="userBtn">👤 ⇄</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
 <div id="stats" class="panel hidden"><div style="font-weight:800;color:var(--gold);margin-bottom:2px">Chỉ số phố cổ</div>
  <div class="row"><span class="lb">🏛️ Bảo tồn</span><span class="bar"><i id="bB" style="background:#f2b705"></i></span><span class="v" id="vB">50</span></div>
  <div class="row"><span class="lb">🏠 Sinh kế</span><span class="bar"><i id="bS" style="background:#2a9d8f"></i></span><span class="v" id="vS">50</span></div>
@@ -163,12 +193,22 @@ body.touch #hint{display:none}
 <div id="hint" class="hidden">WASD / mũi tên: đi · Shift: chạy · Kéo chuột: xoay camera · Lăn chuột: zoom · E: nói chuyện · N: ngày/đêm · F: toàn màn hình</div>
 <div id="banner"><div class="t" id="bnT"></div><div class="s" id="bnS"></div></div>
 <div id="toast"></div>
+<div id="cine" class="hidden"><div class="cbar" style="top:0"></div><div class="cbar" style="bottom:0"></div><div id="cineCap"></div><button id="cineSkip">Bỏ qua ⏭</button></div>
+<div id="flash"></div>
+<div id="phoneOv" class="hidden"><div class="phone"><div class="notch"></div><div class="pscreen">
+ <div class="ptop"><span>📱 VietTravel</span><span>🔋 87%</span></div>
+ <div class="pvid"><video id="vid" class="hidden" playsinline preload="metadata"></video><div id="slides"></div></div>
+ <div class="pinfo"><b>Khám phá Phố cổ Hà Nội</b><small>VietTravel · Cẩm nang cho du khách</small></div>
+ <div class="pbar" id="pbarWrap"><i id="pprog"></i></div>
+ <div class="pctl"><button id="pPlay">⏸</button><span id="ptime">0:00</span><button id="pTts" class="hidden">🔇 Giọng đọc</button><button id="pMute" class="hidden">🔈 Bật tiếng</button><button id="pSkip">Bỏ qua ⏭</button></div>
+ <div class="psub" id="psub"></div>
+</div></div></div>
 <div id="dlg" class="hidden"><div class="dcard" id="dcard"></div></div>
 
 <div id="start" class="over"><div class="sbox">
  <div class="lant">🏮🏮🏮</div>
  <h1>Phiêu lưu Phố cổ Hà Nội</h1>
- <div class="sub">Một thế giới 3D để bạn tự do dạo quanh <b>36 phố phường</b>, gặp người dân, giải mã tên phố và tự tay quyết định tương lai của phố cổ.</div>
+ <div class="sub">Bạn vào vai một <b>du khách nước ngoài</b> lần đầu đến Hà Nội. Xem video giới thiệu trên điện thoại, rồi tự do dạo quanh <b>36 phố phường</b>, trò chuyện với người dân, giải đố và tự tay quyết định tương lai của phố cổ.</div>
  <div class="chs">
   <div><b>Chặng 1</b>Hình thành &amp; phát triển<br>“Thăng Long – Kẻ Chợ”</div>
   <div><b>Chặng 2</b>Giá trị phố cổ<br>“Sưu tầm thẻ giá trị”</div>
@@ -494,94 +534,78 @@ const OBJ=[];
 function obj(o){OBJ.push(o);return o;}
 const C1='Thăng Long – Kẻ Chợ',C2='Kho báu giá trị',C3='Trưởng ban quản lý';
 // ===== Chặng 1 =====
-// 6 người "dạy" kiến thức (ghi vào Sổ tay) -> ông đồ ra đề kiểm tra
+// Kiến thức nằm trong VIDEO mở đầu (+ Sổ tay). Nhân vật: chào hỏi ngắn + Hỏi thêm + đố. Ông đồ ra bài đố cuối.
 const Q=(q,a)=>[q,a];
 const T1=['ongdo','hangdao','hangbac','hangbuom','hangma','dongxuan'];
-obj({id:'ongdo',ch:1,pos:[-26,50],title:'Nghe ông đồ kể chuyện (Bờ Hồ)',who:'Ông đồ Thăng Long',em:'👴',look:{shirt:'#6d4c41',pants:'#efe6d2',hat:'khan',beard:true,dress:true},
- note:{t:'👴 Ông đồ: Thăng Long – Kẻ Chợ',x:'• Năm <b>1010</b>, vua <b>Lý Thái Tổ</b> dời đô về Đại La, đặt tên <b>Thăng Long</b>.<br>• Kinh đô gồm <b>“thành”</b> (vua quan) và <b>“thị”</b> (dân buôn bán, làm nghề) ở phía Đông, gần sông Hồng, sông Tô Lịch.<br>• Thợ từ <b>làng nghề</b> lên lập <b>phường</b>, mỗi phường thành một phố chuyên một mặt hàng → tên <b>“Hàng + mặt hàng”</b>.<br>• Thế kỷ XVII–XVIII (Lê – Trịnh) khu buôn bán phồn thịnh, gọi là <b>Kẻ Chợ</b>: “Thứ nhất Kinh Kỳ, thứ nhì Phố Hiến”.<br>• “36 phố phường”: số 36 là <b>ước lệ</b>, thực tế nhiều hơn.'},
+const NOTES1=[
+ {t:'🐉 Thăng Long – Kẻ Chợ',x:'• Năm <b>1010</b>, vua <b>Lý Thái Tổ</b> dời đô về Đại La, đặt tên <b>Thăng Long</b>.<br>• Kinh đô gồm <b>“thành”</b> (vua quan) và <b>“thị”</b> (dân buôn bán, làm nghề) ở phía Đông, gần sông Hồng, sông Tô Lịch.<br>• Thợ từ <b>làng nghề</b> lên lập <b>phường</b> → <b>phố nghề</b>; tên phố là <b>“Hàng + mặt hàng”</b>.<br>• Thế kỷ XVII–XVIII (Lê – Trịnh) phồn thịnh, gọi là <b>Kẻ Chợ</b>: “Thứ nhất Kinh Kỳ, thứ nhì Phố Hiến”.<br>• “36 phố phường”: số 36 là <b>ước lệ</b>.'},
+ {t:'🧵 Phố Hàng Đào',x:'• Phố <b>nhuộm vải, buôn tơ lụa</b>; thợ nhuộm từ làng <b>Đan Loan</b> (Hải Dương).<br>• Chữ “đào” có thể gợi <b>màu hồng đào</b> của vải nhuộm.'},
+ {t:'💍 Phố Hàng Bạc',x:'• Nghề <b>kim hoàn</b>, <b>đúc bạc nén</b>, <b>đổi bạc</b>.<br>• Thợ từ làng <b>Định Công</b> lên lập phường, dựng <b>đình Kim Ngân</b> thờ tổ nghề.'},
+ {t:'⛵ Phố Hàng Buồm',x:'• Xưa gần <b>bến sông</b>, nhiều nhà <b>bán buồm</b>; nghề mất nhưng <b>tên phố vẫn giữ</b>.<br>• <b>Hội quán Quảng Đông</b> của thương nhân người Hoa → nơi <b>giao thương</b>.'},
+ {t:'🏮 Phố Hàng Mã',x:'• Tên từ đồ <b>vàng mã</b> (thờ cúng).<br>• Nay nổi tiếng <b>đèn lồng, đồ chơi Trung thu</b> → nghề cũ biết <b>thích nghi</b>.'},
+ {t:'🏛️ Chợ Đồng Xuân & thời Pháp',x:'• Năm <b>1889</b>, người Pháp lấp hồ, sông Tô Lịch, lập <b>chợ Đồng Xuân</b>.<br>• Thời Pháp: mở đường, nhiều nhà có <b>mặt tiền kiểu Pháp</b> xen nhà truyền thống.<br>• Năm <b>2004</b>: khu phố cổ thành <b>Di tích lịch sử quốc gia</b>.'}
+];
+obj({id:'ongdo',ch:1,pos:[-26,50],title:'Gặp ông đồ ở Bờ Hồ',who:'Ông đồ Thăng Long',em:'👴',look:{shirt:'#6d4c41',pants:'#efe6d2',hat:'khan',beard:true,dress:true},
  run:async o=>{
-  await say(o,'À, có khách đến thăm! Lại đây ngồi với ta một lát. Ta là ông đồ, bao năm nay ngồi viết chữ bên Bờ Hồ, xem phố phường đổi thay qua từng mùa.');
-  await say(o,'Cháu muốn tìm hiểu phố cổ à? Thế này nhé: ta và những người dân trong phố sẽ <b>kể cho cháu nghe</b>. Mỗi điều quan trọng sẽ được ghi vào <b>📒 Sổ tay</b> của cháu. Nghe đủ rồi thì quay về đây, ta sẽ <b>đố</b> cháu!');
-  await say(o,'Chuyện bắt đầu từ năm <b>1010</b>, khi vua <b>Lý Thái Tổ</b> dời đô từ Hoa Lư về thành Đại La và đặt tên mới là <b>Thăng Long</b>, nghĩa là “rồng bay lên”.');
-  await say(o,'Kinh đô có hai phần: <b>“thành”</b> là nơi vua quan ở và làm việc, còn <b>“thị”</b> là nơi dân buôn bán, làm nghề. Phần “thị” nằm ở <b>phía Đông</b> kinh thành, gần <b>sông Hồng</b> và <b>sông Tô Lịch</b>, thuyền bè ra vào tấp nập.');
-  await say(o,'Thợ thủ công từ các <b>làng nghề</b> quanh vùng kéo về đây làm ăn. Người cùng nghề, cùng quê ở gần nhau, lập thành <b>phường</b>. Mỗi phường dần thành một con phố chuyên bán một thứ hàng, nên tên phố là <b>“Hàng + tên mặt hàng”</b>: Hàng Bạc bán bạc, Hàng Đường bán đường, Hàng Muối bán muối...');
-  await say(o,'Đến thế kỷ XVII–XVIII, thời Lê – Trịnh, khu buôn bán này phồn thịnh nhất. Dân gian gọi là <b>Kẻ Chợ</b>, và có câu <b>“Thứ nhất Kinh Kỳ, thứ nhì Phố Hiến”</b>.');
-  await say(o,'Người ta hay nói <b>“Hà Nội 36 phố phường”</b>. Nhưng con số <b>36 chỉ là ước lệ</b>, ý nói “rất nhiều”, chứ thực tế số phố còn nhiều hơn thế. Ca dao xưa có câu: <i>“Rủ nhau chơi khắp Long Thành, Ba mươi sáu phố rành rành chẳng sai”</i>.');
+  await say(o,'Ô, một vị khách phương xa! Chào cháu, chào mừng cháu đến Hà Nội. Ta là ông đồ, ngồi viết chữ bên Bờ Hồ đã bao năm rồi.');
+  await say(o,'Cháu vừa xem video giới thiệu phố cổ trên điện thoại à? Hay lắm! Thế để ta xem cháu nhớ được gì nào. Quên thì mở <b>📒 Sổ tay</b> hoặc <b>📱 xem lại video</b> nhé.');
   await ask(o,[
-   Q('Vì sao lại gọi là “Kẻ Chợ” hả ông?','Vì nơi đây là chốn họp chợ, hội tụ đủ các nghề, là chợ lớn nhất nước thời ấy. Thương nhân và giáo sĩ phương Tây đến ở thế kỷ XVII còn phiên âm chữ “Kẻ Chợ” thành <b>“Cachao”</b>, “Kecio”... trong sách vở của họ đấy!'),
-   Q('Ông đồ là người làm nghề gì ạ?','Ông đồ là người biết chữ Hán – Nôm, dạy học và viết câu đối, chữ thư pháp. Ngày Tết, người Hà Nội hay ra xin chữ ông đồ như <b>“Phúc”, “Lộc”, “Thọ”</b> để cầu may.'),
-   Q('Phố cổ nằm ở đâu so với Hồ Gươm ạ?','Phố cổ nằm ở <b>phía Bắc Hồ Gươm</b>, kéo dài về phía sông Hồng. Cháu cứ đi thẳng lên phía trước là vào phố Hàng Đào.')]);
-  await say(o,'Giờ cháu đi gặp những người dân trong phố nhé: <b>bà hàng vải ở Hàng Đào, bác thợ bạc ở Hàng Bạc, ông lái buôn ở Hàng Buồm, chị bán đèn ở Hàng Mã</b> và <b>cô tiểu thương ở chợ Đồng Xuân</b>.<br><br>💡 Đi theo <b>mũi tên vàng</b> và <b>cột sáng</b>. Nghe kỹ nhé, lát ta đố đấy!');
+   Q('Ông đồ là người làm nghề gì ạ?','Ông đồ là người biết chữ Hán – Nôm, dạy học và viết câu đối, chữ thư pháp. Ngày Tết, người Hà Nội hay ra xin chữ như <b>“Phúc”, “Lộc”, “Thọ”</b> để cầu may.'),
+   Q('Người phương Tây xưa gọi Thăng Long là gì ạ?','Thương nhân, giáo sĩ phương Tây thế kỷ XVII phiên âm chữ “Kẻ Chợ” thành <b>“Cachao”</b>, “Kecio”... trong sách vở của họ.'),
+   Q('Phố cổ nằm ở đâu so với Hồ Gươm ạ?','Phố cổ ở <b>phía Bắc Hồ Gươm</b>, kéo dài về phía sông Hồng. Cứ đi thẳng lên là vào phố Hàng Đào.')]);
+  await quiz(o,{q:'Năm 1010, ai dời đô về Thăng Long?',o:['Lý Thái Tổ','Lê Lợi','Trần Hưng Đạo','Quang Trung'],x:'Vua <b>Lý Thái Tổ</b> dời đô từ Hoa Lư về Đại La, đặt tên là Thăng Long. Đây là mốc khởi đầu cho khu buôn bán Kẻ Chợ.'});
+  await quiz(o,{q:'Các phố trong phố cổ thường có tên bắt đầu bằng chữ “Hàng” vì sao?',o:['Mỗi phố xưa chuyên làm hoặc bán một loại hàng','Vì phố được xếp thành hàng thẳng','Vì vua đặt tên theo thứ tự hàng','Vì người dân thích chữ “Hàng”'],x:'Tên phố là “tấm bia” ghi lại nghề xưa: Hàng Bạc bán bạc, Hàng Đường bán đường, Hàng Muối bán muối...'});
+  await say(o,'Giỏi lắm! Giờ cháu đi thăm phố: <b>Hàng Đào, Hàng Bạc, Hàng Buồm, Hàng Mã</b> và <b>chợ Đồng Xuân</b>. Mỗi nơi có người đố cháu đấy. Xong hết thì quay về đây làm <b>bài đố cuối</b> của ta nhé!<br><br>💡 Đi theo <b>mũi tên vàng</b> và <b>cột sáng</b>.');
  }});
-obj({id:'hangdao',ch:1,pos:[-23.8,22],title:'Nghe bà hàng vải (Hàng Đào)',who:'Bà hàng vải',em:'👵',look:{shirt:'#d81b60',hat:'non',dress:true},
- note:{t:'👵 Phố Hàng Đào',x:'• Xưa là phố <b>nhuộm vải và buôn tơ lụa</b> sầm uất.<br>• Nhiều thợ nhuộm từ làng <b>Đan Loan</b> (Hải Dương) lên đây làm nghề: cả làng nghề “chuyển” lên phố.<br>• Có cách giải thích chữ “đào” gợi <b>màu hồng đào</b> của vải nhuộm.<br>• Nay bán quần áo; từ 2004, tuyến Hàng Đào – Đồng Xuân là <b>phố đi bộ đầu tiên</b> của Hà Nội.'},
+obj({id:'hangdao',ch:1,pos:[-23.8,22],title:'Gặp bà hàng vải (Hàng Đào)',who:'Bà hàng vải',em:'👵',look:{shirt:'#d81b60',hat:'non',dress:true},
  run:async o=>{
-  await say(o,'Ơ kìa, cháu ở đâu đến thế? Vào đây xem vải với bà! Lụa này mềm lắm, sờ thử xem.');
-  await say(o,'Bà bán vải ở phố này đã mấy chục năm rồi. Mẹ bà, bà ngoại bà cũng buôn vải ở đây. Ngày xưa phố <b>Hàng Đào</b> là nơi <b>nhuộm vải và buôn tơ lụa</b> sầm uất bậc nhất kinh thành.');
-  await say(o,'Nhiều người thợ nhuộm từ làng <b>Đan Loan</b> (Hải Dương) lên đây, vừa nhuộm vừa buôn. Cả một làng nghề “chuyển” lên phố, mang theo bí quyết nhuộm màu của quê mình. Có người giải thích chữ <b>“đào”</b> là gợi <b>màu hồng đào</b> của vải nhuộm đấy.');
-  await say(o,'Bây giờ phố bán chủ yếu quần áo, giày dép. Từ năm <b>2004</b>, đoạn Hàng Đào – Đồng Xuân còn trở thành <b>phố đi bộ đầu tiên</b> của Hà Nội, tối cuối tuần đông vui lắm.');
+  await say(o,'Ơ, cháu là khách Tây à? Nói tiếng Việt giỏi thế! Vào đây xem vải với bà, lụa này mềm lắm. Mà cháu có biết phố của bà ngày xưa làm nghề gì không?');
   await ask(o,[
    Q('Trên phố có di tích nào không bà?','Có chứ! Nhà số <b>38 Hàng Đào</b> vốn là <b>đình Đồng Lạc</b>, dựng từ thời Lê. Năm 2004 nơi này được xếp hạng di tích lịch sử – văn hóa cấp quốc gia.'),
-   Q('Ngày xưa khách mua vải từ đâu đến ạ?','Từ khắp các nơi! Người trong kinh thành mua may áo, còn lái buôn các tỉnh về mua buôn rồi mang đi bán lại. Nhờ vậy phố lúc nào cũng tấp nập.')]);
-  await say(o,'Bà kể thế là đủ rồi, cháu nhớ ghi lại nhé. Đi tiếp đi, ghé <b>Hàng Bạc</b> nghe tiếng búa leng keng!');}});
-obj({id:'hangbac',ch:1,pos:[30,-6],title:'Nghe bác thợ bạc (Hàng Bạc)',who:'Bác thợ bạc',em:'👨‍🔧',look:{shirt:'#90a4ae',pants:'#37474f'},
- note:{t:'👨‍🔧 Phố Hàng Bạc',x:'• Nghề <b>kim hoàn</b> (làm đồ vàng bạc), <b>đúc bạc nén</b> và <b>đổi bạc</b>.<br>• Thợ từ các làng kim hoàn như <b>Định Công</b> lên lập phường, dựng <b>đình Kim Ngân</b> thờ tổ nghề.<br>• Con đường hình thành phố cổ: <b>làng nghề → phường nghề → phố nghề</b>, vì kinh đô đông khách, nhu cầu lớn.'},
+   Q('Bây giờ Hàng Đào bán gì ạ?','Giờ chủ yếu là quần áo, giày dép. Tối cuối tuần, đoạn Hàng Đào – Đồng Xuân thành <b>phố đi bộ, chợ đêm</b>; từ năm 2004 đây là tuyến phố đi bộ đầu tiên của Hà Nội.')]);
+  await quiz(o,{q:'Tên phố Hàng Đào gắn với nghề gì?',o:['Nhuộm vải và buôn bán tơ lụa','Trồng và bán hoa đào','Đóng thuyền','Làm đồ bạc'],x:'Thợ nhuộm từ làng <b>Đan Loan</b> (Hải Dương) lên đây <b>nhuộm vải</b> và buôn tơ lụa.'});
+  await say(o,'Đúng rồi! Cháu học bài kỹ đấy. Đi tiếp đi, ghé <b>Hàng Bạc</b> nghe tiếng búa leng keng nhé.');}});
+obj({id:'hangbac',ch:1,pos:[30,-6],title:'Gặp bác thợ bạc (Hàng Bạc)',who:'Bác thợ bạc',em:'👨‍🔧',look:{shirt:'#90a4ae',pants:'#37474f'},
  run:async o=>{
-  await say(o,'<i>Cốc... cốc... leng keng...</i> À, chào cháu! Đợi bác gõ nốt cái nhẫn này đã. Đấy, xong rồi, sáng bóng chưa?');
-  await say(o,'Nghề của bác là <b>kim hoàn</b>, tức làm đồ vàng bạc. Phố <b>Hàng Bạc</b> có nghề từ mấy trăm năm trước. Ngày xưa ở đây còn <b>đúc bạc nén</b> (bạc đúc thành thỏi dùng như tiền) và <b>đổi bạc</b>, nên phố lúc nào cũng tấp nập.');
-  await say(o,'Các cụ tổ nghề từ những làng kim hoàn quanh Thăng Long, như làng <b>Định Công</b>, lên đây lập phường. Họ dựng cả <b>đình Kim Ngân</b> ngay trên phố để thờ tổ nghề.');
-  await say(o,'Vì sao thợ bỏ làng lên phố? Vì kinh đô đông người, có vua quan, nhà giàu, thương nhân, nên <b>cần nhiều hàng hóa</b>. Lên phố thì gần khách, bán được giá. Thế là có con đường: <b>làng nghề → phường nghề → phố nghề</b>. Cả phố cổ hình thành theo cách ấy đấy, cháu nhớ nhé!');
+  await say(o,'<i>Cốc... cốc... leng keng...</i> Hello! À, cháu nói được tiếng Việt à, tốt quá! Đợi bác gõ nốt cái nhẫn này. Đấy, sáng bóng chưa? Đố cháu biết phố này làm nghề gì?');
   await ask(o,[
-   Q('Làm một chiếc nhẫn bạc khó không bác?','Khó chứ! Phải nấu chảy bạc, kéo sợi, uốn, hàn, rồi <b>chạm khắc</b> hoa văn, đánh bóng. Ngày xưa nghề này truyền trong nhà, <b>cha truyền con nối</b>, học mấy năm mới thạo tay.'),
-   Q('Đình Kim Ngân ở đâu ạ?','Ngay trên phố này thôi, ở số <b>42 Hàng Bạc</b>. Sang chặng sau cháu sẽ ghé thăm đình đấy.')]);
-  await say(o,'Cầm lấy, bác tặng cháu lời chúc: <i>“học hay, chơi giỏi”</i>. Ra <b>Hàng Buồm</b> hỏi ông lái buôn xem sao phố ấy tên lạ thế nhé.');}});
-obj({id:'hangbuom',ch:1,pos:[0,-46],title:'Nghe ông lái buôn (Hàng Buồm)',who:'Ông lái buôn',em:'🧔',look:{shirt:'#1e88e5',hat:'non'},
- note:{t:'🧔 Phố Hàng Buồm',x:'• Xưa gần <b>bến sông</b>, thuyền buôn cập bến nên nhiều nhà <b>bán buồm</b> và đồ đi thuyền.<br>• Sông bị lấp, nghề bán buồm mất nhưng <b>tên phố vẫn giữ</b> như dấu vết lịch sử.<br>• Có nhiều thương nhân người Hoa; <b>Hội quán Quảng Đông (22 Hàng Buồm)</b> lập khoảng 400 năm trước → Kẻ Chợ là nơi <b>giao thương</b> của nhiều nơi.'},
+   Q('Làm một chiếc nhẫn bạc khó không bác?','Khó chứ! Phải nấu chảy bạc, kéo sợi, uốn, hàn, rồi <b>chạm khắc</b> hoa văn, đánh bóng. Nghề này xưa <b>cha truyền con nối</b>, học mấy năm mới thạo tay.'),
+   Q('Vì sao thợ bỏ làng lên phố làm ạ?','Vì kinh đô đông người, có vua quan, nhà giàu, thương nhân nên <b>cần nhiều hàng</b>. Lên phố gần khách, bán được giá: <b>làng nghề → phường nghề → phố nghề</b>.')]);
+  await quiz(o,{q:'Phố Hàng Bạc xưa nổi tiếng với nghề gì?',o:['Chế tác vàng bạc (kim hoàn), đúc bạc nén và đổi bạc','Bán buồm cho thuyền','Dệt chiếu','Bán thuốc bắc'],x:'Thợ kim hoàn từ các làng như <b>Định Công</b> lên lập phường và dựng <b>đình Kim Ngân</b> thờ tổ nghề.'});
+  await say(o,'Chuẩn! Bác tặng cháu lời chúc: <i>“chuyến đi vui vẻ”</i>. Ra <b>Hàng Buồm</b> gặp ông lái buôn nhé.');}});
+obj({id:'hangbuom',ch:1,pos:[0,-46],title:'Gặp ông lái buôn (Hàng Buồm)',who:'Ông lái buôn',em:'🧔',look:{shirt:'#1e88e5',hat:'non'},
  run:async o=>{
-  await say(o,'Hô hô, chào cậu bé! Ta là lái buôn, cả đời đi thuyền ngược xuôi sông Hồng, mang hàng từ các tỉnh về kinh thành bán.');
-  await say(o,'Ngày xưa, khu này ở gần <b>bến sông</b>. Thuyền buôn cập bến, chở gạo, muối, vải, gốm... vào tận phố. Thuyền thì phải có cánh buồm, mà buồm cũ, rách thì phải mua mới. Thế nên phố này có rất nhiều nhà <b>bán buồm</b> và đồ đi thuyền, gọi là <b>Hàng Buồm</b>.');
-  await say(o,'Về sau sông bị lấp, thuyền không vào nữa, nghề bán buồm cũng mất. Nhưng <b>tên phố vẫn được giữ lại</b>, như một dấu vết lịch sử. Nhiều phố Hàng ngày nay bán thứ khác hẳn tên phố đấy.');
-  await say(o,'Khu này xưa còn có nhiều <b>thương nhân người Hoa</b>. Ngay đầu phố có <b>Hội quán Quảng Đông (số 22 Hàng Buồm)</b>, do cộng đồng người gốc Quảng Đông lập từ khoảng <b>400 năm trước</b>. Điều đó cho thấy Kẻ Chợ là nơi <b>giao thương</b>, hội tụ thương nhân từ nhiều nơi.');
+  await say(o,'Hô hô, chào cậu khách phương xa! Ta cũng là dân đi xa đây: cả đời chèo thuyền ngược xuôi sông Hồng chở hàng về kinh thành bán. Phố này tên lạ nhỉ, cậu có biết vì sao không?');
   await ask(o,[
-   Q('Hội quán là gì ạ?','Hội quán là nơi những người cùng quê ở xa đến tụ họp, thờ cúng, giúp đỡ nhau làm ăn. Phố cổ nay còn hai hội quán người Hoa: <b>Quảng Đông</b> ở Hàng Buồm và <b>Phúc Kiến</b> ở Lãn Ông. Hội quán Quảng Đông nay đã được trùng tu thành trung tâm văn hóa nghệ thuật.'),
-   Q('Thuyền chở hàng từ đâu tới ạ?','Từ khắp các vùng ven sông và cả từ biển vào. Sông ngòi chính là “đường cao tốc” thời xưa, nên phố buôn bán mọc lên ở chỗ thuận đường thuyền.')]);
-  await say(o,'Nhớ kỹ chưa? Giờ ra <b>Hàng Mã</b> xem đèn lồng đi, đẹp lắm, đỏ rực cả một góc phố!');}});
-obj({id:'hangma',ch:1,pos:[-60,-74],title:'Nghe chị bán đèn (Hàng Mã)',who:'Chị bán đèn Trung thu',em:'🏮',look:{shirt:'#ffb300',dress:true},
- note:{t:'🏮 Phố Hàng Mã',x:'• Tên phố từ đồ <b>vàng mã</b> (đồ giấy, tre dùng trong thờ cúng).<br>• Ngày nay nổi tiếng với <b>đèn lồng, đồ chơi Trung thu</b>, đồ trang trí lễ Tết.<br>• Nghề cũ biết <b>thích nghi</b> với nhu cầu mới nên phố vẫn sống.'},
+   Q('Hội quán là gì ạ?','Hội quán là nơi những người cùng quê ở xa đến tụ họp, thờ cúng, giúp nhau làm ăn. Phố cổ nay còn hai hội quán người Hoa: <b>Quảng Đông</b> (22 Hàng Buồm) và <b>Phúc Kiến</b> (Lãn Ông).'),
+   Q('Thuyền chở những hàng gì ạ?','Gạo, muối, vải, gốm, đủ thứ! Sông ngòi chính là “đường cao tốc” thời xưa, nên phố buôn bán mọc lên ở nơi thuận đường thuyền.')]);
+  await quiz(o,{q:'Vì sao phố này có tên là Hàng Buồm?',o:['Xưa gần bến sông, nhiều nhà bán buồm và đồ đi thuyền','Vì có nhiều người thả diều','Vì là nơi may lều trại','Vì trồng nhiều cây buồm'],x:'Thuyền buôn cập bến nên cần <b>buồm</b>. Nghề mất nhưng <b>tên phố vẫn giữ dấu vết lịch sử</b>.'});
+  await say(o,'Khá lắm! Giờ ra <b>Hàng Mã</b> xem đèn lồng đi, đỏ rực cả một góc phố!');}});
+obj({id:'hangma',ch:1,pos:[-60,-74],title:'Gặp chị bán đèn (Hàng Mã)',who:'Chị bán đèn Trung thu',em:'🏮',look:{shirt:'#ffb300',dress:true},
  run:async o=>{
-  await say(o,'Em ơi, nhìn lên trên đầu kìa, đèn lồng đỏ rực cả phố! Mua một chiếc đèn ông sao không? Chị để giá rẻ cho!');
-  await say(o,'Phố chị là <b>Hàng Mã</b>. Tên phố bắt nguồn từ đồ <b>vàng mã</b>, tức những đồ làm bằng giấy, tre như tiền giấy, quần áo, nhà cửa thu nhỏ, dùng trong thờ cúng theo tín ngưỡng dân gian.');
-  await say(o,'Ngày nay phố nổi tiếng nhất với <b>đèn lồng, đồ chơi Trung thu</b> và đồ trang trí lễ Tết. Người bán biết <b>thích nghi</b> với nhu cầu mới, nhờ vậy phố vẫn đông vui mà vẫn giữ được nét riêng.');
+  await say(o,'Hi! Welcome! À, em nói tiếng Việt được hả? Nhìn lên đầu kìa, đèn lồng đỏ rực cả phố! Chụp ảnh đi em, đẹp lắm. Mà em biết phố chị bán gì không?');
   await ask(o,[
-   Q('Trung thu ở Hàng Mã vui không chị?','Vui lắm! Trước rằm tháng Tám, phố đông nghịt người. Bố mẹ dắt con đi mua <b>đèn ông sao, đèn kéo quân, mặt nạ giấy bồi, đầu sư tử</b>... Nhiều bạn trẻ còn đến chụp ảnh nữa.'),
-   Q('Đồ chơi Trung thu truyền thống làm thế nào ạ?','Đèn ông sao làm từ <b>nan tre</b> và <b>giấy bóng kính</b> màu; mặt nạ thì làm bằng giấy bồi nhiều lớp rồi vẽ màu. Ngày nay có nhiều đồ nhựa, đồ điện tử, nên đồ chơi thủ công cần được giữ gìn.')]);
-  await say(o,'Đi thêm một đoạn về phía Đông là tới <b>chợ Đồng Xuân</b>, chợ to nhất phố cổ. Ghé xem nhé!');}});
-obj({id:'dongxuan',ch:1,pos:[-10,-86],title:'Nghe cô tiểu thương (chợ Đồng Xuân)',who:'Cô tiểu thương',em:'👩',look:{shirt:'#43a047',hat:'non',dress:true},
- note:{t:'👩 Chợ Đồng Xuân & thời Pháp',x:'• Năm <b>1889</b>, người Pháp lấp hồ Thái Cực, sông Tô Lịch, dồn hàng quán về lập <b>chợ Đồng Xuân</b>.<br>• Thời Pháp thuộc: <b>mở đường, lấp sông hồ, xây chợ</b>; nhiều nhà ống có <b>mặt tiền kiểu Pháp</b> (ban công, cửa chớp) xen nhà truyền thống.<br>• Phố cổ là sự <b>đan xen nhiều lớp lịch sử</b>.'},
+   Q('Trung thu ở Hàng Mã vui không chị?','Vui lắm! Trước rằm tháng Tám, phố đông nghịt. Bố mẹ dắt con đi mua <b>đèn ông sao, đèn kéo quân, mặt nạ giấy bồi, đầu sư tử</b>...'),
+   Q('Đèn ông sao làm thế nào ạ?','Làm từ <b>nan tre</b> và <b>giấy bóng kính</b> màu. Ngày nay nhiều đồ nhựa, đồ điện tử, nên đồ chơi thủ công cần được giữ gìn.')]);
+  await quiz(o,{q:'Phố Hàng Mã ngày nay nổi tiếng với mặt hàng nào?',o:['Đèn lồng, đồ chơi Trung thu, đồ trang trí lễ Tết','Ngựa','Gạo và muối','Đồ sắt'],x:'Từ đồ <b>vàng mã</b> xưa, phố đã <b>thích nghi</b> sang đèn lồng, đồ chơi Trung thu, đồ trang trí.'});
+  await say(o,'Giỏi quá! Đi thêm về phía Đông là tới <b>chợ Đồng Xuân</b>, chợ to nhất phố cổ đấy.');}});
+obj({id:'dongxuan',ch:1,pos:[-10,-86],title:'Gặp cô tiểu thương (chợ Đồng Xuân)',who:'Cô tiểu thương',em:'👩',look:{shirt:'#43a047',hat:'non',dress:true},
  run:async o=>{
-  await say(o,'Mua gì đấy em? Vải, quần áo, đồ khô, cái gì chợ cô cũng có! À, em đi tìm hiểu lịch sử à? Thế thì nghe cô kể này.');
-  await say(o,'Chợ này có từ <b>thời Pháp</b>. Năm <b>1889</b>, người Pháp lấp <b>hồ Thái Cực và sông Tô Lịch</b> (đoạn chảy qua đây), dồn các hàng quán về khu đất trống ở phường Đồng Xuân, lập thành <b>chợ Đồng Xuân</b>. Sau đó chợ được xây kiểu Pháp, có <b>năm vòm cửa</b> ở mặt tiền.');
-  await say(o,'Thời Pháp thuộc, phố cổ đổi khác nhiều: <b>đường được mở rộng, sông hồ bị lấp</b>; nhiều <b>nhà ống</b> xây thêm tầng, mặt tiền có <b>ban công, cửa chớp kiểu Pháp</b>, xen giữa nhà truyền thống mái ngói. Vì thế phố cổ là sự <b>đan xen nhiều lớp lịch sử</b>.');
+  await say(o,'Mua gì đấy em? Áo phông “I love Hà Nội” không? À em đi tham quan à! Chợ cô có từ thời Pháp đấy. Thử xem em nhớ được gì nhé.');
   await ask(o,[
-   Q('Chợ có từng gặp chuyện gì lớn không cô?','Có em ạ. Năm <b>1994</b>, chợ bị <b>cháy gần như toàn bộ</b>. Tiểu thương phải buôn bán tạm ngoài đường mấy năm. Sau đó chợ được xây lại thành 3 tầng, rộng hơn, nhưng vẫn giữ một phần kiến trúc chợ cũ.'),
-   Q('Chợ bán những gì ạ?','Đây là <b>chợ đầu mối bán buôn</b> lớn: quần áo, vải vóc, đồ dùng, đồ khô... Tiểu thương các tỉnh miền Bắc về đây lấy hàng rồi mang đi bán khắp nơi.'),
-   Q('Buổi tối ở đây có gì vui ạ?','Tối cuối tuần có <b>chợ đêm</b> ngay trên phố. Trước cổng chợ còn có biểu diễn <b>hát xẩm</b>, một loại hình âm nhạc dân gian xưa của người đi hát rong.')]);
-  await say(o,'Thế là em đã nghe đủ chuyện rồi đấy!');}});
-obj({id:'ongdo2',ch:1,pos:[-26,50],share:'ongdo',after:T1,title:'Làm bài đố của ông đồ (Bờ Hồ)',lockText:'Bài đố của ông đồ (mở khi nghe đủ 6 người)',who:'Ông đồ Thăng Long',em:'👴',
+   Q('Chợ có từng gặp chuyện gì lớn không cô?','Có em ạ. Năm <b>1994</b>, chợ bị <b>cháy gần như toàn bộ</b>. Sau đó chợ được xây lại thành 3 tầng, rộng hơn, nhưng vẫn giữ một phần kiến trúc chợ cũ.'),
+   Q('Buổi tối ở đây có gì vui ạ?','Tối cuối tuần có <b>chợ đêm</b> ngay trên phố. Trước cổng chợ còn có biểu diễn <b>hát xẩm</b>, một loại hình âm nhạc dân gian xưa.')]);
+  await quiz(o,{q:'Thời Pháp thuộc, phố cổ thay đổi như thế nào?',o:['Lấp sông hồ, mở đường, lập chợ Đồng Xuân (1889); nhiều nhà có mặt tiền kiểu Pháp','Bị phá bỏ hoàn toàn','Trở thành đồng ruộng','Không thay đổi gì'],x:'Phố cổ là sự <b>đan xen</b> nhiều lớp lịch sử: phường nghề truyền thống + dấu ấn đô thị thời Pháp.'});
+  await say(o,'Em giỏi lắm! Nếu đã thăm đủ các phố thì về <b>Bờ Hồ</b> làm bài đố cuối của ông đồ nhé.');}});
+obj({id:'ongdo2',ch:1,pos:[-26,50],share:'ongdo',after:T1,title:'Bài đố cuối của ông đồ (Bờ Hồ)',lockText:'Bài đố cuối của ông đồ (mở khi gặp đủ 6 người)',who:'Ông đồ Thăng Long',em:'👴',
  run:async o=>{
-  await say(o,'Cháu về rồi đấy à! Đi khắp phố có mỏi chân không? Giờ ta đố cháu <b>9 câu</b> về những gì cháu đã nghe nhé. Trả lời sai thì cứ thử lại, không sao cả!');
+  await say(o,'Cháu về rồi đấy à! Đi khắp phố có mỏi chân không? Giờ ta đố cháu <b>3 câu</b> cuối, rồi một thử thách sắp xếp mốc lịch sử nhé!');
   const qs=[
-   {q:'Năm 1010, ai dời đô về Thăng Long?',o:['Lý Thái Tổ','Lê Lợi','Trần Hưng Đạo','Quang Trung'],x:'Vua <b>Lý Thái Tổ</b> dời đô từ Hoa Lư về Đại La, đặt tên là Thăng Long. Đây là mốc khởi đầu cho khu buôn bán Kẻ Chợ.'},
-   {q:'Các phố trong phố cổ thường có tên bắt đầu bằng chữ “Hàng” vì sao?',o:['Mỗi phố xưa chuyên làm hoặc bán một loại hàng','Vì phố được xếp thành hàng thẳng','Vì vua đặt tên theo thứ tự hàng','Vì người dân thích chữ “Hàng”'],x:'Tên phố là “tấm bia” ghi lại nghề xưa: Hàng Bạc bán bạc, Hàng Đường bán đường, Hàng Muối bán muối...'},
    {q:'Con số 36 trong câu “Hà Nội 36 phố phường” có nghĩa là gì?',o:['Con số ước lệ, ý nói rất nhiều phố','Đúng 36 con phố, không hơn không kém','36 cửa ô của kinh thành','36 khu chợ'],x:'Số 36 là <b>ước lệ</b>; thực tế phố cổ có nhiều hơn 36 phố.'},
-   {q:'Tên phố Hàng Đào gắn với nghề gì?',o:['Nhuộm vải và buôn bán tơ lụa','Trồng và bán hoa đào','Đóng thuyền','Làm đồ bạc'],x:'Thợ nhuộm từ làng <b>Đan Loan</b> lên đây <b>nhuộm vải</b>, buôn tơ lụa.'},
-   {q:'Phố Hàng Bạc xưa nổi tiếng với nghề gì?',o:['Chế tác vàng bạc (kim hoàn), đúc bạc nén và đổi bạc','Bán buồm cho thuyền','Dệt chiếu','Bán thuốc bắc'],x:'Thợ kim hoàn từ các làng như <b>Định Công</b> lên lập phường và dựng <b>đình Kim Ngân</b> thờ tổ nghề.'},
    {q:'Các phố nghề trong phố cổ hình thành theo con đường nào?',o:['Làng nghề → phường nghề → phố nghề','Phố nghề → làng nghề → chợ','Chợ → làng nghề → cửa ô','Nhà máy → phố nghề → làng nghề'],x:'Thợ thủ công từ <b>làng nghề</b> lên kinh đô, cùng nghề ở gần nhau thành <b>phường</b>, rồi thành <b>phố nghề</b>.'},
-   {q:'Vì sao phố này có tên là Hàng Buồm?',o:['Xưa gần bến sông, nhiều nhà bán buồm và đồ đi thuyền','Vì có nhiều người thả diều','Vì là nơi may lều trại','Vì trồng nhiều cây buồm'],x:'Thuyền buôn cập bến nên cần <b>buồm</b>. Nghề mất nhưng <b>tên phố vẫn giữ dấu vết lịch sử</b>. Hội quán Quảng Đông trên phố cho thấy nơi đây là chốn giao thương.'},
-   {q:'Phố Hàng Mã ngày nay nổi tiếng với mặt hàng nào?',o:['Đèn lồng, đồ chơi Trung thu, đồ trang trí lễ Tết','Ngựa','Gạo và muối','Đồ sắt'],x:'Từ đồ <b>vàng mã</b> xưa, phố đã <b>thích nghi</b> sang đèn lồng, đồ chơi Trung thu, đồ trang trí.'},
-   {q:'Thời Pháp thuộc, phố cổ thay đổi như thế nào?',o:['Lấp sông hồ, mở đường, xây chợ Đồng Xuân (1889); nhiều nhà có mặt tiền kiểu Pháp','Bị phá bỏ hoàn toàn','Trở thành đồng ruộng','Không thay đổi gì'],x:'Phố cổ là sự <b>đan xen</b> nhiều lớp lịch sử: phường nghề truyền thống + dấu ấn đô thị thời Pháp.'}];
+   {q:'Thời Lê – Trịnh, khu buôn bán sầm uất của kinh thành được dân gian gọi là gì?',o:['Kẻ Chợ','Phố Hiến','Hoàng thành','Hoa Lư'],x:'<b>Kẻ Chợ</b>: “Thứ nhất Kinh Kỳ, thứ nhì Phố Hiến”. Phố Hiến (Hưng Yên) đứng thứ hai.'}];
   for(let i=0;i<qs.length;i++){const q={...qs[i],q:`<span style="color:#ffd166">Câu ${i+1}/${qs.length}.</span> ${qs[i].q}`};await quiz(o,q);}
-  await say(o,'Giỏi lắm, cháu nhớ bài thật đấy! Còn <b>một thử thách cuối</b>: sắp xếp các mốc lịch sử của phố cổ...');
+  await say(o,'Giỏi lắm! Còn <b>một thử thách cuối</b>: sắp xếp các mốc lịch sử của phố cổ...');
  }});
 // ===== Chặng 2 =====
 const CATS={kt:['Kiến trúc','#e76f51','🏠'],ls:['Lịch sử','#6d4c41','🏯'],tn:['Tín ngưỡng','#b71c1c','⛩️'],vh:['Văn hóa nghề','#7b2cbf','💍'],pvt:['Phi vật thể','#2a9d8f','🍜'],kte:['Kinh tế – Du lịch','#1d70b8','🧳']};
@@ -656,6 +680,7 @@ function buildLamps(){
  for(const z of ZS){let i=0;for(let x=-82;x<92;x+=17,i++)lamp(x,z+(i%2?6.2:-6.2));}
  for(let a=0;a<PI*2;a+=.26){const x=LAKE.cx+LAKE.rx*1.12*Math.cos(a),z=LAKE.cz+LAKE.rz*1.12*Math.sin(a);if(z<53||(Math.abs(x-8)<4&&z<64)||Math.abs(x)>92)continue;lamp(x,z);}
 }
+const START={x:-68,z:150,r:Math.atan2(42,-100)};
 function buildWorld(){
  const g=new THREE.Mesh(new THREE.PlaneGeometry(420,420),lam('#8a847b'));g.rotation.x=-PI/2;g.position.set(0,0,30);scene.add(g);
  for(const x of XS)W.add(BOX,x,.02,-20,.25,.02,120,'#d9d2c3');
@@ -681,8 +706,8 @@ function buildWorld(){
   if(!o.share)p.rotation.y=nearestStreetDir(o.pos[0],o.pos[1]);
  }
  // player
- player=makePerson({shirt:'#ffffff',pants:'#1d3557',bag:'#c1272d',hair:'#222',skin:'#efc6a0',scale:.85});
- player.position.set(-30,0,57);player.rotation.y=PI;scene.add(player);
+ player=makePerson({shirt:'#4cc9f0',pants:'#264653',bag:'#e76f51',hair:'#d4a65a',skin:'#f3d3bd',scale:.85});
+ player.position.set(START.x,0,START.z);player.rotation.y=START.r;scene.add(player);buildPhone();
  // walkers
  const lanes=[];for(const x of XS)for(const s of [-6,6])lanes.push({ax:'z',c:x+s,a:-82,b:42});for(const z of ZS)for(const s of [-6,6])lanes.push({ax:'x',c:z+s,a:-92,b:92});
  for(let i=0;i<26;i++){const L=P(lanes);const w=makePerson({hat:rnd()<.3?'non':(rnd()<.3?'cap':null),capC:P(['#e63946','#1d70b8','#fff']),bag:rnd()<.3?P(['#ff7043','#26a69a','#5c6bc0']):null,dress:rnd()<.3});const t=R(L.a,L.b);w.userData.lane=L;w.userData.t=t;w.userData.dir=rnd()<.5?1:-1;w.userData.sp=R(1.6,2.6);scene.add(w);walkers.push(w);}
@@ -800,7 +825,7 @@ async function interact(o){
   if(o.card){S.cards.push(o.id);await showCard(o.card);}
   if(o.note){S.notes.push(o.note);await info('📒 Đã ghi vào Sổ tay!',`<div class="vcard" style="max-width:none"><h3 style="margin-top:0">${o.note.t}</h3><p>${o.note.x}</p></div>`,'Ghi nhớ ✓');}
   const ex=OBJ.find(x=>x.after&&x.ch===o.ch&&!x.done);
-  if(o.note&&ex&&ex.after.every(id=>id===o.id||OBJ.find(x=>x.id===id).done)){closeD();await info('🔓 Đã mở khóa bài đố!','Bạn đã nghe đủ chuyện của mọi người và có <b>'+S.notes.length+' trang Sổ tay</b>.<br><br>👉 Bấm <b>📒 Sổ tay</b> (góc phải) để ôn lại, rồi <b>quay về Bờ Hồ</b> làm bài đố của ông đồ nhé!','Đi thôi!');}
+  if(ex&&ex.after.includes(o.id)&&ex.after.every(id=>id===o.id||OBJ.find(x=>x.id===id).done)){closeD();await info('🔓 Đã mở khóa bài đố cuối!','Bạn đã gặp đủ mọi người trong phố!<br><br>👉 Ôn lại bằng <b>📒 Sổ tay</b> hoặc <b>📱 Video</b> (góc phải), rồi <b>quay về Bờ Hồ</b> làm bài đố cuối của ông đồ nhé!','Đi thôi!');}
   o.done=true;closeD();refreshHUD();toast('✓ Hoàn thành: '+o.title);
   await checkChang();
  }finally{closeD();S.busy=false;saveGame();}
@@ -943,11 +968,12 @@ function update(dt,t){
  const ty=onBridge(px,pz)?.4+1.2*Math.sin(PI*clamp((pz-56)/11,0,1)):(onIsland(px,pz)?.4:0);
  player.position.y+=(ty-player.position.y)*expK(16,dt);
  // 6. Hoạt ảnh bước chân theo tốc độ thật
- const amt=clamp(sp/WALK,0,1);animWalk(player,dt,amt,4+sp*.95);
+ const amt=clamp(sp/WALK,0,1);if(!cineCam)animWalk(player,dt,amt,4+sp*.95);
  // 7. Camera tự xoay ra sau lưng khi đi thẳng (không giành quyền khi người chơi đang xoay)
  if(!paused&&sp>2&&f>.35&&Math.abs(r)<.65&&nowT-lastDrag>1.4&&dragId===null){
   const behind=Math.atan2(vel.x,vel.z)+PI;yaw+=wrapA(behind-yaw)*expK(1.4*Math.min(1,sp/WALK),dt);}
  // 8. Camera bám mượt + tránh xuyên tường
+ if(!cineCam){
  camT.set(player.position.x,player.position.y+2.2,player.position.z);
  if(!camInit){camLook.copy(camT);camInit=true;}
  camLook.lerp(camT,expK(18,dt));
@@ -955,6 +981,7 @@ function update(dt,t){
  let allow=camDist;for(let i=1;i<=12;i++){const d=camDist*i/12;if(blockedCam(camLook.x+dirx*d,camLook.y+diry*d,camLook.z+dirz*d)){allow=Math.max(2.2,camDist*(i-1)/12);break;}}
  curDist+=(allow-curDist)*expK(allow<curDist?20:4,dt);
  camera.position.set(camLook.x+dirx*curDist,camLook.y+diry*curDist,camLook.z+dirz*curDist);camera.lookAt(camLook);
+ }
  // NPC, marker
  near=null;let nd=1e9;
  for(const o of OBJ){const dx=px-o.pos[0],dz=pz-o.pos[1],d=Math.hypot(dx,dz);
@@ -995,6 +1022,109 @@ async function boot(){
  {const st=readStore();const lp=st.profiles[st.last];if(lp)$('pname').value=lp.name;}bootDone=true;renderProfiles();updateStartBtn();
  loop();
 }
+/* ---------- VIDEO giới thiệu trên điện thoại ---------- */
+// Khi có file video thật: đặt vào thư mục video/ với tên gioi-thieu.mp4 -> game tự phát file đó.
+const VIDEO_SRC='video/gioi-thieu.mp4';
+const SLIDES=[
+ {e:'🏙️',bg:'linear-gradient(135deg,#1d3557,#457b9d)',t:'Chào mừng đến Hà Nội!',x:'Xin chào! Bạn sắp bước vào <b>Phố cổ Hà Nội</b>, khu buôn bán lâu đời nằm ở <b>phía Bắc Hồ Gươm</b>. Cùng xem phố cổ đã hình thành và phát triển thế nào nhé!'},
+ {e:'🐉',y:'1010',bg:'linear-gradient(135deg,#7a1e1e,#c1272d)',t:'Thăng Long ra đời',x:'Năm <b>1010</b>, vua <b>Lý Thái Tổ</b> dời đô từ Hoa Lư về thành Đại La, đặt tên mới là <b>Thăng Long</b>, nghĩa là “rồng bay lên”.'},
+ {e:'🏯 ⛵',bg:'linear-gradient(135deg,#264653,#2a9d8f)',t:'“Thành” và “thị”',x:'Kinh đô gồm <b>“thành”</b>, nơi vua quan ở và làm việc, và <b>“thị”</b>, nơi dân buôn bán, làm nghề. Khu “thị” nằm ở <b>phía Đông</b>, gần <b>sông Hồng</b> và <b>sông Tô Lịch</b>, thuyền bè ra vào tấp nập.'},
+ {e:'🛠️ ➜ 🏘️',bg:'linear-gradient(135deg,#6d4c41,#bc8a5f)',t:'Từ làng nghề đến phố nghề',x:'Thợ thủ công từ các <b>làng nghề</b> kéo về kinh đô vì ở đây đông khách. Người cùng nghề ở gần nhau lập thành <b>phường</b>, rồi thành <b>phố nghề</b>. Vì thế tên phố là <b>“Hàng + mặt hàng”</b>: Hàng Bạc, Hàng Đường, Hàng Muối…'},
+ {e:'🏮🏮',y:'TK XVII–XVIII',bg:'linear-gradient(135deg,#9d0208,#f48c06)',t:'Kẻ Chợ phồn thịnh',x:'Thời Lê – Trịnh, khu buôn bán phồn thịnh nhất, được gọi là <b>Kẻ Chợ</b>. Dân gian có câu <b>“Thứ nhất Kinh Kỳ, thứ nhì Phố Hiến”</b>. Còn câu <b>“Hà Nội 36 phố phường”</b> thì số 36 chỉ là <b>ước lệ</b>, thực tế còn nhiều phố hơn.'},
+ {e:'🧵',bg:'linear-gradient(135deg,#ad1457,#f06292)',t:'Phố Hàng Đào',x:'Xưa là phố <b>nhuộm vải và buôn tơ lụa</b>. Nhiều thợ nhuộm từ làng <b>Đan Loan</b> (Hải Dương) lên đây làm nghề. Có cách giải thích chữ “đào” gợi <b>màu hồng đào</b> của vải nhuộm.'},
+ {e:'💍',bg:'linear-gradient(135deg,#455a64,#b0bec5)',t:'Phố Hàng Bạc',x:'Phố của nghề <b>kim hoàn</b> (làm đồ vàng bạc), <b>đúc bạc nén</b> và <b>đổi bạc</b>. Thợ từ các làng như <b>Định Công</b> lên lập phường, dựng <b>đình Kim Ngân</b> để thờ tổ nghề.'},
+ {e:'⛵',bg:'linear-gradient(135deg,#0277bd,#4fc3f7)',t:'Phố Hàng Buồm',x:'Xưa phố gần <b>bến sông</b>, thuyền buôn cập bến nên nhiều nhà <b>bán buồm</b>. Sông bị lấp, nghề mất nhưng <b>tên phố vẫn giữ</b>. Trên phố có <b>Hội quán Quảng Đông</b> của thương nhân người Hoa, cho thấy đây là nơi <b>giao thương</b> của nhiều nơi.'},
+ {e:'🏮',bg:'linear-gradient(135deg,#d00000,#ffba08)',t:'Phố Hàng Mã',x:'Tên phố bắt nguồn từ đồ <b>vàng mã</b> dùng trong thờ cúng. Ngày nay phố nổi tiếng với <b>đèn lồng, đồ chơi Trung thu</b> và đồ trang trí: nghề cũ biết <b>thích nghi</b> với nhu cầu mới.'},
+ {e:'🏛️',y:'1889',bg:'linear-gradient(135deg,#3d405b,#81b29a)',t:'Chợ Đồng Xuân & thời Pháp',x:'Năm <b>1889</b>, người Pháp lấp hồ Thái Cực, sông Tô Lịch và lập <b>chợ Đồng Xuân</b>. Thời Pháp thuộc, đường được mở rộng; nhiều nhà ống có <b>mặt tiền kiểu Pháp</b> (ban công, cửa chớp) xen nhà truyền thống.'},
+ {e:'🏅',y:'2004',bg:'linear-gradient(135deg,#14213d,#fca311)',t:'Di tích lịch sử quốc gia',x:'Năm <b>2004</b>, khu phố cổ được xếp hạng <b>Di tích lịch sử quốc gia</b>. Giờ thì cất điện thoại, bước vào phố, gặp người dân và thử xem bạn nhớ được bao nhiêu nhé!'}
+].map(s=>({...s,d:Math.max(6.5,s.x.replace(/<[^>]+>/g,'').length/15)}));
+const VTOTAL=SLIDES.reduce((a,s)=>a+s.d,0);
+let VP=null; // trạng thái trình phát
+const fmtT=s=>{s=Math.max(0,Math.floor(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
+function viVoice(){try{return (speechSynthesis.getVoices()||[]).find(v=>/^vi/i.test(v.lang));}catch(e){return null;}}
+function speak(html){if(!VP||!VP.tts)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(html.replace(/<[^>]+>/g,''));u.lang='vi-VN';const v=viVoice();if(v)u.voice=v;u.rate=1.05;speechSynthesis.speak(u);}catch(e){}}
+function probeVideo(){return new Promise(res=>{const v=$('vid');let done=false;const fin=ok=>{if(done)return;done=true;res(ok);};
+ v.onloadedmetadata=()=>fin(true);v.onerror=()=>fin(false);setTimeout(()=>fin(false),3500);v.src=VIDEO_SRC;v.load();});}
+function addVideoNotes(){let n=0;for(const note of NOTES1)if(!S.notes.some(x=>x.t===note.t)){S.notes.push(note);n++;}if(n&&S.chang)refreshHUD();return n;}
+function playVideo(){return new Promise(async res=>{
+ const ov=$('phoneOv'),ph=ov.querySelector('.phone');ov.classList.remove('hidden');ph.classList.remove('out');void ph.offsetWidth;
+ VP={t:0,playing:true,real:false,tts:false,idx:-1,res,ended:false};
+ $('slides').innerHTML=SLIDES.map((s,i)=>`<div class="slide" data-i="${i}" style="background:${s.bg}"><div class="emo">${s.e}</div>${s.y?`<div class="yr">${s.y}</div>`:''}<div class="st">${s.t}</div></div>`).join('');
+ $('psub').innerHTML='<i style="opacity:.7">Đang tải video…</i>';
+ const real=await probeVideo();VP.real=real;const v=$('vid');
+ if(real){$('slides').classList.add('hidden');v.classList.remove('hidden');$('pTts').classList.add('hidden');
+  $('psub').innerHTML='🎬 Đang phát video giới thiệu phố cổ.<br><br>Những ý chính sẽ được lưu vào <b>📒 Sổ tay</b> để bạn ôn lại.';
+  v.onended=()=>endVideo();v.currentTime=0;
+  try{await v.play();}catch(e){v.muted=true;try{await v.play();}catch(_){} $('pMute').classList.remove('hidden');}
+ }else{v.classList.add('hidden');v.removeAttribute('src');$('slides').classList.remove('hidden');
+  $('pTts').classList.toggle('hidden',!('speechSynthesis' in window));$('pTts').textContent='🔇 Giọng đọc';}
+ $('pPlay').textContent='⏸';VP.last=performance.now();const vp=VP;requestAnimationFrame(n=>vTick(n,vp));});}
+function vTick(now,vp){if(!vp||vp!==VP||VP.ended)return;const dt=(now-VP.last)/1000;VP.last=now;
+ if(VP.real){const v=$('vid');const d=v.duration||1;$('pprog').style.width=(100*v.currentTime/d)+'%';$('ptime').textContent=fmtT(v.currentTime)+' / '+fmtT(d);}
+ else{if(VP.playing)VP.t+=dt;if(VP.t>=VTOTAL){endVideo();return;}
+  let acc=0,i=0;for(;i<SLIDES.length;i++){if(VP.t<acc+SLIDES[i].d)break;acc+=SLIDES[i].d;}
+  if(i!==VP.idx){VP.idx=i;document.querySelectorAll('#slides .slide').forEach(el=>el.classList.toggle('on',+el.dataset.i===i));$('psub').innerHTML=`<div class="pst">${SLIDES[i].t}</div>${SLIDES[i].x}`;$('psub').scrollTop=0;speak(SLIDES[i].x);}
+  $('pprog').style.width=(100*VP.t/VTOTAL)+'%';$('ptime').textContent=fmtT(VP.t)+' / '+fmtT(VTOTAL);}
+ requestAnimationFrame(n=>vTick(n,vp));}
+function endVideo(skipped){if(!VP||VP.ended)return;VP.ended=true;try{speechSynthesis.cancel();}catch(e){}
+ const v=$('vid');try{v.pause();}catch(e){}
+ const ph=$('phoneOv').querySelector('.phone');ph.classList.add('out');
+ const r=VP.res;setTimeout(()=>{$('phoneOv').classList.add('hidden');const n=addVideoNotes();if(n)toast('📒 Kiến thức trong video đã được lưu vào Sổ tay');r(!!skipped);},430);}
+$('pPlay').onclick=()=>{if(!VP)return;if(VP.real){const v=$('vid');if(v.paused){v.play().catch(()=>{});$('pPlay').textContent='⏸';}else{v.pause();$('pPlay').textContent='▶';}}else{VP.playing=!VP.playing;$('pPlay').textContent=VP.playing?'⏸':'▶';if(!VP.playing)try{speechSynthesis.pause();}catch(e){}else try{speechSynthesis.resume();}catch(e){}}};
+$('pSkip').onclick=()=>endVideo(true);
+$('pMute').onclick=()=>{const v=$('vid');v.muted=false;$('pMute').classList.add('hidden');};
+$('pTts').onclick=()=>{if(!VP)return;VP.tts=!VP.tts;$('pTts').textContent=VP.tts?'🔊 Giọng đọc':'🔇 Giọng đọc';if(VP.tts){if(!viVoice())toast('Máy chưa có giọng đọc tiếng Việt, sẽ dùng giọng mặc định');if(VP.idx>=0)speak(SLIDES[VP.idx].x);}else try{speechSynthesis.cancel();}catch(e){}};
+$('pbarWrap').onclick=e=>{if(!VP)return;const r=e.currentTarget.getBoundingClientRect(),k=clamp((e.clientX-r.left)/r.width,0,1);if(VP.real){const v=$('vid');if(v.duration)v.currentTime=k*v.duration;}else{VP.t=k*VTOTAL;VP.idx=-1;}};
+$('vidBtn').onclick=async()=>{if(S.busy||dlgOpen)return;S.busy=true;document.body.classList.add('cine');await playVideo();document.body.classList.remove('cine');S.busy=false;lastAct='?';};
+
+/* ---------- CẢNH MỞ ĐẦU (cinematic) ---------- */
+let cineCam=false,cineSkip=false,phoneMesh=null;
+const easeIO=k=>k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+function tween(dur,fn){return new Promise(res=>{const t0=performance.now();const st=()=>{if(cineSkip){fn(1);res();return;}const k=Math.min(1,(performance.now()-t0)/(dur*1000));fn(k);if(k<1)requestAnimationFrame(st);else res();};requestAnimationFrame(st);});}
+const wait=s=>tween(s,()=>{});
+function caption(t){const c=$('cineCap');c.style.opacity=0;setTimeout(()=>{c.innerHTML=t;c.style.opacity=t?1:0;},cineSkip?0:250);}
+function buildPhone(){const g=new THREE.Group();
+ const body=new THREE.Mesh(new THREE.BoxGeometry(.4,.78,.06),lam('#151515'));g.add(body);
+ const c=document.createElement('canvas');c.width=128;c.height=256;const x=c.getContext('2d');const gr=x.createLinearGradient(0,0,0,256);gr.addColorStop(0,'#1d3557');gr.addColorStop(1,'#c1272d');x.fillStyle=gr;x.fillRect(0,0,128,256);
+ x.fillStyle='#fff';x.font='800 15px sans-serif';x.textAlign='center';x.fillText('PHỐ CỔ',64,70);x.fillText('HÀ NỘI',64,90);x.beginPath();x.arc(64,150,30,0,PI*2);x.fillStyle='rgba(255,255,255,.9)';x.fill();x.fillStyle='#c1272d';x.beginPath();x.moveTo(54,134);x.lineTo(80,150);x.lineTo(54,166);x.fill();
+ const scr=new THREE.Mesh(new THREE.PlaneGeometry(.35,.7),new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(c)}));scr.position.z=-.035;scr.rotation.y=PI;g.add(scr);
+ g.position.set(.2,2.05,.72);g.rotation.x=.28;g.visible=false;player.add(g);phoneMesh=g;}
+function thirdPersonPos(out){const cp=Math.cos(pitch);const tx=player.position.x,ty=player.position.y+2.2,tz=player.position.z;
+ return out.set(tx+Math.sin(yaw)*cp*camDist,ty+Math.sin(pitch)*camDist,tz+Math.cos(yaw)*cp*camDist);}
+async function introCinematic(){
+ S.busy=true;cineCam=true;cineSkip=false;document.body.classList.add('cine');$('cine').classList.remove('hidden');
+ const arm=player.userData.arms[1],p=player.position,ry=player.rotation.y,fx=Math.sin(ry),fz=Math.cos(ry);
+ const look=new THREE.Vector3(p.x,2,p.z);
+ // 1. Toàn cảnh quanh nhân vật
+ caption('Hà Nội · một buổi chiều...');
+ await tween(3.4,k=>{const e=easeIO(k),a=ry+PI-1.3+1.3*e,r=13-5*e;camera.position.set(p.x+Math.sin(a)*r,6.5-3*e,p.z+Math.cos(a)*r);camera.lookAt(look);});
+ caption('Bạn là <b>'+escH(S.name||'một du khách')+'</b>, du khách nước ngoài lần đầu đến Việt Nam.<br>Phía trước là Hồ Gươm, và xa hơn là <b>Phố cổ Hà Nội</b>.');
+ await wait(cineSkip?0:2.8);
+ // 2. Lấy điện thoại
+ caption('“Trước khi vào phố cổ, xem thử video giới thiệu đã!” 📱');
+ phoneMesh.visible=true;const c0=camera.position.clone();
+ const sh=new THREE.Vector3(p.x-fx*2.2+fz*.9,p.y+3.0,p.z-fz*2.2-fx*.9);
+ await tween(1.6,k=>{const e=easeIO(k);arm.rotation.x=-1.75*e;arm.rotation.z=.35*e;camera.position.lerpVectors(c0,sh,e);const ph=new THREE.Vector3();phoneMesh.getWorldPosition(ph);camera.lookAt(look.clone().lerp(ph,e));});
+ await wait(cineSkip?0:.5);
+ // 3. Chạm vào video + zoom vào màn hình
+ caption('');const ph=new THREE.Vector3();phoneMesh.getWorldPosition(ph);
+ const face=new THREE.Vector3(p.x,p.y+2.25*.85,p.z);const toFace=face.clone().sub(ph).normalize();
+ const c1=camera.position.clone(),c2=ph.clone().add(toFace.multiplyScalar(.42));
+ await tween(2.1,k=>{const e=easeIO(k);camera.position.lerpVectors(c1,c2,e);camera.lookAt(ph);camera.fov=60-28*e;camera.updateProjectionMatrix();});
+ $('flash').style.opacity=1;await wait(cineSkip?0:.3);
+ $('cine').classList.add('hidden');camera.fov=60;camera.updateProjectionMatrix();
+ setTimeout(()=>{$('flash').style.opacity=0;},120);
+ // 4. Xem video (có nút Bỏ qua)
+ await playVideo();
+ // 5. Trở lại góc nhìn chơi game
+ cineSkip=false;yaw=ry+PI;const back=thirdPersonPos(new THREE.Vector3());const c3=camera.position.clone();
+ $('cine').classList.remove('hidden');caption('Cất điện thoại đi, khám phá thôi! 🚶');
+ await tween(1.5,k=>{const e=easeIO(k);camera.position.lerpVectors(c3,back,e);camera.lookAt(look);arm.rotation.x=-1.75*(1-e);arm.rotation.z=.35*(1-e);});
+ phoneMesh.visible=false;arm.rotation.z=0;caption('');
+ $('cine').classList.add('hidden');document.body.classList.remove('cine');cineCam=false;camInit=false;S.busy=false;lastAct='?';
+}
+$('cineSkip').onclick=()=>{cineSkip=true;};
+
 /* ---------- lưu tiến trình theo tên + toàn màn hình ---------- */
 const SAVE_KEY='phoco3d_saves_v2',OLD_KEY='phoco3d_save_v1';
 const VARMAP={tower:'tower',nhaco:'nhaco',viahe:'viahe',hangbac2:'hangbac',dibo:'dibo'};
@@ -1057,7 +1187,7 @@ function beginGame(resume){
   else{startChang(S.chang);const list=OBJ.filter(o=>o.ch===S.chang);
    if(list.every(o=>o.done)){S.busy=true;checkChang().finally(()=>{closeD();S.busy=false;saveGame();});}}
   setTimeout(()=>toast('✓ Chào '+nm+'! Đã tải tiến trình của bạn'),400);}
- else{S.name=nm;startChang(1);}
+ else{S.name=nm;yaw=START.r+PI;camInit=false;introCinematic().then(()=>{startChang(1);saveGame();});}
  saveGame();
  setTimeout(()=>{if(!touchMode)setTimeout(()=>$('hint').classList.add('hidden'),12000);},0);}
 $('startBtn').onclick=()=>beginGame(!!loadSave(nkey($('pname').value)));

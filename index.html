@@ -1,0 +1,939 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>Phiêu lưu Phố cổ Hà Nội 3D</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#1d3557;--navy2:#14213d;--gold:#f2b705;--red:#c1272d;--jade:#2a9d8f;--cream:#fff8e7;--orange:#f77f00;--purple:#7b2cbf}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%;overflow:hidden;background:#14213d;font-family:'Be Vietnam Pro',system-ui,-apple-system,sans-serif;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;color:#fff}
+#c{position:fixed;inset:0;width:100vw;height:100vh;display:block}
+.hidden{display:none!important}
+.panel{background:rgba(20,33,61,.88);border:2px solid var(--gold);border-radius:14px;box-shadow:0 6px 22px rgba(0,0,0,.35)}
+button{font-family:inherit;cursor:pointer}
+/* HUD */
+#hud{position:fixed;left:10px;top:10px;width:min(290px,58vw);padding:9px 11px;font-size:13px;z-index:5}
+#hud .hd{display:flex;align-items:center;justify-content:space-between;gap:6px;cursor:pointer}
+#hud .ch{font-weight:800;color:var(--gold);font-size:13px;line-height:1.25}
+#hud .tg{font-size:12px;opacity:.8}
+#hud ul{list-style:none;margin:7px 0 0;padding:0}
+#hud li{padding:3px 0;display:flex;gap:6px;line-height:1.3;opacity:.95}
+#hud li.ok{opacity:.55;text-decoration:line-through}
+#hud.collapsed ul{display:none}
+#guide{position:fixed;left:50%;top:10px;transform:translateX(-50%);padding:6px 14px;font-size:13px;font-weight:600;z-index:5;display:flex;align-items:center;gap:8px;white-space:nowrap;max-width:46vw;overflow:hidden;text-overflow:ellipsis}
+#guide .ar{display:inline-block;color:var(--gold);font-size:18px;transition:transform .1s linear}
+#mapWrap{position:fixed;right:10px;top:10px;padding:5px;z-index:5;border-radius:12px}
+#mini{display:block;border-radius:8px}
+#topBtns{position:fixed;right:10px;z-index:5;display:flex;flex-direction:column;gap:6px}
+.rbtn{background:rgba(20,33,61,.88);border:2px solid var(--gold);color:#fff;border-radius:12px;padding:6px 10px;font-weight:700;font-size:13px}
+#stats{position:fixed;left:10px;bottom:10px;width:min(250px,56vw);padding:8px 11px;z-index:5;font-size:12px}
+#stats .row{display:flex;align-items:center;gap:6px;margin:4px 0}
+#stats .lb{width:78px;white-space:nowrap}
+#stats .bar{flex:1;height:10px;background:rgba(255,255,255,.15);border-radius:6px;overflow:hidden}
+#stats .bar i{display:block;height:100%;width:50%;border-radius:6px;transition:width .6s}
+#stats .v{width:26px;text-align:right;font-weight:800}
+body.touch #stats{left:10px;bottom:166px;width:min(220px,60vw)}
+#hud.collapsed{width:auto;max-width:58vw}
+/* joystick + action */
+#joy{position:fixed;left:86px;top:calc(100% - 96px);width:116px;height:116px;transform:translate(-50%,-50%);border-radius:50%;background:rgba(255,255,255,.14);border:2px solid rgba(255,255,255,.45);z-index:7;pointer-events:none;opacity:.55;transition:opacity .2s;display:none}
+body.touch #joy{display:block}
+#joyZone{position:fixed;left:0;bottom:0;width:48vw;height:62vh;z-index:6;display:none;touch-action:none}
+body.touch #joyZone{display:block}
+#joy.act{opacity:1;transition:none}
+#joy .knob{position:absolute;left:50%;top:50%;width:56px;height:56px;border-radius:50%;background:rgba(242,183,5,.9);border:3px solid #fff;transform:translate(-50%,-50%)}
+#act{position:fixed;right:18px;bottom:22px;z-index:6;min-width:96px;padding:12px 14px;border-radius:18px;border:3px solid #fff;background:linear-gradient(180deg,#ffd447,#f2a705);color:#3b2600;font-weight:800;font-size:15px;box-shadow:0 6px 18px rgba(0,0,0,.4);animation:pulse 1.2s infinite}
+#act small{display:block;font-size:11px;font-weight:600;max-width:150px}
+@keyframes pulse{50%{transform:scale(1.06)}}
+#hint{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);font-size:12px;opacity:.85;z-index:4;background:rgba(0,0,0,.35);padding:4px 10px;border-radius:10px}
+body.touch #hint{display:none}
+/* dialog */
+#dlg{position:fixed;inset:0;z-index:20;display:flex;align-items:flex-end;justify-content:center;padding:10px;background:rgba(0,0,0,.25)}
+.dcard{width:min(680px,100%);max-height:78vh;overflow:auto;padding:14px 16px 14px;background:linear-gradient(180deg,rgba(29,53,87,.97),rgba(20,33,61,.98));border:3px solid var(--gold);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:up .25s ease-out;touch-action:pan-y}
+@keyframes up{from{transform:translateY(30px);opacity:0}}
+.who{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.av{width:44px;height:44px;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:26px;border:3px solid var(--gold);flex:none}
+.nm{color:var(--gold);font-size:16px}
+.txt{font-size:15.5px;line-height:1.55}
+.txt b{color:#ffd166}
+.q{font-weight:800;font-size:16px;margin:4px 0 8px;color:#fff}
+.opts{display:grid;gap:8px;margin-top:8px}
+.opt{text-align:left;padding:11px 13px;border-radius:12px;border:2px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);color:#fff;font-size:15px;font-weight:600;line-height:1.35}
+.opt:hover{background:rgba(255,255,255,.16)}
+.opt.ask{background:rgba(242,183,5,.12);border-color:rgba(242,183,5,.55)}
+.opt.seen{opacity:.6}
+.opt.good{background:#2a9d8f;border-color:#b7f5ea}
+.opt.bad{background:#9d2a2a;border-color:#ffb3b3;animation:shake .3s}
+.opt:disabled{cursor:default}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.fb{margin-top:10px;font-size:14.5px;line-height:1.5}
+.fb .ex{background:rgba(42,157,143,.22);border-left:4px solid #2a9d8f;padding:8px 10px;border-radius:8px}
+.fb .no{color:#ffb3b3;font-weight:700}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.chip{padding:3px 9px;border-radius:20px;font-weight:800;font-size:13px}
+.chip.p{background:#2a9d8f}.chip.m{background:#c1272d}.chip.z{background:#555}
+.btns{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}
+.go{padding:10px 18px;border-radius:12px;border:none;background:linear-gradient(180deg,#ffd447,#f2a705);color:#3b2600;font-weight:800;font-size:15px}
+.go.sec{background:rgba(255,255,255,.15);color:#fff;border:2px solid rgba(255,255,255,.4)}
+/* card */
+.vcard{margin:6px auto 4px;max-width:420px;border-radius:16px;padding:14px;color:#2b1d00;background:var(--cream);border:4px solid var(--gold);box-shadow:0 8px 22px rgba(0,0,0,.35)}
+.vcard .cat{display:inline-block;padding:3px 10px;border-radius:20px;color:#fff;font-weight:800;font-size:12px}
+.vcard h3{margin:8px 0 4px;font-size:19px}
+.vcard .ic{font-size:40px;float:right}
+.vcard p{margin:4px 0;font-size:14px;line-height:1.5}
+.gal{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.mini{border-radius:12px;padding:9px;background:var(--cream);color:#2b1d00;border:3px solid var(--gold);font-size:13px}
+.mini.lock{background:rgba(255,255,255,.08);color:#ccc;border-style:dashed;border-color:#888}
+.mini b{display:block;margin:4px 0 2px}
+/* timeline */
+.tl{display:grid;gap:7px;margin-top:8px}
+.tli{padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.35);color:#fff;text-align:left;font-size:14.5px;font-weight:600}
+.tli.sel{opacity:.35}
+.ord{display:grid;gap:6px;margin-top:10px}
+.ordi{padding:8px 10px;border-radius:10px;background:#2a9d8f;font-size:14px;display:flex;gap:8px}
+.ordi.wrong{background:#9d2a2a}
+.ordi .n{background:var(--gold);color:#3b2600;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-weight:800;flex:none}
+/* banner, toast */
+#banner{position:fixed;left:50%;top:32%;transform:translate(-50%,-50%);z-index:15;text-align:center;pointer-events:none;width:92vw}
+#banner .t{font-size:clamp(26px,6vw,52px);font-weight:800;color:var(--gold);text-shadow:0 3px 0 #7a1e1e,0 6px 18px rgba(0,0,0,.6)}
+#banner .s{font-size:clamp(14px,3vw,20px);font-weight:600;text-shadow:0 2px 8px rgba(0,0,0,.8);margin-top:6px}
+#banner.show{animation:bn 3.6s ease forwards}
+@keyframes bn{0%{opacity:0;transform:translate(-50%,-40%) scale(.9)}12%{opacity:1;transform:translate(-50%,-50%) scale(1)}80%{opacity:1}100%{opacity:0}}
+#toast{position:fixed;left:50%;top:58px;transform:translateX(-50%);z-index:16;padding:8px 16px;border-radius:12px;background:#2a9d8f;border:2px solid #fff;font-weight:700;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+#toast.on{opacity:1}
+/* start + end */
+.over{position:fixed;inset:0;z-index:30;display:flex;align-items:center;justify-content:center;padding:14px;overflow:auto;background:radial-gradient(circle at 30% 20%,#c1272d 0,#7a1e1e 30%,#1d3557 75%,#14213d 100%);touch-action:pan-y}
+.sbox{width:min(600px,100%);text-align:center;padding:22px 18px;background:rgba(20,33,61,.75);border:3px solid var(--gold);border-radius:22px;box-shadow:0 14px 40px rgba(0,0,0,.5)}
+.sbox h1{margin:4px 0;font-size:clamp(28px,7vw,46px);color:var(--gold);text-shadow:0 3px 0 #7a1e1e;line-height:1.1}
+.sbox .sub{font-size:15px;opacity:.95;margin:8px 0 14px;line-height:1.5}
+.lant{font-size:34px;letter-spacing:8px}
+.chs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}
+.chs div{background:rgba(255,255,255,.08);border-radius:12px;padding:9px 6px;font-size:12.5px;line-height:1.35;border:1px solid rgba(255,255,255,.2)}
+.chs b{display:block;color:var(--gold);font-size:13px;margin-bottom:2px}
+.sbox input{width:100%;max-width:340px;padding:11px 14px;border-radius:12px;border:2px solid var(--gold);background:#fff;color:#14213d;font-size:16px;font-family:inherit;text-align:center;margin:6px 0 12px;user-select:text;-webkit-user-select:text}
+.big{padding:14px 30px;font-size:19px;border-radius:16px;border:none;background:linear-gradient(180deg,#ffd447,#f2a705);color:#3b2600;font-weight:800;box-shadow:0 6px 0 #a86f00}
+.big:disabled{opacity:.6}
+.ctl{font-size:12.5px;opacity:.85;margin-top:14px;line-height:1.6}
+.note{font-size:11.5px;opacity:.7;margin-top:8px}
+.cert{width:min(640px,100%);background:var(--cream);color:#2b1d00;border:6px double #b8860b;border-radius:18px;padding:20px 18px;text-align:center;box-shadow:0 14px 40px rgba(0,0,0,.5)}
+.cert h2{margin:2px 0;color:#9d1c1c;font-size:clamp(22px,5vw,32px)}
+.cert .nm2{font-size:24px;font-weight:800;color:#1d3557;margin:6px 0}
+.cert .end{margin:10px 0;padding:10px;border-radius:12px;background:#fde9b8;font-size:14.5px;line-height:1.5}
+.cert .sum{text-align:left;font-size:13.5px;line-height:1.55;background:#fff;border-radius:12px;padding:10px 12px;margin-top:10px}
+.cert .sum b{color:#9d1c1c}
+.mets{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:8px 0}
+.met{background:#1d3557;color:#fff;border-radius:12px;padding:7px 11px;font-size:13px}
+.met b{color:var(--gold);font-size:16px}
+#loadErr{color:#ffb3b3;font-weight:700;margin-top:10px}
+@media (max-width:600px){
+ #hud{font-size:12px;padding:7px 9px}
+ #guide{top:54px;left:10px;transform:none;max-width:calc(100vw - 140px);font-size:12px}
+ .txt{font-size:14.5px}
+ .chs{grid-template-columns:1fr}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+</head>
+<body>
+<canvas id="c"></canvas>
+
+<div id="hud" class="panel hidden"><div class="hd"><div class="ch" id="chName"></div><span class="tg" id="chProg"></span></div><ul id="quests"></ul></div>
+<div id="guide" class="panel hidden"><span class="ar" id="gArrow">➤</span><span id="gText"></span></div>
+<div id="mapWrap" class="panel hidden"><canvas id="mini"></canvas></div>
+<div id="topBtns" class="hidden"><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
+<div id="stats" class="panel hidden"><div style="font-weight:800;color:var(--gold);margin-bottom:2px">Chỉ số phố cổ</div>
+ <div class="row"><span class="lb">🏛️ Bảo tồn</span><span class="bar"><i id="bB" style="background:#f2b705"></i></span><span class="v" id="vB">50</span></div>
+ <div class="row"><span class="lb">🏠 Sinh kế</span><span class="bar"><i id="bS" style="background:#2a9d8f"></i></span><span class="v" id="vS">50</span></div>
+ <div class="row"><span class="lb">🧳 Du lịch</span><span class="bar"><i id="bD" style="background:#e76f51"></i></span><span class="v" id="vD">50</span></div>
+</div>
+<div id="joyZone"></div><div id="joy"><div class="knob"></div></div>
+<button id="act" class="hidden">💬 Nói chuyện<small id="actWho"></small></button>
+<div id="hint" class="hidden">WASD / mũi tên: đi · Shift: chạy · Kéo chuột: xoay camera · Lăn chuột: zoom · E: nói chuyện</div>
+<div id="banner"><div class="t" id="bnT"></div><div class="s" id="bnS"></div></div>
+<div id="toast"></div>
+<div id="dlg" class="hidden"><div class="dcard" id="dcard"></div></div>
+
+<div id="start" class="over"><div class="sbox">
+ <div class="lant">🏮🏮🏮</div>
+ <h1>Phiêu lưu Phố cổ Hà Nội</h1>
+ <div class="sub">Một thế giới 3D để bạn tự do dạo quanh <b>36 phố phường</b>, gặp người dân, giải mã tên phố và tự tay quyết định tương lai của phố cổ.</div>
+ <div class="chs">
+  <div><b>Chặng 1</b>Hình thành &amp; phát triển<br>“Thăng Long – Kẻ Chợ”</div>
+  <div><b>Chặng 2</b>Giá trị phố cổ<br>“Sưu tầm thẻ giá trị”</div>
+  <div><b>Chặng 3</b>Bảo tồn<br>“Trưởng ban quản lý”</div>
+ </div>
+ <input id="pname" maxlength="30" placeholder="Nhập tên của bạn (hoặc tên nhóm)">
+ <br><button class="big" id="startBtn" disabled>Đang dựng phố…</button>
+ <div id="loadErr" class="hidden">Không tải được thư viện 3D. Hãy kiểm tra kết nối mạng rồi tải lại trang.</div>
+ <div class="ctl">📱 Điện thoại: cần điều khiển bên trái để đi, vuốt màn hình để xoay, bấm nút vàng để nói chuyện.<br>💻 Máy tính: WASD / mũi tên để đi, kéo chuột để xoay, phím E để nói chuyện.</div>
+ <div class="note">Bản đồ đã được cách điệu và thu nhỏ; vị trí các phố, công trình chỉ mang tính tương đối. Các nhân vật là nhân vật hư cấu.</div>
+</div></div>
+
+<div id="end" class="over hidden"><div class="cert" id="certBox"></div></div>
+
+<script>
+(function(){
+'use strict';
+const $=id=>document.getElementById(id);
+if(!window.THREE){ $('loadErr').classList.remove('hidden'); $('startBtn').textContent='Không tải được'; return; }
+const PI=Math.PI;
+
+/* ---------- random ---------- */
+let seed=20241112; const rnd=()=>{seed=(seed*16807)%2147483647;return (seed-1)/2147483646;};
+const R=(a,b)=>a+rnd()*(b-a), P=a=>a[Math.floor(rnd()*a.length)];
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;};
+const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+/* ---------- renderer ---------- */
+const isTouch=matchMedia('(pointer:coarse)').matches&&!matchMedia('(pointer:fine)').matches;
+let touchMode=isTouch;document.body.classList.toggle('touch',touchMode);
+// Tự chuyển chế độ theo thiết bị thật đang dùng (laptop cảm ứng: chuột -> bàn phím, chạm -> cần điều khiển)
+addEventListener('pointerdown',e=>{const t=e.pointerType==='touch'||e.pointerType==='pen';if(t!==touchMode){touchMode=t;document.body.classList.toggle('touch',t);}},true);
+const renderer=new THREE.WebGLRenderer({canvas:$('c'),antialias:!isTouch||devicePixelRatio<2});
+renderer.setPixelRatio(Math.min(devicePixelRatio,isTouch?1.4:1.75));
+const scene=new THREE.Scene();
+scene.background=new THREE.Color('#bfe0f5');
+scene.fog=new THREE.Fog('#d3e8f4',70,240);
+const camera=new THREE.PerspectiveCamera(60,1,0.3,600);
+scene.add(new THREE.HemisphereLight('#ffffff','#8d7b62',0.88));
+const sun=new THREE.DirectionalLight('#fff0d0',0.72); sun.position.set(-60,100,40); scene.add(sun);
+function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
+addEventListener('resize',resize); resize();
+
+/* ---------- geometry batching ---------- */
+const BOX=new THREE.BoxGeometry(1,1,1).toNonIndexed();
+const PRISM=new THREE.CylinderGeometry(1,1,1,3,1).toNonIndexed();
+const CYL=new THREE.CylinderGeometry(1,1,1,8,1).toNonIndexed();
+const CONE4=new THREE.ConeGeometry(1,1,4,1).toNonIndexed();
+const CONE=new THREE.ConeGeometry(1,1,10,1).toNonIndexed();
+const ICO=new THREE.IcosahedronGeometry(1,0).toNonIndexed();
+const _m=new THREE.Matrix4(),_q=new THREE.Quaternion(),_e=new THREE.Euler(),_p=new THREE.Vector3(),_s=new THREE.Vector3(),_n=new THREE.Matrix3(),_c=new THREE.Color(),_t=new THREE.Vector3();
+const VMAT=new THREE.MeshLambertMaterial({vertexColors:true});
+class Batch{
+ constructor(){this.p=[];this.n=[];this.c=[];}
+ add(g,x,y,z,sx,sy,sz,col,ry=0,rx=0,rz=0){
+  _e.set(rx,ry,rz,'YXZ');_q.setFromEuler(_e);_m.compose(_p.set(x,y,z),_q,_s.set(sx,sy,sz));_n.getNormalMatrix(_m);_c.set(col);
+  const P_=g.attributes.position,N=g.attributes.normal;
+  for(let i=0;i<P_.count;i++){_t.fromBufferAttribute(P_,i).applyMatrix4(_m);this.p.push(_t.x,_t.y,_t.z);_t.fromBufferAttribute(N,i).applyMatrix3(_n).normalize();this.n.push(_t.x,_t.y,_t.z);this.c.push(_c.r,_c.g,_c.b);}
+ }
+ mesh(){const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(this.p,3));g.setAttribute('normal',new THREE.Float32BufferAttribute(this.n,3));g.setAttribute('color',new THREE.Float32BufferAttribute(this.c,3));g.computeBoundingSphere();return new THREE.Mesh(g,VMAT);}
+}
+function makePut(B,ox,oz,ry){const c=Math.cos(ry),s=Math.sin(ry);return (g,lx,ly,lz,sx,sy,sz,col,rx=0,rz=0)=>B.add(g,ox+lx*c+lz*s,ly,oz-lx*s+lz*c,sx,sy,sz,col,ry,rx,rz);}
+const WHITE=new THREE.Color('#ffffff');
+const lighten=(c,k=.3)=>new THREE.Color(c).lerp(WHITE,k);
+const matCache={}; const lam=c=>matCache[c]||(matCache[c]=new THREE.MeshLambertMaterial({color:c}));
+
+/* ---------- canvas text ---------- */
+function rr(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.lineTo(x+w-r,y);ctx.quadraticCurveTo(x+w,y,x+w,y+r);ctx.lineTo(x+w,y+h-r);ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h);ctx.lineTo(x+r,y+h);ctx.quadraticCurveTo(x,y+h,x,y+h-r);ctx.lineTo(x,y+r);ctx.quadraticCurveTo(x,y,x+r,y);ctx.closePath();}
+function labelCanvas(text,o={}){
+ const fs=o.fs||46,pad=o.pad||22,font=`800 ${fs}px "Be Vietnam Pro",system-ui,sans-serif`;
+ const c=document.createElement('canvas');let ctx=c.getContext('2d');ctx.font=font;
+ c.width=Math.ceil(ctx.measureText(text).width+pad*2);c.height=Math.ceil(fs*1.55+pad*.5);
+ ctx=c.getContext('2d');ctx.font=font;rr(ctx,4,4,c.width-8,c.height-8,o.r==null?18:o.r);
+ ctx.fillStyle=o.bg||'#1d3557';ctx.fill();ctx.lineWidth=o.bw||6;ctx.strokeStyle=o.border||'#f2b705';ctx.stroke();
+ ctx.fillStyle=o.fg||'#fff';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,c.width/2,c.height/2+3);return c;
+}
+const texCache={};
+function textTex(text,o){const k=text+JSON.stringify(o||{});if(texCache[k])return texCache[k];const c=labelCanvas(text,o);const t=new THREE.CanvasTexture(c);t.anisotropy=4;t.userData={ar:c.width/c.height};return texCache[k]=t;}
+function makeSprite(text,o,H){const t=textTex(text,o);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:t,depthWrite:false,fog:false}));sp.scale.set(H*t.userData.ar,H,1);return sp;}
+function addPlaneSign(text,o,x,y,z,ry,H,double=true){
+ const t=textTex(text,o);const g=new THREE.PlaneGeometry(H*t.userData.ar,H);const m=new THREE.MeshBasicMaterial({map:t});
+ const a=new THREE.Mesh(g,m);a.position.set(x,y,z);a.rotation.y=ry;scene.add(a);
+ if(double){const b=new THREE.Mesh(g,m);b.position.set(x,y,z);b.rotation.y=ry+PI;scene.add(b);}
+ return a;
+}
+function markerTex(sym,bg){const k='mk'+sym+bg;if(texCache[k])return texCache[k];const c=document.createElement('canvas');c.width=c.height=128;const x=c.getContext('2d');x.beginPath();x.arc(64,64,54,0,PI*2);x.fillStyle=bg;x.fill();x.lineWidth=9;x.strokeStyle='#fff';x.stroke();x.fillStyle='#fff';x.font='800 64px system-ui,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(sym,64,68);return texCache[k]=new THREE.CanvasTexture(c);}
+
+/* ---------- world layout ---------- */
+const XS=[-90,-30,10,50,90], ZS=[-80,-40,0,40];
+const STREET_W=10, SIDE=2;
+const NAMES={
+ v:{'-90':['Hàng Lược','Hàng Thuốc Bắc','Hàng Hòm'],'-30':['Hàng Đường','Hàng Ngang','Hàng Đào'],'10':['Hàng Giầy','Tạ Hiện','Hàng Bè'],'50':['Đào Duy Từ','Mã Mây','Hàng Thùng'],'90':['Trần Nhật Duật','Trần Nhật Duật','Trần Nhật Duật']},
+ h:{'-80':['Hàng Mã','Hàng Chiếu','Hàng Chiếu','Hàng Chiếu'],'-40':['Lãn Ông','Hàng Buồm','Hàng Buồm','Hàng Buồm'],'0':['Hàng Bồ','Hàng Bạc','Hàng Bạc','Hàng Bạc'],'40':['Hàng Gai','Cầu Gỗ','Cầu Gỗ','Cầu Gỗ']}
+};
+const LAKE={cx:-10,cz:110,rx:48,rz:52};
+const ISLAND={x:8,z:72,r:5};
+const BRIDGE={x0:6.5,x1:9.5,z0:55,z1:68};
+const RES=[
+ {x0:-26,x1:6,z0:-125,z1:-87},   // chợ Đồng Xuân
+ {x0:16,x1:36,z0:-62,z1:-47},    // đền Bạch Mã
+ {x0:20,x1:38,z0:7,z1:22},       // đình Kim Ngân
+ {x0:57,x1:70,z0:-25,z1:-15},    // 87 Mã Mây
+ {x0:-68,x1:-54,z0:18,z1:33},    // khu đất dự án (Hàng Gai)
+ {x0:-64,x1:-56,z0:-33,z1:-24}   // nhà cổ xuống cấp (Lãn Ông)
+];
+const reserved=(x,z)=>RES.some(r=>x>r.x0&&x<r.x1&&z>r.z0&&z<r.z1);
+const COL=[]; // colliders {x0,x1,z0,z1,h}
+const W=new Batch();
+
+const FACADE=['#efc86a','#f3d98f','#e2a84b','#f2e6c9','#cfe0b4','#a9cbe0','#eab8a0','#f5dd9b','#d9c8a6','#f0b7b3','#bfe3d3','#f6c453'];
+const AWN=['#d62828','#1d70b8','#2a9d8f','#f77f00','#7b2cbf','#e63946','#0081a7','#3a86ff'];
+const SIGN=['#c1121f','#f2b705','#1d3557','#d62828','#2a9d8f','#ffb703','#8338ec'];
+const SHUT=['#2f7d5b','#3a6ea5','#6b4226','#2e8b57','#3c8d93'];
+const ROOF=['#8d3b2b','#7b3f2a','#9c4a32','#6e3524','#874030'];
+
+function house(B,ox,oz,ry,w,d,o={}){
+ const floors=o.floors||(rnd()<.5?2:3),fh=3.1,h=floors*fh;
+ const wall=o.wall||P(FACADE);const put=makePut(B,ox,oz,ry);
+ put(BOX,0,h/2,-d/2,w-.06,h,d,wall);
+ put(BOX,0,fh-.05,.08,w,.18,.25,o.trim||'#efe7d6');
+ if(!o.noShop){
+  put(BOX,0,1.3,.04,w*.8,2.45,.06,'#3b2b22');
+  for(let k=0;k<2;k++) put(BOX,(k?1:-1)*w*.2,.75+rnd()*.4,.14,w*.26,.9+rnd()*.5,.22,o.goods?P(o.goods):P(AWN));
+  if(!o.noAwning) put(BOX,0,2.75,.6,w*.96,.08,1.25,o.awn||P(AWN),.28);
+  put(BOX,0,3.45,.1,w*.74,.55,.1,o.sign||P(SIGN));
+ }
+ for(let f=1;f<floors;f++){
+  const y=f*fh+1.55,n=w>4.4?2:1,sc=o.shut||P(SHUT);
+  for(let k=0;k<n;k++){const lx=n===1?0:(k?w*.23:-w*.23);put(BOX,lx,y,.04,.95,1.75,.1,'#2b2420');put(BOX,lx-.25,y,.1,.42,1.7,.08,sc);put(BOX,lx+.25,y,.1,.42,1.7,.08,sc);}
+  if(f===1&&(o.balcony||(!o.noBalcony&&rnd()<.5))){put(BOX,0,fh+.1,.5,w*.92,.14,1,'#ddd3c0');put(BOX,0,fh+.55,.98,w*.92,.75,.05,'#33302c');if(rnd()<.7)put(ICO,w*.3,fh+.6,.6,.38,.38,.38,'#3f8f3f');}
+ }
+ const rt=o.roof||(rnd()<.62?'tile':'flat');
+ if(rt==='tile'){const rc=o.roofCol||P(ROOF),a=.42,L=(d+.6)/(2*Math.cos(a));
+  put(BOX,0,h+.2+Math.sin(a)*L/2,.3-L/2*Math.cos(a),w+.12,.22,L,rc,a);
+  put(BOX,0,h+.2+Math.sin(a)*L/2,-d-.3+L/2*Math.cos(a),w+.12,.22,L,rc,-a);}
+ else{const lw=lighten(wall);put(BOX,0,h+.5,-.2,w,1,.3,lw);put(BOX,0,h+.05,-.1,w+.15,.2,.5,'#efe7d6');put(BOX,0,h+.1,-d/2,w-.3,.2,d-.6,'#9b9186');if(rnd()<.45)put(PRISM,0,h+1.15,-.2,w*.2,.3,.5,lw,-PI/2);}
+ return h;
+}
+function fillFace(ax,from,to,front,ry,dmin,dmax,o){
+ let t=from;
+ while(to-t>2.6){let w=R(3.6,5.4);if(to-t-w<2.8)w=to-t;const mid=t+w/2,d=R(dmin,dmax);
+  const ox=ax==='x'?mid:front,oz=ax==='x'?front:mid;const cx=ox-Math.sin(ry)*d/2,cz=oz-Math.cos(ry)*d/2;
+  if(!reserved(cx,cz))house(W,ox,oz,ry,w,d,o?o(mid):{});t+=w;}
+}
+// Hàng Mã goods (đồ chơi Trung thu rực rỡ)
+const MA_GOODS=['#ff006e','#ffbe0b','#fb5607','#8338ec','#3a86ff','#e63946'];
+function buildBlocks(){
+ for(let i=0;i<4;i++)for(let j=0;j<3;j++){
+  const x0=XS[i]+5,x1=XS[i+1]-5,z0=ZS[j]+5,z1=ZS[j+1]-5;
+  W.add(BOX,(x0+x1)/2,.08,(z0+z1)/2,x1-x0,.16,z1-z0,'#cdbfa5');
+  const X0=x0+SIDE,X1=x1-SIDE,Z0=z0+SIDE,Z1=z1-SIDE;
+  COL.push({x0:X0,x1:X1,z0:Z0,z1:Z1,h:9});
+  const nearMa=(j===0&&i===0);
+  fillFace('x',X0,X1,Z0,PI,8.8,9.2,nearMa?()=>({goods:MA_GOODS,awn:'#d62828'}):null);
+  fillFace('x',X0,X1,Z1,0,8.8,9.2);
+  fillFace('z',Z0+9,Z1-9,X0,-PI/2,7,9);
+  fillFace('z',Z0+9,Z1-9,X1,PI/2,7,9);
+  const temple=(i===2&&j===0)||(i===2&&j===2);
+  if(!temple) W.add(BOX,(X0+X1)/2,3,(Z0+Z1)/2,X1-X0-12,6,Z1-Z0-12,'#a89a85');
+ }
+ // outer strips
+ W.add(BOX,-110,.08,-20,30,.16,130,'#cdbfa5');W.add(BOX,110,.08,-20,30,.16,130,'#cdbfa5');W.add(BOX,0,.08,-105,250,.16,40,'#cdbfa5');
+ COL.push({x0:-130,x1:-97,z0:-85,z1:45,h:9},{x0:97,x1:130,z0:-85,z1:45,h:9},{x0:-130,x1:130,z0:-130,z1:-87,h:9});
+ fillFace('z',-83,43,-97,PI/2,7,9);
+ fillFace('z',-83,43,97,-PI/2,7,9);
+ fillFace('x',-97,97,-87,0,7,9,x=>x<-30?{goods:MA_GOODS}:{});
+ W.add(BOX,-115,4,-20,18,8,130,'#a89a85');W.add(BOX,115,4,-20,18,8,130,'#a89a85');W.add(BOX,0,4,-112,250,8,26,'#a89a85');
+ // street wires (dây điện chằng chịt) + Hàng Mã lanterns
+ for(const x of [-60,-50,-40]) lanternString(x,-80);
+ for(const x of [-70,-62,-54,-46,-38]){W.add(BOX,x,6.0,-80,.05,.05,10,'#222');} for(const x of [-70,-62,-54,-46,-38]) for(let z=-84;z<=-76;z+=2.2) W.add(BOX,x,5.6,z,.45,.6,.45,P(['#e63946','#ffbe0b','#fb5607','#ff006e']));
+}
+function lanternString(x,zc){W.add(BOX,x,6.3,zc,.05,.05,10,'#222');for(let z=zc-4;z<=zc+4;z+=1.3){W.add(BOX,x,5.75,z,.6,.8,.6,'#d62828');W.add(BOX,x,5.75,z,.66,.12,.66,'#f2b705');}}
+
+/* ---------- landmarks ---------- */
+const LABELS=[];
+function label(text,x,y,z,o,H=2.4){const s=makeSprite(text,o||{},H);s.position.set(x,y,z);scene.add(s);LABELS.push(s);return s;}
+function buildMarket(){
+ const cx=-10,fz=-87;
+ W.add(BOX,cx,4.5,fz-10.5,30,9,21,'#f1e6cf');W.add(BOX,cx,9.15,fz-10.5,30.6,.3,21.6,'#8f8a84');
+ for(const gx of [-10,0,10]){W.add(PRISM,cx+gx,10.6,fz-.5,5.6,1,3.2,'#f6eedd',0,-PI/2);W.add(BOX,cx+gx,3.2,fz+.03,5,5.6,.1,'#5a4636');W.add(BOX,cx+gx,6.4,fz+.06,5.6,.4,.2,'#c49a52');
+  for(let k=-1;k<=1;k++)W.add(BOX,cx+gx+k*1.3,10.5,fz+.1,.5,.5,.1,'#7d6a52');}
+ for(const gx of [-15,-5,5,15])W.add(BOX,cx+gx,4.7,fz+.1,1,9.4,.6,'#e5d6b6');
+ W.add(BOX,cx,8.1,fz+.12,30,.5,.3,'#c49a52');
+ addPlaneSign('CHỢ ĐỒNG XUÂN',{bg:'#b71c1c',border:'#f2b705',fs:50},cx,7.2,fz+.4,0,1.5,false);
+ label('Chợ Đồng Xuân',cx,16,fz-6,{bg:'#b71c1c'});
+}
+function buildGate(){
+ const gx=80,c='#9b7a5f',d='#7d604a';
+ W.add(BOX,gx,3.25,-84.5,4,6.5,5,c);W.add(BOX,gx,3.25,-75.5,4,6.5,5,c);
+ W.add(BOX,gx,5.6,-80,4,1.8,4.02,c);W.add(BOX,gx,4.5,-81.6,4.02,.6,.8,c);W.add(BOX,gx,4.5,-78.4,4.02,.6,.8,c);
+ W.add(BOX,gx,6.6,-80,4.6,.25,14.2,'#8a6a52');W.add(BOX,gx-2.15,7.1,-80,.25,.8,14,d);W.add(BOX,gx+2.15,7.1,-80,.25,.8,14,d);
+ W.add(BOX,gx,8.2,-80,3,2.2,4,'#b08968');for(const s of [-1,1]){W.add(BOX,gx+s*1.52,8.2,-80,.05,1,2,'#3b2b22');W.add(BOX,gx+s*2.02,1.5,-84.5,.06,2.6,1.6,'#4a3a2e');W.add(BOX,gx+s*2.02,1.5,-75.5,.06,2.6,1.6,'#4a3a2e');}
+ W.add(CONE4,gx,10.2,-80,3.3,1.9,3.3,'#4e342e',PI/4);
+ for(const s of [-1,1]) addPlaneSign('ĐÔNG HÀ MÔN',{bg:'#3e2723',border:'#c9a15b',fs:40,bw:4},gx+s*2.03,5.6,-80,s*PI/2,.8,false);
+ COL.push({x0:78,x1:82,z0:-87,z1:-82,h:7},{x0:78,x1:82,z0:-78,z1:-73,h:7});
+ label('Ô Quan Chưởng',gx,14.5,-80,{bg:'#6d4c41'});
+}
+function buildTemple(cx,fz,ry,w,depth,wallC,sign){
+ const put=makePut(W,cx,fz,ry);
+ for(const sx of [-2.4,2.4])put(BOX,sx,2.2,-.4,.7,4.4,.7,'#b5332e');
+ put(BOX,0,4.6,-.4,6.4,.35,1.7,'#4e3426');put(BOX,0,5,-.4,5.2,.3,1.2,'#5d4033');
+ put(BOX,-3.3,4.85,-.4,.9,.25,1.5,'#4e3426',0,.5);put(BOX,3.3,4.85,-.4,.9,.25,1.5,'#4e3426',0,-.5);
+ const sw=w/2-2.75;put(BOX,-(2.75+sw/2),1.2,-.4,sw,2.4,.5,wallC);put(BOX,2.75+sw/2,1.2,-.4,sw,2.4,.5,wallC);
+ put(BOX,0,.07,-3.4,w-1,.12,5.4,'#bfae93');
+ put(BOX,0,.6,-3.6,1,1.2,1,'#6d6d6d');put(BOX,0,1.3,-3.6,1.4,.25,1.4,'#5a5a5a');
+ const hz=6.2,hd=depth-hz;put(BOX,0,2.3,-(hz+hd/2),w-2,4.6,hd,wallC);
+ for(let k=-3;k<=3;k++)put(CYL,k*(w-3)/6,2.3,-(hz-.3),.28,4.6,.28,'#a4282c');
+ put(BOX,0,1.7,-(hz-.02),w-6,3.2,.08,'#3b2416');
+ const a=.5,L=(hd+1.6)/(2*Math.cos(a)),yc=4.8+Math.sin(a)*L/2;
+ put(BOX,0,yc,-hz+.8-L/2*Math.cos(a),w-.6,.3,L,'#4e3426',a);put(BOX,0,yc,-depth-.8+L/2*Math.cos(a),w-.6,.3,L,'#4e3426',-a);
+ const ry2=4.8+Math.sin(a)*L+.15;put(BOX,0,ry2,-(hz+hd/2),w-1.2,.4,.5,'#3e2a20');
+ put(BOX,-(w/2-.6),ry2+.35,-(hz+hd/2),.6,.7,.45,'#3e2a20',0,.6);put(BOX,w/2-.6,ry2+.35,-(hz+hd/2),.6,.7,.45,'#3e2a20',0,-.6);
+ put(BOX,-1.6,3.6,-.1,.5,.7,.5,'#d62828');put(BOX,1.6,3.6,-.1,.5,.7,.5,'#d62828');
+ const c=Math.cos(ry),s=Math.sin(ry);
+ if(sign){const t=addPlaneSign(sign,{bg:'#7a1e1e',border:'#f2b705',fs:40,bw:4},cx+.5*s,4.1,fz+.5*c,ry,.75,false);}
+}
+function buildMaMay(){
+ const ox=57,oz=-20,ry=-PI/2;
+ house(W,ox,oz,ry,8,10,{wall:'#7a5a40',floors:2,roof:'tile',roofCol:'#5d3a2a',shut:'#4a3426',sign:'#c0392b',awn:'#6d4c41',goods:['#8d6e63','#c9a15b'],trim:'#5d4037',balcony:true});
+ const put=makePut(W,ox,oz,ry);
+ for(let k=-3;k<=3;k++)put(BOX,k*1.1,4.6,.09,.12,2.6,.08,'#3e2a1e');
+ put(BOX,-2.6,2.3,.6,.5,.7,.5,'#d62828');put(BOX,2.6,2.3,.6,.5,.7,.5,'#d62828');
+ addPlaneSign('NHÀ CỔ · 87 MÃ MÂY',{bg:'#3e2723',border:'#f2b705',fs:40,bw:4},ox-.3,3.45,oz,ry,.62,false);
+ label('Nhà cổ 87 Mã Mây',ox+4,11.5,oz,{bg:'#5d4037'});
+}
+function buildLake(){
+ const park=new THREE.Mesh(new THREE.PlaneGeometry(260,140),lam('#86b55a'));park.rotation.x=-PI/2;park.position.set(0,.03,45+70);scene.add(park);
+ const plaza=new THREE.Mesh(new THREE.PlaneGeometry(190,7),lam('#cbbd9f'));plaza.rotation.x=-PI/2;plaza.position.set(0,.05,48.5);scene.add(plaza);
+ const ring=new THREE.Mesh(new THREE.RingGeometry(1.02,1.14,72),lam('#d8c9a8'));ring.rotation.x=-PI/2;ring.scale.set(LAKE.rx,LAKE.rz,1);ring.position.set(LAKE.cx,.07,LAKE.cz);scene.add(ring);
+ const water=new THREE.Mesh(new THREE.CircleGeometry(1,72),new THREE.MeshLambertMaterial({color:'#5aa39a'}));water.rotation.x=-PI/2;water.scale.set(LAKE.rx,LAKE.rz,1);water.position.set(LAKE.cx,.09,LAKE.cz);scene.add(water);
+ W.add(CYL,ISLAND.x,.2,ISLAND.z,ISLAND.r,.4,ISLAND.r,'#7cb342');
+ buildTemple(8,68,PI,7,8,'#e0c27a','ĐỀN NGỌC SƠN');
+ COL.push({x0:4.6,x1:11.4,z0:68.6,z1:76.2,h:6});
+ for(let k=0;k<=10;k++){const z=56+k*1.1,y=.25+1.2*Math.sin(PI*k/10);W.add(BOX,8,y,z,3,.3,1.2,'#c62828');W.add(BOX,6.55,y+.55,z,.15,.8,1.15,'#e53935');W.add(BOX,9.45,y+.55,z,.15,.8,1.15,'#e53935');}
+ W.add(CYL,-12,.2,118,3.5,.5,3.5,'#7cb342');
+ W.add(BOX,-12,1.6,118,3,2.6,2.4,'#d8cbb0');W.add(BOX,-12,3.8,118,2.4,1.8,2,'#d8cbb0');W.add(BOX,-12,5.3,118,1.7,1.2,1.5,'#d8cbb0');
+ for(const y of [1.5,3.7])W.add(BOX,-12,y,116.75,.9,1.3,.1,'#5b4a3a');
+ W.add(CONE4,-12,6.4,118,1.4,1,1.4,'#7a5a40',PI/4);
+ label('Hồ Gươm',LAKE.cx,10,95,{bg:'#2a9d8f'},2.8);label('Tháp Rùa',-12,10,118,{bg:'#2a9d8f'},2);label('Đền Ngọc Sơn · Cầu Thê Húc',8,11,70,{bg:'#b71c1c'},2);
+ // trees
+ for(const f of [1.22,1.4]){for(let a=0;a<PI*2;a+=0.16/f){const x=LAKE.cx+LAKE.rx*f*Math.cos(a)+R(-1,1),z=LAKE.cz+LAKE.rz*f*Math.sin(a)+R(-1,1);
+  if(z<53||Math.abs(x)>92||z>172)continue;if(Math.abs(x-8)<4&&z<64)continue;if(Math.hypot(x+50,z-52)<4||Math.hypot(x+26,z-50)<4)continue;tree(x,z);}}
+ for(let x=-90;x<=92;x+=9){tree(x+R(-1,1),172+R(-1,1));}
+ for(let z=60;z<170;z+=9){tree(-93,z);tree(93,z);}
+}
+function tree(x,z){const s=R(.85,1.25);W.add(BOX,x,1.3*s,z,.5,2.6*s,.5,'#6d4c41');W.add(ICO,x,3.6*s,z,2.3*s,2*s,2.3*s,P(['#3e8e41','#4caf50','#2e7d32','#558b2f']));W.add(ICO,x+.8,4.4*s,z-.4,1.4*s,1.3*s,1.4*s,P(['#66bb6a','#43a047']));}
+function buildBanners(){
+ for(const x of XS){NAMES.v[x].forEach((nm,j)=>{const z=(ZS[j]+ZS[j+1])/2;W.add(BOX,x,6.9,z,10,.06,.06,'#222');addPlaneSign('PHỐ '+nm.toUpperCase(),{bg:'#1d3557',border:'#ffffff',fs:44,bw:5,r:10},x,6.1,z,0,1.2);});}
+ for(const z of ZS){NAMES.h[z].forEach((nm,i)=>{const x=(XS[i]+XS[i+1])/2;W.add(BOX,x,6.9,z,.06,.06,10,'#222');addPlaneSign('PHỐ '+nm.toUpperCase(),{bg:'#1d3557',border:'#ffffff',fs:44,bw:5,r:10},x,6.1,z,PI/2,1.2);});}
+ // dây điện
+ for(const x of XS)for(let z=-75;z<40;z+=13)W.add(BOX,x+R(-3,3),7.4,z,.04,.04,12,'#2a2a2a',R(-.3,.3));
+}
+
+/* ---------- variant (changeable) scenery for chặng 3 ---------- */
+const VAR={};
+function variant(name,key,fn){const B=new Batch();fn(B);const m=B.mesh();m.visible=false;scene.add(m);(VAR[name]=VAR[name]||{})[key]=m;}
+function setVar(name,key){for(const k in VAR[name])VAR[name][k].visible=(k===key);}
+function buildVariants(){
+ // Khu đất Hàng Gai: front z=33, x center -61, facing +z
+ variant('tower','old',B=>{house(B,-61,33,0,13,10,{wall:'#a39e92',floors:2,roofCol:'#6f6a60',roof:'tile',shut:'#5d5d5d',sign:'#777',noBalcony:true});
+  for(let x=-67.5;x<=-54.5;x+=1.6)B.add(BOX,x,1.2,33.6,1.5,2.4,.12,'#1b5e20');B.add(BOX,-61,3,33.7,7,1.4,.15,'#f2b705');});
+ variant('tower','A',B=>{B.add(BOX,-61,14,26,13,28,13,'#7fa7c9');for(let y=3;y<28;y+=3.1)B.add(BOX,-61,y,32.55,13.1,.25,.1,'#dfe9f2');for(let x=-66;x<=-56;x+=2.5)B.add(BOX,x,14,32.55,.2,28,.1,'#dfe9f2');B.add(BOX,-61,1.5,32.7,6,3,.1,'#263238');});
+ variant('tower','B',B=>{let x=-67.5;for(const w of [4.4,4.2,4.4]){house(B,x+w/2,33,0,w,9,{floors:R(2,3)>2.5?3:2,roof:'tile',balcony:true});x+=w;}});
+ variant('tower','C',B=>{house(B,-61,33,0,13,10,{wall:'#8f8a80',floors:2,roofCol:'#5f5a50',roof:'tile',shut:'#4d4d4d',sign:'#666',noBalcony:true});B.add(BOX,-63,6.9,30,4,.15,5,'#1565c0',.2);B.add(BOX,-58,4.5,33.15,.1,3,.1,'#3b3b3b');});
+ // Nhà cổ Lãn Ông: front z=-33, facing -z, center x=-60
+ variant('nhaco','old',B=>{house(B,-60,-33,PI,8,9,{wall:'#a8a294',floors:2,roofCol:'#6f6a60',roof:'tile',shut:'#5d5d5d',sign:'#7a7a7a',awn:'#757575',noBalcony:true});B.add(BOX,-61,6.9,-28,4,.12,5,'#1565c0',.25);for(const x of [-62.5,-58])B.add(BOX,x,3.2,-33.08,.08,2.2,.05,'#4d4d4d');});
+ variant('nhaco','A',B=>{house(B,-60,-33,PI,8,9,{wall:'#a8a294',floors:2,roofCol:'#6f6a60',roof:'tile',shut:'#5d5d5d',sign:'#7a7a7a',noBalcony:true});B.add(BOX,-60,8.6,-36.5,8,3.2,1.2,'#9e9e9e');B.add(BOX,-60,8.6,-37.15,7,2.2,.1,'#64b5f6');});
+ variant('nhaco','B',B=>{house(B,-60,-33,PI,8,9,{wall:'#efc86a',floors:2,roofCol:'#9c4a32',roof:'tile',shut:'#2f7d5b',sign:'#c1121f',balcony:true});});
+ variant('nhaco','C',B=>{B.add(BOX,-60,10.5,-28.5,8,21,9,'#b0b6bb');for(let y=3;y<21;y+=3)B.add(BOX,-60,y,-33.05,8.05,.25,.1,'#e0e0e0');for(const x of [-62,-58])B.add(BOX,x,11,-33.06,1.4,18,.1,'#78909c');});
+ // vỉa hè Tạ Hiện (x=10 street, z -35..-5)
+ const stool=(B,x,z,c)=>{B.add(BOX,x,.35,z,.55,.7,.55,c);};
+ variant('viahe','old',B=>{for(let z=-33;z<-8;z+=1.3){stool(B,15.6+R(-.3,.3),z,P(['#d62828','#1d70b8']));if(rnd()<.7)stool(B,R(8,13.5),z+R(-.4,.4),P(['#d62828','#1d70b8']));if(rnd()<.4)stool(B,R(5.5,7.5),z,P(['#d62828','#1d70b8']));}for(let z=-30;z<-8;z+=5)B.add(BOX,R(10,13),.5,z,1.2,1,1.2,'#8d6e63');});
+ variant('viahe','A',B=>{B.add(BOX,15.5,.2,-20,.1,.1,.1,'#cdbfa5');});
+ variant('viahe','B',B=>{for(let z=-33;z<-8;z+=1.3)stool(B,15.7,z,P(['#d62828','#1d70b8']));B.add(BOX,14.2,.04,-20.5,.15,.05,27,'#ffffff');for(let z=-31;z<-9;z+=6)B.add(BOX,16.3,.5,z,.8,1,.8,'#8d6e63');});
+ variant('viahe','C',B=>{for(let z=-34;z<-6;z+=1)for(let x=6;x<16;x+=1.4)if(rnd()<.55)stool(B,x+R(-.2,.2),z,P(['#d62828','#1d70b8','#2a9d8f']));});
+ // phố đi bộ: cờ dây quanh hồ
+ variant('dibo','on',B=>{for(let a=0;a<PI*2;a+=.12){const f=1.16,x=LAKE.cx+LAKE.rx*f*Math.cos(a),z=LAKE.cz+LAKE.rz*f*Math.sin(a);if(z<54||Math.abs(x-8)<3&&z<62)continue;B.add(BOX,x,2,z,.12,4,.12,'#555');B.add(PRISM,x,3.6,z,.45,.05,.7,P(['#e63946','#ffbe0b','#2a9d8f','#3a86ff','#8338ec']),a,PI/2);}
+  for(let x=-85;x<=85;x+=7){B.add(PRISM,x,4.2,46,.5,.05,.7,P(['#e63946','#ffbe0b','#2a9d8f','#3a86ff']),0,PI/2);}B.add(BOX,0,4.6,46,170,.05,.05,'#333');});
+ variant('dibo','off',B=>{B.add(BOX,0,-5,0,.1,.1,.1,'#000');});
+ setVar('tower','old');setVar('nhaco','old');setVar('viahe','old');setVar('dibo','off');
+}
+
+/* ---------- people ---------- */
+const SKIN=['#e9c09a','#d9a77c','#f1cba5','#c98f62'];
+function makePerson(o={}){
+ const g=new THREE.Group();const skin=o.skin||P(SKIN),shirt=o.shirt||P(['#c0392b','#2980b9','#27ae60','#8e44ad','#f39c12','#ecf0f1','#16a085','#d35400']),pants=o.pants||P(['#2c3e50','#34495e','#5d4037','#212121','#37474f']);
+ const legs=[],arms=[];
+ for(const s of [-1,1]){const hip=new THREE.Group();hip.position.set(.19*s,.95,0);const l=new THREE.Mesh(new THREE.BoxGeometry(.32,.95,.34),lam(pants));l.position.y=-.47;hip.add(l);const f=new THREE.Mesh(new THREE.BoxGeometry(.34,.14,.46),lam('#3b2b22'));f.position.set(0,-.92,.05);hip.add(f);g.add(hip);legs.push(hip);}
+ const body=new THREE.Mesh(new THREE.BoxGeometry(.82,1.0,.46),lam(shirt));body.position.y=1.45;g.add(body);
+ if(o.dress){const sk=new THREE.Mesh(new THREE.BoxGeometry(.86,.7,.5),lam(shirt));sk.position.y=.75;g.add(sk);}
+ for(const s of [-1,1]){const sh=new THREE.Group();sh.position.set(.53*s,1.88,0);const a=new THREE.Mesh(new THREE.BoxGeometry(.24,.9,.26),lam(shirt));a.position.y=-.42;sh.add(a);const h=new THREE.Mesh(new THREE.BoxGeometry(.22,.2,.22),lam(skin));h.position.y=-.95;sh.add(h);g.add(sh);arms.push(sh);}
+ const head=new THREE.Mesh(new THREE.BoxGeometry(.56,.56,.52),lam(skin));head.position.y=2.25;g.add(head);
+ const hair=new THREE.Mesh(new THREE.BoxGeometry(.6,.2,.56),lam(o.hair||'#1b1b1b'));hair.position.y=2.58;g.add(hair);
+ const back=new THREE.Mesh(new THREE.BoxGeometry(.6,.4,.12),lam(o.hair||'#1b1b1b'));back.position.set(0,2.35,-.24);g.add(back);
+ for(const s of [-1,1]){const e=new THREE.Mesh(new THREE.BoxGeometry(.08,.08,.02),lam('#111'));e.position.set(.13*s,2.3,.265);g.add(e);}
+ if(o.hat==='non'){const n=new THREE.Mesh(new THREE.ConeGeometry(.62,.42,14),lam('#efe0b0'));n.position.y=2.86;g.add(n);}
+ if(o.hat==='khan'){const k=new THREE.Mesh(new THREE.CylinderGeometry(.34,.34,.22,12),lam('#222'));k.position.y=2.72;g.add(k);}
+ if(o.hat==='cap'){const k=new THREE.Mesh(new THREE.BoxGeometry(.6,.16,.6),lam(o.capC||'#e63946'));k.position.y=2.66;g.add(k);const v=new THREE.Mesh(new THREE.BoxGeometry(.5,.06,.3),lam(o.capC||'#e63946'));v.position.set(0,2.6,.4);g.add(v);}
+ if(o.bag){const b=new THREE.Mesh(new THREE.BoxGeometry(.6,.7,.3),lam(o.bag));b.position.set(0,1.5,-.38);g.add(b);}
+ if(o.ganh){const p=new THREE.Mesh(new THREE.BoxGeometry(.08,.08,2.6),lam('#a1887f'));p.position.set(.45,1.95,0);g.add(p);for(const s of [-1,1]){const bk=new THREE.Mesh(new THREE.CylinderGeometry(.42,.32,.45,10),lam('#c8a165'));bk.position.set(.45,.75,1.15*s);g.add(bk);const fd=new THREE.Mesh(new THREE.CylinderGeometry(.36,.36,.1,10),lam(s>0?'#f4d35e':'#e76f51'));fd.position.set(.45,1.0,1.15*s);g.add(fd);}}
+ if(o.beard){const b=new THREE.Mesh(new THREE.BoxGeometry(.3,.25,.1),lam('#eeeeee'));b.position.set(0,2.0,.27);g.add(b);}
+ g.userData={legs,arms,phase:Math.random()*6};g.scale.setScalar(o.scale||.82);return g;
+}
+function animWalk(p,dt,amt,rate){const u=p.userData;u.ph=(u.ph==null?u.phase:u.ph)+dt*rate;u.amt=(u.amt||0)+(amt-(u.amt||0))*Math.min(1,dt*10);const a=Math.sin(u.ph)*.62*u.amt;u.legs[0].rotation.x=a;u.legs[1].rotation.x=-a;u.arms[0].rotation.x=-a*.8;u.arms[1].rotation.x=a*.8;}
+function makeBike(){const g=new THREE.Group();const c=P(['#d62828','#1d70b8','#222','#f2f2f2','#2a9d8f']);
+ const b=new THREE.Mesh(new THREE.BoxGeometry(.5,.55,1.7),lam(c));b.position.y=.7;g.add(b);const s=new THREE.Mesh(new THREE.BoxGeometry(.45,.15,.8),lam('#222'));s.position.set(0,1.05,-.2);g.add(s);
+ const hb=new THREE.Mesh(new THREE.BoxGeometry(.9,.08,.08),lam('#555'));hb.position.set(0,1.35,.75);g.add(hb);
+ for(const z of [-.75,.8]){const w=new THREE.Mesh(new THREE.CylinderGeometry(.35,.35,.18,12),lam('#111'));w.rotation.z=PI/2;w.position.set(0,.35,z);g.add(w);}
+ const r=makePerson({hat:Math.random()<.5?'cap':null,capC:P(['#fff','#e63946','#1d70b8']),scale:.72});r.position.set(0,.55,-.1);r.userData.legs.forEach(l=>l.rotation.x=-1.2);g.add(r);return g;}
+
+/* ---------- game data ---------- */
+const S={chang:0,asked:0,notes:[],firstTry:0,quizTotal:0,cards:[],stats:{B:50,S:50,D:50},dec:{},name:'',busy:false,timelineFirst:null,free:false};
+const OBJ=[];
+function obj(o){OBJ.push(o);return o;}
+const C1='Thăng Long – Kẻ Chợ',C2='Kho báu giá trị',C3='Trưởng ban quản lý';
+// ===== Chặng 1 =====
+// 6 người "dạy" kiến thức (ghi vào Sổ tay) -> ông đồ ra đề kiểm tra
+const Q=(q,a)=>[q,a];
+const T1=['ongdo','hangdao','hangbac','hangbuom','hangma','dongxuan'];
+obj({id:'ongdo',ch:1,pos:[-26,50],title:'Nghe ông đồ kể chuyện (Bờ Hồ)',who:'Ông đồ Thăng Long',em:'👴',look:{shirt:'#6d4c41',pants:'#efe6d2',hat:'khan',beard:true,dress:true},
+ note:{t:'👴 Ông đồ: Thăng Long – Kẻ Chợ',x:'• Năm <b>1010</b>, vua <b>Lý Thái Tổ</b> dời đô về Đại La, đặt tên <b>Thăng Long</b>.<br>• Kinh đô gồm <b>“thành”</b> (vua quan) và <b>“thị”</b> (dân buôn bán, làm nghề) ở phía Đông, gần sông Hồng, sông Tô Lịch.<br>• Thợ từ <b>làng nghề</b> lên lập <b>phường</b>, mỗi phường thành một phố chuyên một mặt hàng → tên <b>“Hàng + mặt hàng”</b>.<br>• Thế kỷ XVII–XVIII (Lê – Trịnh) khu buôn bán phồn thịnh, gọi là <b>Kẻ Chợ</b>: “Thứ nhất Kinh Kỳ, thứ nhì Phố Hiến”.<br>• “36 phố phường”: số 36 là <b>ước lệ</b>, thực tế nhiều hơn.'},
+ run:async o=>{
+  await say(o,'À, có khách đến thăm! Lại đây ngồi với ta một lát. Ta là ông đồ, bao năm nay ngồi viết chữ bên Bờ Hồ, xem phố phường đổi thay qua từng mùa.');
+  await say(o,'Cháu muốn tìm hiểu phố cổ à? Thế này nhé: ta và những người dân trong phố sẽ <b>kể cho cháu nghe</b>. Mỗi điều quan trọng sẽ được ghi vào <b>📒 Sổ tay</b> của cháu. Nghe đủ rồi thì quay về đây, ta sẽ <b>đố</b> cháu!');
+  await say(o,'Chuyện bắt đầu từ năm <b>1010</b>, khi vua <b>Lý Thái Tổ</b> dời đô từ Hoa Lư về thành Đại La và đặt tên mới là <b>Thăng Long</b>, nghĩa là “rồng bay lên”.');
+  await say(o,'Kinh đô có hai phần: <b>“thành”</b> là nơi vua quan ở và làm việc, còn <b>“thị”</b> là nơi dân buôn bán, làm nghề. Phần “thị” nằm ở <b>phía Đông</b> kinh thành, gần <b>sông Hồng</b> và <b>sông Tô Lịch</b>, thuyền bè ra vào tấp nập.');
+  await say(o,'Thợ thủ công từ các <b>làng nghề</b> quanh vùng kéo về đây làm ăn. Người cùng nghề, cùng quê ở gần nhau, lập thành <b>phường</b>. Mỗi phường dần thành một con phố chuyên bán một thứ hàng, nên tên phố là <b>“Hàng + tên mặt hàng”</b>: Hàng Bạc bán bạc, Hàng Đường bán đường, Hàng Muối bán muối...');
+  await say(o,'Đến thế kỷ XVII–XVIII, thời Lê – Trịnh, khu buôn bán này phồn thịnh nhất. Dân gian gọi là <b>Kẻ Chợ</b>, và có câu <b>“Thứ nhất Kinh Kỳ, thứ nhì Phố Hiến”</b>.');
+  await say(o,'Người ta hay nói <b>“Hà Nội 36 phố phường”</b>. Nhưng con số <b>36 chỉ là ước lệ</b>, ý nói “rất nhiều”, chứ thực tế số phố còn nhiều hơn thế. Ca dao xưa có câu: <i>“Rủ nhau chơi khắp Long Thành, Ba mươi sáu phố rành rành chẳng sai”</i>.');
+  await ask(o,[
+   Q('Vì sao lại gọi là “Kẻ Chợ” hả ông?','Vì nơi đây là chốn họp chợ, hội tụ đủ các nghề, là chợ lớn nhất nước thời ấy. Thương nhân và giáo sĩ phương Tây đến ở thế kỷ XVII còn phiên âm chữ “Kẻ Chợ” thành <b>“Cachao”</b>, “Kecio”... trong sách vở của họ đấy!'),
+   Q('Ông đồ là người làm nghề gì ạ?','Ông đồ là người biết chữ Hán – Nôm, dạy học và viết câu đối, chữ thư pháp. Ngày Tết, người Hà Nội hay ra xin chữ ông đồ như <b>“Phúc”, “Lộc”, “Thọ”</b> để cầu may.'),
+   Q('Phố cổ nằm ở đâu so với Hồ Gươm ạ?','Phố cổ nằm ở <b>phía Bắc Hồ Gươm</b>, kéo dài về phía sông Hồng. Cháu cứ đi thẳng lên phía trước là vào phố Hàng Đào.')]);
+  await say(o,'Giờ cháu đi gặp những người dân trong phố nhé: <b>bà hàng vải ở Hàng Đào, bác thợ bạc ở Hàng Bạc, ông lái buôn ở Hàng Buồm, chị bán đèn ở Hàng Mã</b> và <b>cô tiểu thương ở chợ Đồng Xuân</b>.<br><br>💡 Đi theo <b>mũi tên vàng</b> và <b>cột sáng</b>. Nghe kỹ nhé, lát ta đố đấy!');
+ }});
+obj({id:'hangdao',ch:1,pos:[-23.8,22],title:'Nghe bà hàng vải (Hàng Đào)',who:'Bà hàng vải',em:'👵',look:{shirt:'#d81b60',hat:'non',dress:true},
+ note:{t:'👵 Phố Hàng Đào',x:'• Xưa là phố <b>nhuộm vải và buôn tơ lụa</b> sầm uất.<br>• Nhiều thợ nhuộm từ làng <b>Đan Loan</b> (Hải Dương) lên đây làm nghề: cả làng nghề “chuyển” lên phố.<br>• Có cách giải thích chữ “đào” gợi <b>màu hồng đào</b> của vải nhuộm.<br>• Nay bán quần áo; từ 2004, tuyến Hàng Đào – Đồng Xuân là <b>phố đi bộ đầu tiên</b> của Hà Nội.'},
+ run:async o=>{
+  await say(o,'Ơ kìa, cháu ở đâu đến thế? Vào đây xem vải với bà! Lụa này mềm lắm, sờ thử xem.');
+  await say(o,'Bà bán vải ở phố này đã mấy chục năm rồi. Mẹ bà, bà ngoại bà cũng buôn vải ở đây. Ngày xưa phố <b>Hàng Đào</b> là nơi <b>nhuộm vải và buôn tơ lụa</b> sầm uất bậc nhất kinh thành.');
+  await say(o,'Nhiều người thợ nhuộm từ làng <b>Đan Loan</b> (Hải Dương) lên đây, vừa nhuộm vừa buôn. Cả một làng nghề “chuyển” lên phố, mang theo bí quyết nhuộm màu của quê mình. Có người giải thích chữ <b>“đào”</b> là gợi <b>màu hồng đào</b> của vải nhuộm đấy.');
+  await say(o,'Bây giờ phố bán chủ yếu quần áo, giày dép. Từ năm <b>2004</b>, đoạn Hàng Đào – Đồng Xuân còn trở thành <b>phố đi bộ đầu tiên</b> của Hà Nội, tối cuối tuần đông vui lắm.');
+  await ask(o,[
+   Q('Trên phố có di tích nào không bà?','Có chứ! Nhà số <b>38 Hàng Đào</b> vốn là <b>đình Đồng Lạc</b>, dựng từ thời Lê. Năm 2004 nơi này được xếp hạng di tích lịch sử – văn hóa cấp quốc gia.'),
+   Q('Ngày xưa khách mua vải từ đâu đến ạ?','Từ khắp các nơi! Người trong kinh thành mua may áo, còn lái buôn các tỉnh về mua buôn rồi mang đi bán lại. Nhờ vậy phố lúc nào cũng tấp nập.')]);
+  await say(o,'Bà kể thế là đủ rồi, cháu nhớ ghi lại nhé. Đi tiếp đi, ghé <b>Hàng Bạc</b> nghe tiếng búa leng keng!');}});
+obj({id:'hangbac',ch:1,pos:[30,-6],title:'Nghe bác thợ bạc (Hàng Bạc)',who:'Bác thợ bạc',em:'👨‍🔧',look:{shirt:'#90a4ae',pants:'#37474f'},
+ note:{t:'👨‍🔧 Phố Hàng Bạc',x:'• Nghề <b>kim hoàn</b> (làm đồ vàng bạc), <b>đúc bạc nén</b> và <b>đổi bạc</b>.<br>• Thợ từ các làng kim hoàn như <b>Định Công</b> lên lập phường, dựng <b>đình Kim Ngân</b> thờ tổ nghề.<br>• Con đường hình thành phố cổ: <b>làng nghề → phường nghề → phố nghề</b>, vì kinh đô đông khách, nhu cầu lớn.'},
+ run:async o=>{
+  await say(o,'<i>Cốc... cốc... leng keng...</i> À, chào cháu! Đợi bác gõ nốt cái nhẫn này đã. Đấy, xong rồi, sáng bóng chưa?');
+  await say(o,'Nghề của bác là <b>kim hoàn</b>, tức làm đồ vàng bạc. Phố <b>Hàng Bạc</b> có nghề từ mấy trăm năm trước. Ngày xưa ở đây còn <b>đúc bạc nén</b> (bạc đúc thành thỏi dùng như tiền) và <b>đổi bạc</b>, nên phố lúc nào cũng tấp nập.');
+  await say(o,'Các cụ tổ nghề từ những làng kim hoàn quanh Thăng Long, như làng <b>Định Công</b>, lên đây lập phường. Họ dựng cả <b>đình Kim Ngân</b> ngay trên phố để thờ tổ nghề.');
+  await say(o,'Vì sao thợ bỏ làng lên phố? Vì kinh đô đông người, có vua quan, nhà giàu, thương nhân, nên <b>cần nhiều hàng hóa</b>. Lên phố thì gần khách, bán được giá. Thế là có con đường: <b>làng nghề → phường nghề → phố nghề</b>. Cả phố cổ hình thành theo cách ấy đấy, cháu nhớ nhé!');
+  await ask(o,[
+   Q('Làm một chiếc nhẫn bạc khó không bác?','Khó chứ! Phải nấu chảy bạc, kéo sợi, uốn, hàn, rồi <b>chạm khắc</b> hoa văn, đánh bóng. Ngày xưa nghề này truyền trong nhà, <b>cha truyền con nối</b>, học mấy năm mới thạo tay.'),
+   Q('Đình Kim Ngân ở đâu ạ?','Ngay trên phố này thôi, ở số <b>42 Hàng Bạc</b>. Sang chặng sau cháu sẽ ghé thăm đình đấy.')]);
+  await say(o,'Cầm lấy, bác tặng cháu lời chúc: <i>“học hay, chơi giỏi”</i>. Ra <b>Hàng Buồm</b> hỏi ông lái buôn xem sao phố ấy tên lạ thế nhé.');}});
+obj({id:'hangbuom',ch:1,pos:[0,-46],title:'Nghe ông lái buôn (Hàng Buồm)',who:'Ông lái buôn',em:'🧔',look:{shirt:'#1e88e5',hat:'non'},
+ note:{t:'🧔 Phố Hàng Buồm',x:'• Xưa gần <b>bến sông</b>, thuyền buôn cập bến nên nhiều nhà <b>bán buồm</b> và đồ đi thuyền.<br>• Sông bị lấp, nghề bán buồm mất nhưng <b>tên phố vẫn giữ</b> như dấu vết lịch sử.<br>• Có nhiều thương nhân người Hoa; <b>Hội quán Quảng Đông (22 Hàng Buồm)</b> lập khoảng 400 năm trước → Kẻ Chợ là nơi <b>giao thương</b> của nhiều nơi.'},
+ run:async o=>{
+  await say(o,'Hô hô, chào cậu bé! Ta là lái buôn, cả đời đi thuyền ngược xuôi sông Hồng, mang hàng từ các tỉnh về kinh thành bán.');
+  await say(o,'Ngày xưa, khu này ở gần <b>bến sông</b>. Thuyền buôn cập bến, chở gạo, muối, vải, gốm... vào tận phố. Thuyền thì phải có cánh buồm, mà buồm cũ, rách thì phải mua mới. Thế nên phố này có rất nhiều nhà <b>bán buồm</b> và đồ đi thuyền, gọi là <b>Hàng Buồm</b>.');
+  await say(o,'Về sau sông bị lấp, thuyền không vào nữa, nghề bán buồm cũng mất. Nhưng <b>tên phố vẫn được giữ lại</b>, như một dấu vết lịch sử. Nhiều phố Hàng ngày nay bán thứ khác hẳn tên phố đấy.');
+  await say(o,'Khu này xưa còn có nhiều <b>thương nhân người Hoa</b>. Ngay đầu phố có <b>Hội quán Quảng Đông (số 22 Hàng Buồm)</b>, do cộng đồng người gốc Quảng Đông lập từ khoảng <b>400 năm trước</b>. Điều đó cho thấy Kẻ Chợ là nơi <b>giao thương</b>, hội tụ thương nhân từ nhiều nơi.');
+  await ask(o,[
+   Q('Hội quán là gì ạ?','Hội quán là nơi những người cùng quê ở xa đến tụ họp, thờ cúng, giúp đỡ nhau làm ăn. Phố cổ nay còn hai hội quán người Hoa: <b>Quảng Đông</b> ở Hàng Buồm và <b>Phúc Kiến</b> ở Lãn Ông. Hội quán Quảng Đông nay đã được trùng tu thành trung tâm văn hóa nghệ thuật.'),
+   Q('Thuyền chở hàng từ đâu tới ạ?','Từ khắp các vùng ven sông và cả từ biển vào. Sông ngòi chính là “đường cao tốc” thời xưa, nên phố buôn bán mọc lên ở chỗ thuận đường thuyền.')]);
+  await say(o,'Nhớ kỹ chưa? Giờ ra <b>Hàng Mã</b> xem đèn lồng đi, đẹp lắm, đỏ rực cả một góc phố!');}});
+obj({id:'hangma',ch:1,pos:[-60,-74],title:'Nghe chị bán đèn (Hàng Mã)',who:'Chị bán đèn Trung thu',em:'🏮',look:{shirt:'#ffb300',dress:true},
+ note:{t:'🏮 Phố Hàng Mã',x:'• Tên phố từ đồ <b>vàng mã</b> (đồ giấy, tre dùng trong thờ cúng).<br>• Ngày nay nổi tiếng với <b>đèn lồng, đồ chơi Trung thu</b>, đồ trang trí lễ Tết.<br>• Nghề cũ biết <b>thích nghi</b> với nhu cầu mới nên phố vẫn sống.'},
+ run:async o=>{
+  await say(o,'Em ơi, nhìn lên trên đầu kìa, đèn lồng đỏ rực cả phố! Mua một chiếc đèn ông sao không? Chị để giá rẻ cho!');
+  await say(o,'Phố chị là <b>Hàng Mã</b>. Tên phố bắt nguồn từ đồ <b>vàng mã</b>, tức những đồ làm bằng giấy, tre như tiền giấy, quần áo, nhà cửa thu nhỏ, dùng trong thờ cúng theo tín ngưỡng dân gian.');
+  await say(o,'Ngày nay phố nổi tiếng nhất với <b>đèn lồng, đồ chơi Trung thu</b> và đồ trang trí lễ Tết. Người bán biết <b>thích nghi</b> với nhu cầu mới, nhờ vậy phố vẫn đông vui mà vẫn giữ được nét riêng.');
+  await ask(o,[
+   Q('Trung thu ở Hàng Mã vui không chị?','Vui lắm! Trước rằm tháng Tám, phố đông nghịt người. Bố mẹ dắt con đi mua <b>đèn ông sao, đèn kéo quân, mặt nạ giấy bồi, đầu sư tử</b>... Nhiều bạn trẻ còn đến chụp ảnh nữa.'),
+   Q('Đồ chơi Trung thu truyền thống làm thế nào ạ?','Đèn ông sao làm từ <b>nan tre</b> và <b>giấy bóng kính</b> màu; mặt nạ thì làm bằng giấy bồi nhiều lớp rồi vẽ màu. Ngày nay có nhiều đồ nhựa, đồ điện tử, nên đồ chơi thủ công cần được giữ gìn.')]);
+  await say(o,'Đi thêm một đoạn về phía Đông là tới <b>chợ Đồng Xuân</b>, chợ to nhất phố cổ. Ghé xem nhé!');}});
+obj({id:'dongxuan',ch:1,pos:[-10,-86],title:'Nghe cô tiểu thương (chợ Đồng Xuân)',who:'Cô tiểu thương',em:'👩',look:{shirt:'#43a047',hat:'non',dress:true},
+ note:{t:'👩 Chợ Đồng Xuân & thời Pháp',x:'• Năm <b>1889</b>, người Pháp lấp hồ Thái Cực, sông Tô Lịch, dồn hàng quán về lập <b>chợ Đồng Xuân</b>.<br>• Thời Pháp thuộc: <b>mở đường, lấp sông hồ, xây chợ</b>; nhiều nhà ống có <b>mặt tiền kiểu Pháp</b> (ban công, cửa chớp) xen nhà truyền thống.<br>• Phố cổ là sự <b>đan xen nhiều lớp lịch sử</b>.'},
+ run:async o=>{
+  await say(o,'Mua gì đấy em? Vải, quần áo, đồ khô, cái gì chợ cô cũng có! À, em đi tìm hiểu lịch sử à? Thế thì nghe cô kể này.');
+  await say(o,'Chợ này có từ <b>thời Pháp</b>. Năm <b>1889</b>, người Pháp lấp <b>hồ Thái Cực và sông Tô Lịch</b> (đoạn chảy qua đây), dồn các hàng quán về khu đất trống ở phường Đồng Xuân, lập thành <b>chợ Đồng Xuân</b>. Sau đó chợ được xây kiểu Pháp, có <b>năm vòm cửa</b> ở mặt tiền.');
+  await say(o,'Thời Pháp thuộc, phố cổ đổi khác nhiều: <b>đường được mở rộng, sông hồ bị lấp</b>; nhiều <b>nhà ống</b> xây thêm tầng, mặt tiền có <b>ban công, cửa chớp kiểu Pháp</b>, xen giữa nhà truyền thống mái ngói. Vì thế phố cổ là sự <b>đan xen nhiều lớp lịch sử</b>.');
+  await ask(o,[
+   Q('Chợ có từng gặp chuyện gì lớn không cô?','Có em ạ. Năm <b>1994</b>, chợ bị <b>cháy gần như toàn bộ</b>. Tiểu thương phải buôn bán tạm ngoài đường mấy năm. Sau đó chợ được xây lại thành 3 tầng, rộng hơn, nhưng vẫn giữ một phần kiến trúc chợ cũ.'),
+   Q('Chợ bán những gì ạ?','Đây là <b>chợ đầu mối bán buôn</b> lớn: quần áo, vải vóc, đồ dùng, đồ khô... Tiểu thương các tỉnh miền Bắc về đây lấy hàng rồi mang đi bán khắp nơi.'),
+   Q('Buổi tối ở đây có gì vui ạ?','Tối cuối tuần có <b>chợ đêm</b> ngay trên phố. Trước cổng chợ còn có biểu diễn <b>hát xẩm</b>, một loại hình âm nhạc dân gian xưa của người đi hát rong.')]);
+  await say(o,'Thế là em đã nghe đủ chuyện rồi đấy!');}});
+obj({id:'ongdo2',ch:1,pos:[-26,50],share:'ongdo',after:T1,title:'Làm bài đố của ông đồ (Bờ Hồ)',lockText:'Bài đố của ông đồ (mở khi nghe đủ 6 người)',who:'Ông đồ Thăng Long',em:'👴',
+ run:async o=>{
+  await say(o,'Cháu về rồi đấy à! Đi khắp phố có mỏi chân không? Giờ ta đố cháu <b>9 câu</b> về những gì cháu đã nghe nhé. Trả lời sai thì cứ thử lại, không sao cả!');
+  const qs=[
+   {q:'Năm 1010, ai dời đô về Thăng Long?',o:['Lý Thái Tổ','Lê Lợi','Trần Hưng Đạo','Quang Trung'],x:'Vua <b>Lý Thái Tổ</b> dời đô từ Hoa Lư về Đại La, đặt tên là Thăng Long. Đây là mốc khởi đầu cho khu buôn bán Kẻ Chợ.'},
+   {q:'Các phố trong phố cổ thường có tên bắt đầu bằng chữ “Hàng” vì sao?',o:['Mỗi phố xưa chuyên làm hoặc bán một loại hàng','Vì phố được xếp thành hàng thẳng','Vì vua đặt tên theo thứ tự hàng','Vì người dân thích chữ “Hàng”'],x:'Tên phố là “tấm bia” ghi lại nghề xưa: Hàng Bạc bán bạc, Hàng Đường bán đường, Hàng Muối bán muối...'},
+   {q:'Con số 36 trong câu “Hà Nội 36 phố phường” có nghĩa là gì?',o:['Con số ước lệ, ý nói rất nhiều phố','Đúng 36 con phố, không hơn không kém','36 cửa ô của kinh thành','36 khu chợ'],x:'Số 36 là <b>ước lệ</b>; thực tế phố cổ có nhiều hơn 36 phố.'},
+   {q:'Tên phố Hàng Đào gắn với nghề gì?',o:['Nhuộm vải và buôn bán tơ lụa','Trồng và bán hoa đào','Đóng thuyền','Làm đồ bạc'],x:'Thợ nhuộm từ làng <b>Đan Loan</b> lên đây <b>nhuộm vải</b>, buôn tơ lụa.'},
+   {q:'Phố Hàng Bạc xưa nổi tiếng với nghề gì?',o:['Chế tác vàng bạc (kim hoàn), đúc bạc nén và đổi bạc','Bán buồm cho thuyền','Dệt chiếu','Bán thuốc bắc'],x:'Thợ kim hoàn từ các làng như <b>Định Công</b> lên lập phường và dựng <b>đình Kim Ngân</b> thờ tổ nghề.'},
+   {q:'Các phố nghề trong phố cổ hình thành theo con đường nào?',o:['Làng nghề → phường nghề → phố nghề','Phố nghề → làng nghề → chợ','Chợ → làng nghề → cửa ô','Nhà máy → phố nghề → làng nghề'],x:'Thợ thủ công từ <b>làng nghề</b> lên kinh đô, cùng nghề ở gần nhau thành <b>phường</b>, rồi thành <b>phố nghề</b>.'},
+   {q:'Vì sao phố này có tên là Hàng Buồm?',o:['Xưa gần bến sông, nhiều nhà bán buồm và đồ đi thuyền','Vì có nhiều người thả diều','Vì là nơi may lều trại','Vì trồng nhiều cây buồm'],x:'Thuyền buôn cập bến nên cần <b>buồm</b>. Nghề mất nhưng <b>tên phố vẫn giữ dấu vết lịch sử</b>. Hội quán Quảng Đông trên phố cho thấy nơi đây là chốn giao thương.'},
+   {q:'Phố Hàng Mã ngày nay nổi tiếng với mặt hàng nào?',o:['Đèn lồng, đồ chơi Trung thu, đồ trang trí lễ Tết','Ngựa','Gạo và muối','Đồ sắt'],x:'Từ đồ <b>vàng mã</b> xưa, phố đã <b>thích nghi</b> sang đèn lồng, đồ chơi Trung thu, đồ trang trí.'},
+   {q:'Thời Pháp thuộc, phố cổ thay đổi như thế nào?',o:['Lấp sông hồ, mở đường, xây chợ Đồng Xuân (1889); nhiều nhà có mặt tiền kiểu Pháp','Bị phá bỏ hoàn toàn','Trở thành đồng ruộng','Không thay đổi gì'],x:'Phố cổ là sự <b>đan xen</b> nhiều lớp lịch sử: phường nghề truyền thống + dấu ấn đô thị thời Pháp.'}];
+  for(let i=0;i<qs.length;i++){const q={...qs[i],q:`<span style="color:#ffd166">Câu ${i+1}/${qs.length}.</span> ${qs[i].q}`};await quiz(o,q);}
+  await say(o,'Giỏi lắm, cháu nhớ bài thật đấy! Còn <b>một thử thách cuối</b>: sắp xếp các mốc lịch sử của phố cổ...');
+ }});
+// ===== Chặng 2 =====
+const CATS={kt:['Kiến trúc','#e76f51','🏠'],ls:['Lịch sử','#6d4c41','🏯'],tn:['Tín ngưỡng','#b71c1c','⛩️'],vh:['Văn hóa nghề','#7b2cbf','💍'],pvt:['Phi vật thể','#2a9d8f','🍜'],kte:['Kinh tế – Du lịch','#1d70b8','🧳']};
+obj({id:'mamay',ch:2,pos:[56,-20.5],title:'Nhà cổ 87 Mã Mây',who:'Chị hướng dẫn viên',em:'👩‍🏫',look:{shirt:'#ffffff',dress:true},
+ card:{cat:'kt',t:'Nhà ống phố cổ',x:'Mặt tiền hẹp, nhà chạy sâu vào trong. Trước là cửa hàng, giữa có <b>giếng trời</b>, sau là nơi ở, kho, bếp. Nhà 87 Mã Mây được trùng tu năm 1998–1999 nhờ hợp tác Hà Nội – Toulouse (Pháp).'},
+ run:async o=>{await say(o,'Mời bạn vào ngôi nhà cổ số 87 Mã Mây! Đây là kiểu <b>nhà ống</b> điển hình của phố cổ: mặt tiền chỉ vài mét nhưng chạy rất sâu vào trong.');
+  await say(o,'Gian ngoài cùng để <b>bán hàng</b>, tiếp đến là khoảng sân nhỏ có <b>giếng trời</b> (khoảng sân không mái, giúp <b>lấy ánh sáng và không khí</b> cho ngôi nhà vừa hẹp vừa sâu), rồi tới gian thờ, nơi ở, kho và bếp. Nhà được <b>trùng tu năm 1998–1999</b> trong chương trình hợp tác giữa Hà Nội và thành phố Toulouse (Pháp), giữ lại vật liệu và kiến trúc cũ.');
+  await quiz(o,{q:'Giếng trời trong nhà ống dùng để làm gì?',o:['Lấy ánh sáng và không khí cho ngôi nhà vừa hẹp vừa sâu','Chứa nước uống','Để xe máy','Chỉ để trang trí'],x:'Nhà ống sâu và hẹp nên rất tối, bí. <b>Giếng trời</b> giúp lấy ánh sáng, thông gió, hứng nước mưa. Đây là cách ông cha ta thích nghi với khí hậu và mảnh đất chật.'});}});
+obj({id:'oquan',ch:2,pos:[72,-79],title:'Ô Quan Chưởng',who:'Cụ kể chuyện cửa ô',em:'🧓',look:{shirt:'#8d6e63',hat:'khan',beard:true},
+ card:{cat:'ls',t:'Ô Quan Chưởng',x:'Xây năm 1749, tên chữ là Đông Hà Môn, mở ra bến sông Hồng. Đây là <b>cửa ô duy nhất còn lại</b> của Thăng Long – Hà Nội xưa.'},
+ run:async o=>{await say(o,'Cửa ô này xây năm <b>1749</b>, tên chữ là <b>Đông Hà Môn</b>, là cửa phía Đông thông ra bến sông Hồng. Ngày mở, đêm đóng, có lính canh gác.');
+  await say(o,'Trên cửa còn tấm bia năm <b>1882</b> của Tổng đốc Hoàng Diệu, nghiêm cấm lính gác sách nhiễu người qua lại. Hà Nội xưa có nhiều cửa ô, nay chỉ còn lại <b>duy nhất</b> cửa này.');
+  await quiz(o,{q:'Điều gì khiến Ô Quan Chưởng đặc biệt?',o:['Là cửa ô duy nhất còn lại của Thăng Long – Hà Nội xưa','Là cửa ô mới xây năm 2000','Là cổng chợ Đồng Xuân','Là cổng Văn Miếu'],x:'Ô Quan Chưởng là <b>chứng tích lịch sử</b> quý giá: nhìn vào nó, ta hình dung được kinh thành Thăng Long xưa có tường lũy và các cửa ra vào.'});}});
+obj({id:'bachma',ch:2,pos:[22,-46],title:'Đền Bạch Mã',who:'Cụ thủ từ',em:'👴',look:{shirt:'#5d4037',hat:'khan'},
+ card:{cat:'tn',t:'Đền Bạch Mã',x:'Một trong <b>Thăng Long tứ trấn</b>, bốn ngôi đền trấn giữ bốn phía kinh thành; đền Bạch Mã trấn phía <b>Đông</b>.'},
+ run:async o=>{await say(o,'Đây là <b>đền Bạch Mã</b>, một trong <b>“Thăng Long tứ trấn”</b>, tức bốn ngôi đền được coi là trấn giữ bốn phía kinh thành. Đền Bạch Mã trấn giữ <b>phía Đông</b>.');
+  await say(o,'Giữa những dãy nhà buôn bán sầm uất, phố cổ vẫn có rất nhiều <b>đình, đền, chùa, hội quán</b>. Chúng là nơi sinh hoạt tâm linh, lễ hội và gắn kết cộng đồng của cư dân phố cổ.');
+  await quiz(o,{q:'Đền Bạch Mã trấn giữ phía nào của kinh thành Thăng Long?',o:['Phía Đông','Phía Tây','Phía Nam','Phía Bắc'],x:'Đền Bạch Mã trấn phía <b>Đông</b>. Phố cổ không chỉ là nơi buôn bán mà còn lưu giữ nhiều <b>công trình tín ngưỡng</b> có giá trị.'});}});
+obj({id:'kimngan',ch:2,pos:[24,6],title:'Đình Kim Ngân',who:'Cụ trưởng phường bạc',em:'👴',look:{shirt:'#7b1fa2',hat:'khan'},
+ card:{cat:'vh',t:'Đình thờ tổ nghề',x:'Thợ từ làng quê ra phố lập nghiệp vẫn dựng <b>đình thờ tổ nghề</b> để nhớ cội nguồn. Phố cổ hiện còn khoảng 14 đình thờ tổ nghề, như đình Kim Ngân (42 Hàng Bạc).'},
+ run:async o=>{await say(o,'Đình Kim Ngân ở số 42 Hàng Bạc gắn với <b>phường thợ kim hoàn</b>. Người thợ rời làng ra phố làm ăn nhưng vẫn lập đình thờ tổ nghề, để <b>tưởng nhớ người sáng lập ra nghề</b> và <b>gắn kết những người cùng nghề, cùng quê</b>.');
+  await say(o,'Theo thống kê, phố cổ hiện còn khoảng <b>14 đình thờ tổ nghề</b>. Đó là dấu tích cho thấy <b>“làng trong phố”</b>: mỗi phố nghề như một làng thu nhỏ giữa kinh thành.');
+  await quiz(o,{q:'Vì sao các phường nghề lập đình thờ tổ nghề ngay trên phố?',o:['Để tưởng nhớ người sáng lập nghề và gắn kết những người cùng nghề, cùng quê','Để làm chợ','Để làm kho hàng','Vì luật bắt buộc mọi phố phải có đình'],x:'Đình thờ tổ nghề thể hiện truyền thống <b>“uống nước nhớ nguồn”</b> và tinh thần cộng đồng của người thợ thủ công.'});}});
+obj({id:'amthuc',ch:2,pos:[15.8,-17],title:'Ẩm thực phố Tạ Hiện',who:'Cô hàng rong',em:'👩‍🍳',look:{shirt:'#ef6c00',hat:'non',ganh:true,dress:true},
+ card:{cat:'pvt',t:'Ẩm thực & nếp sống',x:'Phở, bún chả, bánh cuốn, gánh hàng rong, tiếng rao đêm, lễ hội đình... là <b>giá trị phi vật thể</b> làm nên “hồn phố”.'},
+ run:async o=>{await say(o,'Ai bánh giò, bánh khúc đâyyy! Cháu ơi, phố cổ đâu chỉ có nhà với đền. Còn có <b>phở, bún chả, bánh cuốn</b>, có gánh hàng rong, có tiếng rao lúc đêm khuya nữa.');
+  await say(o,'Những thứ <b>không cầm nắm được</b> như món ăn, nghề thủ công, lễ hội, cách sống thanh lịch của người Hà Nội gọi là <b>giá trị phi vật thể</b>. Chúng rất dễ mai một nếu không ai giữ gìn.');
+  await quiz(o,{q:'Giá trị nào dưới đây là giá trị PHI VẬT THỂ của phố cổ?',o:['Nghề truyền thống, ẩm thực, lễ hội, nếp sống','Mái ngói nhà ống','Cửa Ô Quan Chưởng','Tòa nhà chợ Đồng Xuân'],x:'Mái ngói, cửa ô, tòa chợ là <b>giá trị vật thể</b>. Nghề, món ăn, lễ hội, nếp sống là <b>phi vật thể</b>. Cả hai cùng làm nên phố cổ.'});}});
+obj({id:'hoguom',ch:2,pos:[8,53.5],title:'Hồ Gươm – cầu Thê Húc',who:'Du khách Emma',em:'🧳',look:{shirt:'#00acc1',hat:'cap',capC:'#ffffff',bag:'#ff7043',skin:'#f6d7c3',hair:'#c99a5b'},
+ card:{cat:'kte',t:'Kinh tế – Du lịch',x:'Phố cổ cùng Hồ Gươm hút du khách trong và ngoài nước; buôn bán, dịch vụ, du lịch tạo việc làm cho rất nhiều người dân.'},
+ run:async o=>{await say(o,'Xin chào! Mình đến từ nước ngoài. Mình thích đi dạo phố cổ, ăn phở, mua đèn lồng ở Hàng Mã, rồi ra Hồ Gươm ngắm cầu Thê Húc!');
+  await say(o,'Rất nhiều du khách như mình tới đây. Nhờ vậy, <b>buôn bán, nhà hàng, khách sạn, dịch vụ du lịch</b> tạo việc làm cho rất nhiều người. Năm <b>2004</b>, tuyến Hàng Đào – Đồng Xuân còn trở thành <b>không gian đi bộ đầu tiên</b> của Hà Nội.');
+  await quiz(o,{q:'Phố cổ mang lại giá trị kinh tế chủ yếu qua hoạt động nào?',o:['Buôn bán, dịch vụ và du lịch','Khai thác khoáng sản','Trồng lúa nước','Công nghiệp nặng'],x:'Phố cổ là một <b>trung tâm thương mại – du lịch</b>. Nhưng du lịch phát triển quá nóng cũng tạo sức ép lên di sản, và đó là chuyện của chặng sau!'});}});
+// ===== Chặng 3 =====
+obj({id:'tower',ch:3,pos:[-61,34.6],title:'Dự án khách sạn – Hàng Gai',who:'Nhà đầu tư',em:'💼',look:{shirt:'#263238',pants:'#263238'},spot:true,
+ run:async o=>{await say(o,'Chào Trưởng ban! Ngôi nhà cũ sau hàng rào kia đã xuống cấp. Tôi muốn phá đi để xây <b>khách sạn 9 tầng</b>, có thêm phòng cho khách, đóng thuế nhiều cho thành phố.');
+  await choose(o,'Bạn quyết định thế nào?',[
+   {t:'Đồng ý cho xây khách sạn 9 tầng',d:{B:-25,S:5,D:10},fb:'Tòa nhà cao vượt hẳn dãy mái ngói thấp tầng, <b>phá vỡ cảnh quan</b> phố cổ. Một ngôi nhà cổ mất đi là <b>mất vĩnh viễn</b>.',v:'A'},
+   {t:'Không cho phá; hỗ trợ cải tạo bên trong, giữ mặt tiền và chiều cao đúng quy định của phố',d:{B:15,S:5,D:5},fb:'Cách làm hài hòa! Khu phố cổ có <b>quy chế quản lý quy hoạch – kiến trúc</b> riêng, khống chế chiều cao và giữ hình thức mặt tiền. Chủ nhà vẫn có thể làm homestay, cửa hàng.',v:'B'},
+   {t:'Cấm tuyệt đối mọi sửa chữa, để nguyên hiện trạng',d:{B:-5,S:-10,D:-5},fb:'Để nguyên không có nghĩa là bảo tồn: nhà tiếp tục <b>xuống cấp</b>, có thể sập, người dân sống thiếu an toàn.',v:'C'}],'tower');}});
+obj({id:'nhaco',ch:3,pos:[-60,-35.4],title:'Nhà cổ xuống cấp – Lãn Ông',who:'Bà cụ chủ nhà',em:'👵',look:{shirt:'#8d6e63',dress:true},spot:true,
+ run:async o=>{await say(o,'Ngôi nhà này có <b>nhiều hộ cùng ở</b>, mỗi nhà chỉ vài mét vuông. Mái dột, tường nứt. Mấy hộ định tự đổ bê tông, ốp kính cho chắc. Trưởng ban tính sao?');
+  await choose(o,'Bạn quyết định thế nào?',[
+   {t:'Kệ dân, ai muốn sửa thế nào thì sửa',d:{B:-15,S:5,D:-5},fb:'Mỗi hộ sửa một kiểu: cơi nới, ốp kính, đổ bê tông. Ngôi nhà mất hết <b>nét kiến trúc cổ</b>, nhìn chắp vá.',v:'A'},
+   {t:'Hỗ trợ kinh phí, hướng dẫn tu bổ đúng kiến trúc gốc; khuyến khích giãn dân tự nguyện ra khu ở mới',d:{B:15,S:5,D:5},fb:'Giống cách đã làm với nhà <b>87 Mã Mây</b>: tu bổ đúng kỹ thuật, giữ vật liệu cũ. <b>Giãn dân</b> giúp người dân có chỗ ở tốt hơn và nhà cổ bớt quá tải.',v:'B'},
+   {t:'Phá bỏ toàn bộ, xây chung cư mới cao tầng',d:{B:-25,S:5,D:-5},fb:'Người dân có nhà mới, nhưng phố cổ mất thêm một <b>di sản</b>, và tòa nhà cao phá vỡ cảnh quan.',v:'C'}],'nhaco');}});
+obj({id:'viahe',ch:3,pos:[10,-28],title:'Vỉa hè – phố Tạ Hiện',who:'Chủ quán',em:'🍜',look:{shirt:'#f4511e'},spot:true,
+ run:async o=>{await say(o,'Phố ẩm thực đông khách lắm! Quán xá bày tràn <b>vỉa hè và lòng đường</b>, người đi bộ phải len xuống giữa phố. Nhưng đây là nồi cơm của bao gia đình...');
+  await choose(o,'Bạn quyết định thế nào?',[
+   {t:'Cấm hoàn toàn buôn bán trên vỉa hè',d:{B:5,S:-15,D:-10},fb:'Phố gọn hơn nhưng nhiều gia đình <b>mất kế sinh nhai</b>, phố ẩm thực mất đi sức sống vốn là nét hấp dẫn du khách.',v:'A'},
+   {t:'Kẻ vạch, quy định khung giờ và phần vỉa hè được bày bán, luôn chừa lối cho người đi bộ',d:{B:5,S:10,D:10},fb:'Cân bằng được <b>trật tự</b> và <b>sinh kế</b>. Văn hóa ẩm thực đường phố vẫn được giữ, an toàn hơn cho người đi bộ.',v:'B'},
+   {t:'Để tự do, càng đông càng vui',d:{B:-10,S:5,D:-5},fb:'Lộn xộn, ùn tắc, rác thải, tiếng ồn... Mất an toàn và mất thiện cảm của du khách.',v:'C'}],'viahe');}});
+obj({id:'hangbac2',ch:3,pos:[44,-6],title:'Tiệm bạc gia truyền – Hàng Bạc',who:'Nghệ nhân bạc',em:'💍',look:{shirt:'#546e7a',beard:true},spot:true,
+ run:async o=>{await say(o,'Tiệm bạc nhà tôi truyền ba đời, giờ <b>sắp đóng cửa</b>. Tiền thuê cao, con cháu không theo nghề, khách lại chuộng đồ lưu niệm làm hàng loạt, rẻ tiền.');
+  await choose(o,'Bạn quyết định thế nào?',[
+   {t:'Để thị trường tự quyết định',d:{B:-10,S:-5,D:-5},fb:'Nghề truyền thống, “linh hồn” của các phố Hàng, dần biến mất. Phố nào cũng bán những món giống nhau.',v:'A'},
+   {t:'Hỗ trợ nghệ nhân mở xưởng trình diễn, dạy nghề, gắn với tour trải nghiệm cho du khách',d:{B:10,S:10,D:10},fb:'Nghề được <b>sống tiếp</b>, nghệ nhân có thu nhập, du khách có trải nghiệm độc đáo. Đây là cách <b>phát huy</b> giá trị chứ không chỉ cất giữ.',v:'B'},
+   {t:'Bắt buộc cả phố chỉ được bán đồ bạc',d:{B:5,S:-15,D:-5},fb:'Áp đặt cứng nhắc: nhiều hộ kinh doanh khác bị thiệt hại, mà không giải quyết được chuyện thiếu người theo nghề.',v:'C'}],'hangbac');}});
+obj({id:'dibo',ch:3,pos:[-50,52],title:'Không gian đi bộ – Hồ Gươm',who:'Cán bộ phường',em:'🧑‍💼',look:{shirt:'#1565c0',pants:'#263238'},spot:true,
+ run:async o=>{await say(o,'Khu Hồ Gươm và phố cổ lúc nào cũng đông xe cộ, khói bụi, ồn ào. Có đề xuất tổ chức <b>không gian đi bộ</b>. Ý Trưởng ban thế nào?');
+  await choose(o,'Bạn quyết định thế nào?',[
+   {t:'Mở phố đi bộ các tối cuối tuần, tổ chức trò chơi dân gian, nghệ thuật truyền thống, quản lý tiếng ồn',d:{B:10,S:10,D:15},fb:'Hà Nội đã làm điều này: từ <b>2004</b> với tuyến Hàng Đào – Đồng Xuân, sau đó mở rộng ra <b>quanh Hồ Gươm</b>. Người dân có không gian vui chơi, nghệ thuật dân gian có chỗ biểu diễn.',v:'A'},
+   {t:'Cấm xe hoàn toàn, mọi lúc, mọi ngày',d:{B:5,S:-10,D:0},fb:'Không khí trong lành hơn nhưng người dân <b>đi lại, chở hàng rất khó khăn</b>; nhiều cửa hàng bị ảnh hưởng.',v:'B'},
+   {t:'Giữ nguyên như hiện nay',d:{B:-5,S:0,D:-10},fb:'Khói bụi, ồn ào tiếp diễn; du khách khó tận hưởng vẻ đẹp phố cổ.',v:'C'}],'dibo');}});
+
+/* ---------- build everything ---------- */
+const NPCS=[];
+let player, walkers=[], bikes=[];
+function buildWorld(){
+ const g=new THREE.Mesh(new THREE.PlaneGeometry(420,420),lam('#8a847b'));g.rotation.x=-PI/2;g.position.set(0,0,30);scene.add(g);
+ for(const x of XS)W.add(BOX,x,.02,-20,.25,.02,120,'#d9d2c3');
+ for(const z of ZS)W.add(BOX,0,.02,z,180,.02,.25,'#d9d2c3');
+ buildBlocks();buildMarket();buildGate();
+ buildTemple(26,-47,0,16,14,'#e3c27a','ĐỀN BẠCH MÃ');label('Đền Bạch Mã',26,12,-54,{bg:'#b71c1c'});
+ buildTemple(29,7,PI,14,13,'#e8cf8f','ĐÌNH KIM NGÂN');label('Đình Kim Ngân',29,12,14,{bg:'#7b2cbf'});
+ buildMaMay();buildLake();buildBanners();
+ scene.add(W.mesh());
+ buildVariants();
+ label('Phố Tạ Hiện',10,9,-20,{bg:'#e76f51',fs:40},1.8);
+ // NPCs & markers
+ for(const o of OBJ){
+  let p;if(o.share){p=OBJ.find(x=>x.id===o.share).mesh;}else{p=makePerson(o.look||{});p.position.set(o.pos[0],0,o.pos[1]);scene.add(p);}o.mesh=p;
+  const mk=new THREE.Sprite(new THREE.SpriteMaterial({map:markerTex(o.spot?'📋':'!',o.ch===1?'#e63946':o.ch===2?'#7b2cbf':'#f77f00'),depthWrite:false,fog:false}));
+  if(o.spot){mk.material.map=markerTex('?','#f77f00');}
+  mk.scale.set(1.3,1.3,1);mk.position.set(o.pos[0],3.6,o.pos[1]);mk.visible=false;scene.add(mk);o.marker=mk;
+  const bc=new THREE.Mesh(new THREE.CylinderGeometry(.9,.9,60,14,1,true),new THREE.MeshBasicMaterial({color:o.ch===1?'#ffd166':o.ch===2?'#c77dff':'#ff9f1c',transparent:true,opacity:.22,depthWrite:false,side:THREE.DoubleSide,fog:false}));
+  bc.position.set(o.pos[0],30,o.pos[1]);bc.visible=false;scene.add(bc);o.beacon=bc;
+  // face street
+  if(!o.share)p.rotation.y=nearestStreetDir(o.pos[0],o.pos[1]);
+ }
+ // player
+ player=makePerson({shirt:'#ffffff',pants:'#1d3557',bag:'#c1272d',hair:'#222',skin:'#efc6a0',scale:.85});
+ player.position.set(-30,0,57);player.rotation.y=PI;scene.add(player);
+ // walkers
+ const lanes=[];for(const x of XS)for(const s of [-6,6])lanes.push({ax:'z',c:x+s,a:-82,b:42});for(const z of ZS)for(const s of [-6,6])lanes.push({ax:'x',c:z+s,a:-92,b:92});
+ for(let i=0;i<26;i++){const L=P(lanes);const w=makePerson({hat:rnd()<.3?'non':(rnd()<.3?'cap':null),capC:P(['#e63946','#1d70b8','#fff']),bag:rnd()<.3?P(['#ff7043','#26a69a','#5c6bc0']):null,dress:rnd()<.3});const t=R(L.a,L.b);w.userData.lane=L;w.userData.t=t;w.userData.dir=rnd()<.5?1:-1;w.userData.sp=R(1.6,2.6);scene.add(w);walkers.push(w);}
+ const blanes=[];for(const x of XS)blanes.push({ax:'z',c:x,a:-80,b:40});for(const z of ZS.slice(0,3))blanes.push({ax:'x',c:z,a:-90,b:90});
+ for(let i=0;i<12;i++){const L=P(blanes);const b=makeBike();b.userData={lane:L,t:R(L.a,L.b),dir:rnd()<.5?1:-1,sp:R(5,8)};scene.add(b);bikes.push(b);}
+}
+function nearestStreetDir(x,z){let best=1e9,ang=0;for(const sx of XS){const d=Math.abs(x-sx);if(d<best){best=d;ang=x<sx?PI/2:-PI/2;}}for(const sz of ZS){const d=Math.abs(z-sz);if(d<best){best=d;ang=z<sz?0:PI;}}if(z>44)ang=PI;return ang;}
+
+/* ---------- collision ---------- */
+const inLake=(x,z,m=0)=>{const dx=(x-LAKE.cx)/(LAKE.rx+m),dz=(z-LAKE.cz)/(LAKE.rz+m);return dx*dx+dz*dz<1;};
+const onBridge=(x,z)=>x>BRIDGE.x0&&x<BRIDGE.x1&&z>BRIDGE.z0&&z<BRIDGE.z1;
+const onIsland=(x,z)=>Math.hypot(x-ISLAND.x,z-ISLAND.z)<ISLAND.r-.6;
+function resolve(pos,r){
+ for(const c of COL){const cx=clamp(pos.x,c.x0,c.x1),cz=clamp(pos.z,c.z0,c.z1);const dx=pos.x-cx,dz=pos.z-cz,d2=dx*dx+dz*dz;
+  if(d2<r*r){if(d2>1e-6){const d=Math.sqrt(d2);pos.x=cx+dx/d*r;pos.z=cz+dz/d*r;}else{const l=pos.x-c.x0,rr_=c.x1-pos.x,t=pos.z-c.z0,b=c.z1-pos.z,m=Math.min(l,rr_,t,b);if(m===l)pos.x=c.x0-r;else if(m===rr_)pos.x=c.x1+r;else if(m===t)pos.z=c.z0-r;else pos.z=c.z1+r;}}}
+ pos.x=clamp(pos.x,-93,93);pos.z=clamp(pos.z,-86.2,169);
+}
+function blockedCam(x,y,z){if(y>10.5)return false;for(const c of COL)if(x>c.x0-.3&&x<c.x1+.3&&z>c.z0-.3&&z<c.z1+.3&&y<(c.h||9)+1)return true;return false;}
+
+/* ---------- input ---------- */
+const keys={};
+// Dùng e.code (phím vật lý) để không bị kẹt phím khi bật bộ gõ tiếng Việt (Unikey/EVKey/Telex)
+const KM={KeyW:'f',ArrowUp:'f',KeyS:'b',ArrowDown:'b',KeyA:'l',ArrowLeft:'l',KeyD:'r',ArrowRight:'r',ShiftLeft:'run',ShiftRight:'run'};
+const clearKeys=()=>{for(const k in keys)keys[k]=false;};
+addEventListener('keydown',e=>{if(e.target.matches&&e.target.matches('input'))return;
+ const c=e.code,a=KM[c];
+ if(dlgOpen){if(c==='Enter'||c==='NumpadEnter'||c==='Space'){e.preventDefault();if(!e.repeat){const b=document.querySelector('#dcard .go:not(.sec)');if(b)b.click();}}return;}
+ if(a){keys[a]=true;e.preventDefault();}
+ if(c==='Space')e.preventDefault();
+ if((c==='KeyE'||c==='Enter'||c==='NumpadEnter')&&!e.repeat&&near&&!S.busy)interact(near);});
+addEventListener('keyup',e=>{const a=KM[e.code];if(a)keys[a]=false;if(e.key==='Shift')keys.run=false;
+ if(e.key==='Meta'||e.key==='Alt'||e.key==='Control')clearKeys();});
+addEventListener('blur',clearKeys);
+document.addEventListener('visibilitychange',()=>{if(document.hidden)clearKeys();});
+addEventListener('contextmenu',e=>{clearKeys();e.preventDefault();});
+let yaw=0,pitch=.38,camDist=11,curDist=11,lastDrag=-10,nowT=0,dlgOpen=false,endOpen=false;let jx=0,jy=0,joyId=null,dragId=null,lx=0,ly=0;
+// Cần điều khiển "nổi": chạm ở đâu nửa trái màn hình thì cần hiện ra ở đó
+const joyZone=$('joyZone'),joy=$('joy'),knob=joy.querySelector('.knob');let jcx=0,jcy=0;const JR=58,DEAD=.12;
+function joyUpd(e){let dx=e.clientX-jcx,dy=e.clientY-jcy;const L=Math.hypot(dx,dy);if(L>JR){dx*=JR/L;dy*=JR/L;}
+ knob.style.transform=`translate(calc(-50% + ${dx}px),calc(-50% + ${dy}px))`;
+ const nx=dx/JR,ny=-dy/JR,m=Math.hypot(nx,ny);if(m<DEAD){jx=jy=0;return;}const k=(m-DEAD)/(1-DEAD)/m;jx=nx*k;jy=ny*k;}
+function joyReset(){joyId=null;jx=jy=0;knob.style.transform='translate(-50%,-50%)';joy.style.left='';joy.style.top='';joy.classList.remove('act');}
+joyZone.addEventListener('pointerdown',e=>{if(joyId!==null||e.pointerType==='mouse')return;joyId=e.pointerId;try{joyZone.setPointerCapture(e.pointerId);}catch(_){}jcx=e.clientX;jcy=e.clientY;joy.style.left=jcx+'px';joy.style.top=jcy+'px';joy.classList.add('act');joyUpd(e);e.preventDefault();});
+joyZone.addEventListener('pointermove',e=>{if(e.pointerId===joyId)joyUpd(e);});
+const joyEnd=e=>{if(e.pointerId===joyId)joyReset();};
+joyZone.addEventListener('pointerup',joyEnd);joyZone.addEventListener('pointercancel',joyEnd);joyZone.addEventListener('lostpointercapture',joyEnd);
+// Xoay camera (1 ngón / chuột) + chụm 2 ngón để zoom
+const cv=$('c');const touches=new Map();let pinchD=0;
+cv.addEventListener('pointerdown',e=>{touches.set(e.pointerId,{x:e.clientX,y:e.clientY});try{cv.setPointerCapture(e.pointerId);}catch(_){}
+ if(touches.size===2){const [a,b]=[...touches.values()];pinchD=Math.hypot(a.x-b.x,a.y-b.y);dragId=null;}else if(dragId===null){dragId=e.pointerId;lx=e.clientX;ly=e.clientY;}});
+cv.addEventListener('pointermove',e=>{if(!touches.has(e.pointerId))return;touches.set(e.pointerId,{x:e.clientX,y:e.clientY});
+ if(touches.size===2){const [a,b]=[...touches.values()];const d=Math.hypot(a.x-b.x,a.y-b.y);if(pinchD>0)camDist=clamp(camDist*pinchD/d,5,22);pinchD=d;return;}
+ if(e.pointerId!==dragId)return;const dx=e.clientX-lx,dy=e.clientY-ly;lx=e.clientX;ly=e.clientY;yaw-=dx*(touchMode?.0085:.006);pitch=clamp(pitch+dy*(touchMode?.0055:.004),.08,1.1);lastDrag=nowT;});
+const dEnd=e=>{touches.delete(e.pointerId);if(e.pointerId===dragId)dragId=null;if(touches.size<2)pinchD=0;};
+cv.addEventListener('pointerup',dEnd);cv.addEventListener('pointercancel',dEnd);
+cv.addEventListener('wheel',e=>{camDist=clamp(camDist+e.deltaY*.01,5,22);e.preventDefault();},{passive:false});
+$('act').addEventListener('click',()=>{if(near&&!S.busy)interact(near);});
+$('hud').addEventListener('click',()=>$('hud').classList.toggle('collapsed'));
+if(innerWidth<600)$('hud').classList.add('collapsed');
+
+/* ---------- UI helpers ---------- */
+const dlg=$('dlg'),dc=$('dcard');
+function openD(){dlg.classList.remove('hidden');dlgOpen=true;clearKeys();joyReset();vel.set(0,0,0);}
+function closeD(){dlg.classList.add('hidden');dlgOpen=false;dc.innerHTML='';}
+function head(o){return `<div class="who"><span class="av">${o.em}</span><b class="nm">${o.who}</b></div>`;}
+function say(o,text){return new Promise(res=>{openD();dc.innerHTML=head(o)+`<div class="txt">${text}</div><div class="btns"><button class="go">Tiếp ▸</button></div>`;dc.scrollTop=0;dc.querySelector('.go').onclick=()=>res();});}
+function quiz(o,q){return new Promise(res=>{openD();S.quizTotal++;let tries=0;const opts=shuffle(q.o.map((t,i)=>({t,ok:i===0})));
+ dc.innerHTML=head(o)+`<div class="q">❓ ${q.q}</div><div class="opts">${opts.map((p,i)=>`<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}. ${p.t}</button>`).join('')}</div><div class="fb"></div><div class="btns"></div>`;dc.scrollTop=0;
+ dc.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const p=opts[+b.dataset.i];if(p.ok){if(tries===0)S.firstTry++;b.classList.add('good');dc.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+   dc.querySelector('.fb').innerHTML=`<div class="ex">✅ ${tries===0?'Chính xác ngay lần đầu!':'Đúng rồi!'}<br>${q.x}</div>`;dc.querySelector('.btns').innerHTML='<button class="go">Tiếp ▸</button>';dc.querySelector('.btns .go').onclick=()=>res(tries===0);dc.querySelector('.btns .go').scrollIntoView({block:'nearest'});}
+  else{tries++;b.classList.add('bad');b.disabled=true;dc.querySelector('.fb').innerHTML='<span class="no">Chưa đúng rồi, thử lại nhé! 💪</span>';}});});}
+function ask(o,qs){return new Promise(res=>{const done=new Set();
+ const draw=()=>{openD();dc.innerHTML=head(o)+`<div class="q">💬 Hỏi thêm ${o.who.toLowerCase()} <span style="font-weight:600;opacity:.75;font-size:13px">(${done.size}/${qs.length} · không bắt buộc)</span></div><div class="opts">${qs.map((q,i)=>`<button class="opt ask${done.has(i)?' seen':''}" data-i="${i}">${done.has(i)?'✓':'❔'} ${q[0]}</button>`).join('')}</div><div class="btns"><button class="go">${done.size===qs.length?'⭐ Hỏi hết rồi! Giải đố ▸':'Giải đố thôi ▸'}</button></div>`;dc.scrollTop=0;
+  dc.querySelectorAll('.opt').forEach(b=>b.onclick=async()=>{const i=+b.dataset.i;if(!done.has(i)){done.add(i);S.asked++;}await say(o,`<div style="opacity:.75;font-style:italic;margin-bottom:6px">🙋 Bạn: ${qs[i][0]}</div>${qs[i][1]}`);draw();});
+  dc.querySelector('.go').onclick=()=>res();};draw();});}
+function chips(d){const nm={B:'🏛️ Bảo tồn',S:'🏠 Sinh kế',D:'🧳 Du lịch'};return `<div class="chips">${['B','S','D'].map(k=>`<span class="chip ${d[k]>0?'p':d[k]<0?'m':'z'}">${nm[k]} ${d[k]>0?'+':''}${d[k]}</span>`).join('')}</div>`;}
+function choose(o,q,opts,varName){return new Promise(res=>{openD();
+ dc.innerHTML=head(o)+`<div class="q">🧭 ${q}</div><div class="opts">${opts.map((p,i)=>`<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}. ${p.t}</button>`).join('')}</div><div class="fb"></div><div class="btns"></div>`;dc.scrollTop=0;
+ dc.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const p=opts[+b.dataset.i];dc.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x!==b)x.style.opacity=.45;});b.classList.add('good');
+  for(const k in p.d)S.stats[k]=clamp(S.stats[k]+p.d[k],0,100);S.dec[o.id]=p.v;updStats();applyVar(varName,p.v);
+  dc.querySelector('.fb').innerHTML=chips(p.d)+`<div class="ex">${p.fb}</div>`;dc.querySelector('.btns').innerHTML='<button class="go">Tiếp ▸</button>';const g=dc.querySelector('.btns .go');g.onclick=()=>res(p.v);g.scrollIntoView({block:'nearest'});});});}
+function applyVar(n,v){if(n==='tower')setVar('tower',v);else if(n==='nhaco')setVar('nhaco',v==='C'?'C':v);else if(n==='viahe')setVar('viahe',v);else if(n==='dibo'){if(v==='A'||v==='B')setVar('dibo','on');}
+ else if(n==='hangbac'&&v==='B'){label('✨ Xưởng bạc trình diễn',44,7.5,-11,{bg:'#7b2cbf'},1.6);}}
+function cardHTML(c){const k=CATS[c.cat];return `<div class="vcard"><span class="ic">${k[2]}</span><span class="cat" style="background:${k[1]}">${k[0]}</span><h3>${c.t}</h3><p>${c.x}</p></div>`;}
+function showCard(c){return new Promise(res=>{openD();dc.innerHTML=`<div class="q" style="text-align:center">🎴 Bạn nhận được Thẻ giá trị!</div>${cardHTML(c)}<div class="btns" style="justify-content:center"><button class="go">Cất vào bộ sưu tập ✓</button></div>`;dc.scrollTop=0;dc.querySelector('.go').onclick=()=>res();});}
+function info(title,html,btn='Tiếp ▸'){return new Promise(res=>{openD();dc.innerHTML=`<div class="q">${title}</div><div class="txt">${html}</div><div class="btns"><button class="go">${btn}</button></div>`;dc.scrollTop=0;dc.querySelector('.go').onclick=()=>res();});}
+let toastT;function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2200);}
+function banner(t,s){const b=$('banner');$('bnT').textContent=t;$('bnS').textContent=s||'';b.classList.remove('show');void b.offsetWidth;b.classList.add('show');}
+function updStats(){for(const k of ['B','S','D']){$('b'+k).style.width=S.stats[k]+'%';$('v'+k).textContent=S.stats[k];}}
+const isUnlocked=o=>!o.after||o.after.every(id=>OBJ.find(x=>x.id===id).done);
+const isActive=o=>o.ch===S.chang&&!o.done&&isUnlocked(o);
+function refreshHUD(){
+ const names={1:'Chặng 1 · '+C1,2:'Chặng 2 · '+C2,3:'Chặng 3 · '+C3};
+ if(S.free){$('chName').textContent='🗺️ Tự do khám phá';$('chProg').textContent='';$('quests').innerHTML='<li>Hoàn thành! Hãy dạo phố tùy thích.</li>';return;}
+ const list=OBJ.filter(o=>o.ch===S.chang);const d=list.filter(o=>o.done).length;
+ $('chName').textContent=names[S.chang];$('chProg').textContent=`${d}/${list.length} ▾`;
+ $('quests').innerHTML=list.map(o=>!isUnlocked(o)?`<li style="opacity:.6">🔒 ${o.lockText||o.title}</li>`:`<li class="${o.done?'ok':''}">${o.done?'✅':(o.after?'📝':(o.spot?'📋':'⭐'))} ${o.title}</li>`).join('');
+ $('notesBtn').textContent=`📒 Sổ tay ${S.notes.length}`;
+ $('cardsBtn').textContent=`🎴 Thẻ ${S.cards.length}/6`;
+ for(const o of OBJ){const act=isActive(o);o.marker.visible=act;o.beacon.visible=act;}
+}
+$('notesBtn').onclick=()=>{if(S.busy)return;openD();
+ dc.innerHTML=`<div class="q">📒 Sổ tay phố cổ (${S.notes.length} trang)</div>${S.notes.length?S.notes.map(n=>`<div class="vcard" style="max-width:none;margin:8px 0"><h3 style="margin-top:0">${n.t}</h3><p>${n.x}</p></div>`).join(''):'<div class="txt">Chưa có gì. Hãy trò chuyện với mọi người để ghi chép nhé!</div>'}<div class="btns"><button class="go">Đóng</button></div>`;
+ dc.querySelector('.go').onclick=closeD;};
+$('cardsBtn').onclick=()=>{if(S.busy)return;const all=OBJ.filter(o=>o.card);openD();
+ dc.innerHTML=`<div class="q">🎴 Bộ sưu tập Thẻ giá trị (${S.cards.length}/6)</div><div class="gal">${all.map(o=>S.cards.includes(o.id)?`<div class="mini"><span class="cat" style="background:${CATS[o.card.cat][1]};color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:800">${CATS[o.card.cat][0]}</span><b>${CATS[o.card.cat][2]} ${o.card.t}</b>${o.card.x}</div>`:`<div class="mini lock"><b>🔒 ${o.title}</b>Tìm và trả lời đúng để mở thẻ.</div>`).join('')}</div><div class="btns"><button class="go">Đóng</button></div>`;
+ dc.querySelector('.go').onclick=closeD;};
+$('helpBtn').onclick=()=>{if(S.busy)return;S.busy=true;info('❔ Hướng dẫn',`<b>Mục tiêu:</b> đi theo <b>mũi tên vàng</b> ở trên cùng và các <b>cột sáng</b> để tìm nhân vật có dấu <b>!</b> hoặc <b>?</b>.<br><br>📱 <b>Điện thoại:</b> kéo cần điều khiển bên trái để đi · vuốt màn hình để xoay góc nhìn · bấm nút vàng để nói chuyện.<br>💻 <b>Máy tính:</b> WASD / mũi tên để đi · Shift để chạy · kéo chuột để xoay · lăn chuột để phóng to/thu nhỏ · E để nói chuyện.<br><br>🗺️ Bản đồ nhỏ góc phải: chấm vàng là mục tiêu, tam giác đỏ là bạn.<br>🏮 Bạn có thể tự do dạo phố bất cứ lúc nào!`,'Đã hiểu').then(()=>{closeD();S.busy=false;});};
+
+/* ---------- interaction & progression ---------- */
+let near=null;
+async function interact(o){
+ S.busy=true;$('act').classList.add('hidden');
+ try{await o.run(o);
+  if(o.card){S.cards.push(o.id);await showCard(o.card);}
+  if(o.note){S.notes.push(o.note);await info('📒 Đã ghi vào Sổ tay!',`<div class="vcard" style="max-width:none"><h3 style="margin-top:0">${o.note.t}</h3><p>${o.note.x}</p></div>`,'Ghi nhớ ✓');}
+  const ex=OBJ.find(x=>x.after&&x.ch===o.ch&&!x.done);
+  if(o.note&&ex&&ex.after.every(id=>id===o.id||OBJ.find(x=>x.id===id).done)){closeD();await info('🔓 Đã mở khóa bài đố!','Bạn đã nghe đủ chuyện của mọi người và có <b>'+S.notes.length+' trang Sổ tay</b>.<br><br>👉 Bấm <b>📒 Sổ tay</b> (góc phải) để ôn lại, rồi <b>quay về Bờ Hồ</b> làm bài đố của ông đồ nhé!','Đi thôi!');}
+  o.done=true;closeD();refreshHUD();toast('✓ Hoàn thành: '+o.title);
+  await checkChang();
+ }finally{closeD();S.busy=false;}
+}
+async function checkChang(){
+ if(S.free)return;
+ const list=OBJ.filter(o=>o.ch===S.chang);if(!list.every(o=>o.done))return;
+ if(S.chang===1){await timelineGame();closeD();
+  await info('🎉 Hoàn thành Chặng 1!','Bạn đã hiểu phố cổ <b>hình thành và phát triển</b> thế nào: từ Kẻ Chợ thời Lý, phường nghề thành phố nghề thời Lê, đến những đổi thay thời Pháp và việc được xếp hạng <b>di tích lịch sử quốc gia năm 2004</b>.<br><br>👉 <b>Chặng 2: Kho báu giá trị.</b> Hãy tìm 6 địa điểm và trả lời đúng để sưu tầm đủ <b>6 Thẻ giá trị</b> của phố cổ!','Bắt đầu Chặng 2');
+  closeD();startChang(2);}
+ else if(S.chang===2){await info('🎴 Đủ 6 Thẻ giá trị!','<b>Giá trị vật thể:</b> nhà ống, Ô Quan Chưởng, đền Bạch Mã, đình Kim Ngân, chợ Đồng Xuân…<br><b>Giá trị phi vật thể:</b> nghề truyền thống, ẩm thực, lễ hội, nếp sống thanh lịch.<br><b>Giá trị kinh tế – du lịch:</b> buôn bán, dịch vụ, việc làm.<br><br>Nhưng những giá trị ấy đang chịu nhiều <b>sức ép</b>: nhà cao tầng, dân quá đông, nghề mai một, du lịch quá tải… Liệu chúng có được gìn giữ?','Tiếp tục');
+  await info('🏛️ Bạn được bổ nhiệm!','Từ giờ bạn nhập vai <b>Trưởng ban quản lý phố cổ</b>. Hãy đến <b>5 điểm nóng</b> (dấu <b>?</b> màu cam) và đưa ra quyết định.<br><br>Mỗi quyết định ảnh hưởng tới 3 chỉ số: <b>🏛️ Bảo tồn · 🏠 Sinh kế người dân · 🧳 Du lịch</b>. Thế giới quanh bạn cũng sẽ <b>thay đổi theo lựa chọn</b>. Hãy tìm cách cân bằng!','Nhận nhiệm vụ');
+  closeD();startChang(3);}
+ else if(S.chang===3){await info('📋 Đã xử lý xong 5 điểm nóng','Hãy cùng xem phố cổ của bạn trong tương lai sẽ ra sao…','Xem kết quả');closeD();showEnd();}
+}
+function startChang(n){S.chang=n;refreshHUD();const t={1:['Chặng 1',C1+' · Hình thành & phát triển'],2:['Chặng 2',C2+' · Giá trị của phố cổ'],3:['Chặng 3',C3+' · Bảo tồn phố cổ']}[n];banner(t[0],t[1]);
+ $('stats').classList.toggle('hidden',n!==3);}
+function timelineGame(){return new Promise(res=>{
+ const items=[{y:'1010',t:'Lý Thái Tổ dời đô về Thăng Long; khu Kẻ Chợ dần hình thành'},{y:'Thời Lê',t:'Phường nghề thành phố nghề, Kẻ Chợ phồn thịnh: “Thứ nhất Kinh Kỳ, thứ nhì Phố Hiến”'},{y:'1749',t:'Xây cửa ô Đông Hà (Ô Quan Chưởng)'},{y:'1889',t:'Người Pháp lấp sông hồ, xây chợ Đồng Xuân'},{y:'2004',t:'Khu phố cổ được xếp hạng Di tích lịch sử quốc gia'}];
+ let first=true;openD();
+ const render=()=>{const sh=shuffle(items.map((it,i)=>({...it,i})));let ord=[];
+  const draw=()=>{dc.innerHTML=`<div class="who"><span class="av">👴</span><b class="nm">Thử thách của ông đồ</b></div><div class="q">⏳ Sắp xếp các mốc sau theo đúng thứ tự thời gian (chạm lần lượt từ cũ nhất đến mới nhất)</div>
+   <div class="tl">${sh.map(it=>`<button class="tli ${ord.includes(it.i)?'sel':''}" data-i="${it.i}" ${ord.includes(it.i)?'disabled':''}>${it.t}</button>`).join('')}</div>
+   <div class="ord">${ord.map((i,k)=>`<div class="ordi" data-k="${k}"><span class="n">${k+1}</span>${items[i].t}</div>`).join('')}</div><div class="fb"></div>
+   <div class="btns"><button class="go sec" id="tlR">Làm lại</button>${ord.length===items.length?'<button class="go" id="tlC">Kiểm tra</button>':''}</div>`;
+   dc.querySelectorAll('.tli').forEach(b=>b.onclick=()=>{ord.push(+b.dataset.i);draw();});
+   $('tlR').onclick=()=>{ord=[];draw();};
+   const c=$('tlC');if(c)c.onclick=()=>{const ok=ord.every((v,k)=>v===k);
+    dc.querySelectorAll('.ordi').forEach((el,k)=>{if(ord[k]!==k)el.classList.add('wrong');});
+    if(ok){if(first)S.timelineFirst=true;else if(S.timelineFirst===null)S.timelineFirst=false;
+     dc.querySelector('.fb').innerHTML=`<div class="ex">✅ Tuyệt vời! ${items.map(it=>`<br><b>${it.y}</b>: ${it.t}`).join('')}</div>`;
+     dc.querySelector('.btns').innerHTML='<button class="go">Tiếp ▸</button>';dc.querySelector('.btns .go').onclick=()=>res();dc.querySelector('.btns .go').scrollIntoView({block:'nearest'});}
+    else{first=false;S.timelineFirst=false;dc.querySelector('.fb').innerHTML='<span class="no">Còn mốc đặt sai (màu đỏ). Bấm “Làm lại” để thử tiếp nhé!</span>';c.remove();}};
+  };draw();};
+ render();});}
+function ending(){const {B,S:s,D}=S.stats;
+ if(B>=65&&s>=65&&D>=65)return['🏆 Phố cổ hài hòa','Phố cổ giữ được mái ngói, nhà ống và hồn xưa; người dân sống tốt bằng nghề của mình; du khách khắp nơi yêu mến. Bạn đã cân bằng xuất sắc giữa <b>bảo tồn và phát triển</b>!','Đại sứ Phố cổ xuất sắc'];
+ if(B<40)return['🏚️ Phố cổ mất hồn','Nhà cao tầng mọc lên, nhà cổ biến dạng. Phố vẫn đông đúc nhưng không còn là “phố cổ” nữa. Bảo tồn di sản là việc <b>không thể làm lại</b>.','Đại sứ Phố cổ'];
+ if(s<40)return['🏛️ Phố cổ thành “bảo tàng” vắng người','Nhà cổ được giữ nhưng người dân mất kế sinh nhai, dần rời đi. Một phố cổ không còn người sống thì cũng mất đi sức sống.','Đại sứ Phố cổ'];
+ if(D<40)return['🌙 Phố cổ lặng lẽ','Phố được giữ gìn nhưng ít người biết tới, kinh tế khó khăn. Bảo tồn cần đi cùng với <b>phát huy giá trị</b>.','Đại sứ Phố cổ'];
+ return['🌱 Phố cổ đang chuyển mình','Phố cổ còn nhiều thử thách, nhưng đang đi đúng hướng. Hãy thử chơi lại để tìm cách cân bằng tốt hơn!','Đại sứ Phố cổ'];}
+function showEnd(){
+ const e=ending();S.chang=4;
+ $('certBox').innerHTML=`<div style="font-size:30px">🏮🎖️🏮</div><h2>GIẤY CHỨNG NHẬN</h2><div style="font-size:14px">Danh hiệu <b>${e[2]}</b> được trao cho</div><div class="nm2">${S.name||'Nhà thám hiểm phố cổ'}</div>
+ <div class="mets"><span class="met">Câu đúng ngay lần đầu <b>${S.firstTry}/${S.quizTotal}</b></span><span class="met">Thẻ giá trị <b>${S.cards.length}/6</b></span><span class="met">🔍 Câu hỏi thêm <b>${S.asked}</b></span><span class="met">Dòng thời gian <b>${S.timelineFirst?'✓':'↻'}</b></span></div>
+ <div class="mets"><span class="met">🏛️ Bảo tồn <b>${S.stats.B}</b></span><span class="met">🏠 Sinh kế <b>${S.stats.S}</b></span><span class="met">🧳 Du lịch <b>${S.stats.D}</b></span></div>
+ <div class="end"><b style="font-size:17px">${e[0]}</b><br>${e[1]}</div>
+ <div class="sum"><b>📌 Tổng kết dự án</b><br><b>1. Hình thành &amp; phát triển:</b> Kẻ Chợ phía Đông kinh thành Thăng Long (từ 1010) → phường nghề thành phố “Hàng” thời Lê → biến đổi thời Pháp (chợ Đồng Xuân 1889) → Di tích lịch sử quốc gia (2004).<br><b>2. Giá trị:</b> kiến trúc (nhà ống, đình, đền, cửa ô), lịch sử, văn hóa nghề, ẩm thực – nếp sống (phi vật thể), kinh tế – du lịch.<br><b>3. Bảo tồn:</b> giữ cảnh quan và chiều cao công trình, tu bổ đúng kiến trúc gốc, giãn dân, giữ nghề truyền thống, quản lý vỉa hè, phát triển du lịch bền vững.</div>
+ <div class="btns" style="justify-content:center;flex-wrap:wrap"><button class="go sec" style="background:#1d3557" id="freeBtn">🗺️ Tiếp tục dạo phố</button><button class="go" id="againBtn">🔄 Chơi lại</button></div>`;
+ $('end').classList.remove('hidden');endOpen=true;
+ $('freeBtn').onclick=()=>{$('end').classList.add('hidden');endOpen=false;S.free=true;$('stats').classList.remove('hidden');refreshHUD();};
+ $('againBtn').onclick=()=>location.reload();
+}
+
+/* ---------- minimap ---------- */
+const MX0=-100,MX1=100,MZ0=-95,MZ1=172,MW=isTouch&&innerWidth<600?92:126,MSC=MW/(MX1-MX0),MH=Math.round((MZ1-MZ0)*MSC);
+const mini=$('mini');mini.width=MW*2;mini.height=MH*2;mini.style.width=MW+'px';mini.style.height=MH+'px';const mctx=mini.getContext('2d');mctx.scale(2,2);
+const mbase=document.createElement('canvas');mbase.width=MW*2;mbase.height=MH*2;
+const mx=x=>(x-MX0)*MSC,mz=z=>(z-MZ0)*MSC;
+function drawMapBase(){const c=mbase.getContext('2d');c.scale(2,2);c.fillStyle='#b9a888';c.fillRect(0,0,MW,MH);c.fillStyle='#86b55a';c.fillRect(0,mz(45),MW,MH);
+ c.fillStyle='#ece5d6';for(const x of XS)c.fillRect(mx(x-5),mz(-85),10*MSC,130*MSC);for(const z of ZS)c.fillRect(mx(-95),mz(z-5),190*MSC,10*MSC);c.fillRect(0,mz(45),MW,7*MSC);
+ c.fillStyle='#4f9a8f';c.beginPath();c.ellipse(mx(LAKE.cx),mz(LAKE.cz),LAKE.rx*MSC,LAKE.rz*MSC,0,0,PI*2);c.fill();
+ c.fillStyle='#c62828';c.fillRect(mx(7),mz(56),2*MSC,12*MSC);c.fillStyle='#7cb342';c.beginPath();c.arc(mx(8),mz(72),5*MSC,0,PI*2);c.fill();
+ c.fillStyle='#b71c1c';c.fillRect(mx(-24),mz(-108),28*MSC,20*MSC);c.fillStyle='#6d4c41';c.fillRect(mx(78),mz(-86),4*MSC,12*MSC);}
+function drawMini(t){mctx.clearRect(0,0,MW,MH);mctx.drawImage(mbase,0,0,MW,MH);
+ for(const o of OBJ){if(!o.marker.visible)continue;mctx.fillStyle=o.ch===1?'#ffd166':o.ch===2?'#c77dff':'#ff9f1c';mctx.strokeStyle='#14213d';mctx.lineWidth=1.2;mctx.beginPath();mctx.arc(mx(o.pos[0]),mz(o.pos[1]),3.2+Math.sin(t*5)*.8,0,PI*2);mctx.fill();mctx.stroke();}
+ const px=mx(player.position.x),pz=mz(player.position.z),a=player.rotation.y;mctx.save();mctx.translate(px,pz);mctx.rotate(-a+PI);mctx.fillStyle='#e63946';mctx.strokeStyle='#fff';mctx.lineWidth=1.3;mctx.beginPath();mctx.moveTo(0,-6);mctx.lineTo(4.5,5);mctx.lineTo(-4.5,5);mctx.closePath();mctx.fill();mctx.stroke();mctx.restore();}
+
+/* ---------- main loop ---------- */
+const clock=new THREE.Clock();let started=false;
+const camT=new THREE.Vector3(),camLook=new THREE.Vector3(-30,2.2,57),vel=new THREE.Vector3(),np=new THREE.Vector3();
+const expK=(k,dt)=>1-Math.exp(-k*dt);
+const wrapA=a=>{while(a>PI)a-=PI*2;while(a<-PI)a+=PI*2;return a;};
+const okPos=(x,z)=>!(inLake(x,z,.8)&&!onBridge(x,z)&&!onIsland(x,z));
+const WALK=8.5,RUN=14;
+let lastAct='',guideT=0,mapT=0,camInit=false;
+function moveStep(dx,dz){const p=player.position;np.set(p.x+dx,0,p.z+dz);
+ if(!okPos(np.x,np.z)){if(okPos(np.x,p.z))np.z=p.z;else if(okPos(p.x,np.z))np.x=p.x;else return;}
+ resolve(np,.75);p.x=np.x;p.z=np.z;}
+function update(dt,t){
+ nowT=t;
+ const paused=S.busy||!started||dlgOpen||endOpen;
+ // 1. Đọc điều khiển
+ let f=0,r=0;
+ if(!paused){f=jy+(keys.f?1:0)-(keys.b?1:0);r=jx+(keys.r?1:0)-(keys.l?1:0);}
+ let m=Math.hypot(f,r);if(m>1){f/=m;r/=m;m=1;}
+ const run=keys.run||(joyId!==null&&Math.hypot(jx,jy)>.93);
+ const maxSp=run?RUN:WALK;
+ // 2. Vận tốc mục tiêu theo hướng camera, tăng/giảm tốc mượt
+ const sy=Math.sin(yaw),cy=Math.cos(yaw);
+ const tx=(-sy*f+cy*r)*maxSp,tz=(-cy*f-sy*r)*maxSp;
+ const a=expK(m>.05?9:22,dt);vel.x+=(tx-vel.x)*a;vel.z+=(tz-vel.z)*a;
+ let sp=Math.hypot(vel.x,vel.z);if(sp<.06&&m<.05){vel.x=vel.z=0;sp=0;}
+ // 3. Di chuyển chia nhỏ bước để không xuyên tường, trượt dọc tường
+ if(sp>0&&dt>0){const p=player.position,ox=p.x,oz=p.z,n=Math.max(1,Math.ceil(sp*dt/.35));
+  for(let i=0;i<n;i++)moveStep(vel.x*dt/n,vel.z*dt/n);
+  const ax=(p.x-ox)/dt,az=(p.z-oz)/dt;vel.x=ax;vel.z=az;sp=Math.hypot(ax,az);}
+ // 4. Quay mặt theo hướng đi
+ if(sp>.4){const da=wrapA(Math.atan2(vel.x,vel.z)-player.rotation.y);player.rotation.y+=da*expK(14,dt);}
+ // 5. Độ cao (cầu Thê Húc, đảo Ngọc Sơn) mượt
+ const px=player.position.x,pz=player.position.z;
+ const ty=onBridge(px,pz)?.4+1.2*Math.sin(PI*clamp((pz-56)/11,0,1)):(onIsland(px,pz)?.4:0);
+ player.position.y+=(ty-player.position.y)*expK(16,dt);
+ // 6. Hoạt ảnh bước chân theo tốc độ thật
+ const amt=clamp(sp/WALK,0,1);animWalk(player,dt,amt,4+sp*.95);
+ // 7. Camera tự xoay ra sau lưng khi đi thẳng (không giành quyền khi người chơi đang xoay)
+ if(!paused&&sp>2&&f>.35&&Math.abs(r)<.65&&nowT-lastDrag>1.4&&dragId===null){
+  const behind=Math.atan2(vel.x,vel.z)+PI;yaw+=wrapA(behind-yaw)*expK(1.4*Math.min(1,sp/WALK),dt);}
+ // 8. Camera bám mượt + tránh xuyên tường
+ camT.set(player.position.x,player.position.y+2.2,player.position.z);
+ if(!camInit){camLook.copy(camT);camInit=true;}
+ camLook.lerp(camT,expK(18,dt));
+ const cp=Math.cos(pitch),dirx=Math.sin(yaw)*cp,diry=Math.sin(pitch),dirz=Math.cos(yaw)*cp;
+ let allow=camDist;for(let i=1;i<=12;i++){const d=camDist*i/12;if(blockedCam(camLook.x+dirx*d,camLook.y+diry*d,camLook.z+dirz*d)){allow=Math.max(2.2,camDist*(i-1)/12);break;}}
+ curDist+=(allow-curDist)*expK(allow<curDist?20:4,dt);
+ camera.position.set(camLook.x+dirx*curDist,camLook.y+diry*curDist,camLook.z+dirz*curDist);camera.lookAt(camLook);
+ // NPC, marker
+ near=null;let nd=1e9;
+ for(const o of OBJ){const dx=px-o.pos[0],dz=pz-o.pos[1],d=Math.hypot(dx,dz);
+  if(o.marker.visible){o.marker.position.y=3.5+Math.sin(t*3+o.pos[0])*.25;if(d<4.2&&d<nd){nd=d;near=o;}}
+  if(d<8){o.mesh.rotation.y+=wrapA(Math.atan2(dx,dz)-o.mesh.rotation.y)*expK(5,dt);}
+  o.mesh.userData.arms[1].rotation.x=d<5?Math.sin(t*6)*.5-.6:0;}
+ // Chỉ cập nhật DOM khi có thay đổi (tránh giật trên điện thoại)
+ const actKey=(near&&!paused)?near.id:'';
+ if(actKey!==lastAct){lastAct=actKey;const act=$('act');if(actKey){act.classList.remove('hidden');$('actWho').textContent=near.who+(touchMode?'':' [E]');act.firstChild.textContent=near.spot?'📋 Xử lý ':'💬 Nói chuyện ';}else act.classList.add('hidden');}
+ if(t-guideT>.12){guideT=t;
+  const tg=OBJ.filter(isActive);
+  if(tg.length&&started&&!S.free){let b=null,bd=1e9;for(const o of tg){const d=Math.hypot(o.pos[0]-px,o.pos[1]-pz);if(d<bd){bd=d;b=o;}}
+   $('guide').classList.remove('hidden');const txt=`${b.title} · ${Math.round(bd)} m`;if($('gText').textContent!==txt)$('gText').textContent=txt;
+   const wa=Math.atan2(b.pos[0]-px,b.pos[1]-pz),ca=Math.atan2(-sy,-cy);$('gArrow').style.transform=`rotate(${(-(wa-ca)-PI/2).toFixed(3)}rad)`;}
+  else $('guide').classList.add('hidden');}
+ // Người đi bộ, xe máy
+ for(const w of walkers){const u=w.userData,L=u.lane;u.t+=u.dir*u.sp*dt;if(u.t>L.b||u.t<L.a){u.dir*=-1;u.t=clamp(u.t,L.a,L.b);}
+  if(L.ax==='z'){w.position.set(L.c,0,u.t);w.rotation.y=u.dir>0?0:PI;}else{w.position.set(u.t,0,L.c);w.rotation.y=u.dir>0?PI/2:-PI/2;}animWalk(w,dt,1,u.sp*3.6);}
+ for(const b of bikes){const u=b.userData,L=u.lane,off=u.dir>0?-1.7:1.7;let bs=u.sp;const bx=L.ax==='z'?L.c+off:u.t,bz=L.ax==='z'?u.t:L.c-off;
+  if(Math.hypot(bx-px,bz-pz)<4)bs=0;
+  u.t+=u.dir*bs*dt;if(u.t>L.b||u.t<L.a){u.dir*=-1;u.t=clamp(u.t,L.a,L.b);}
+  if(L.ax==='z'){b.position.set(L.c+(u.dir>0?-1.7:1.7),0,u.t);b.rotation.y=u.dir>0?0:PI;}else{b.position.set(u.t,0,L.c+(u.dir>0?1.7:-1.7));b.rotation.y=u.dir>0?PI/2:-PI/2;}}
+ for(const o of OBJ)if(o.beacon.visible)o.beacon.material.opacity=.16+Math.sin(t*2.5)*.07;
+}
+// Tự giảm độ phân giải nếu máy yếu để giữ chuyển động mượt
+let pr=renderer.getPixelRatio(),fpsAcc=0,fpsN=0,fpsT=0;
+function loop(){requestAnimationFrame(loop);const raw=clock.getDelta(),dt=Math.min(raw,.05),t=clock.elapsedTime;update(dt,t);renderer.render(scene,camera);
+ if(started&&t-mapT>.1){mapT=t;drawMini(t);}
+ if(started){fpsAcc+=raw;fpsN++;if(t-fpsT>2.5){const avg=fpsAcc/fpsN;fpsAcc=0;fpsN=0;fpsT=t;if(avg>1/38&&pr>.75){pr=Math.max(.75,pr-.2);renderer.setPixelRatio(pr);resize();}}}}
+
+/* ---------- boot ---------- */
+async function boot(){
+ try{await Promise.race([document.fonts.load('800 40px "Be Vietnam Pro"'),new Promise(r=>setTimeout(r,1800))]);}catch(e){}
+ buildWorld();drawMapBase();updStats();
+ camera.position.set(-30,8,68);camera.lookAt(-30,2,40);
+ $('startBtn').disabled=false;$('startBtn').textContent='▶ Bắt đầu khám phá';
+ loop();
+}
+$('startBtn').onclick=()=>{S.name=$('pname').value.trim();$('start').classList.add('hidden');['hud','mapWrap','topBtns'].forEach(id=>$(id).classList.remove('hidden'));if(!isTouch)$('hint').classList.remove('hidden');
+ $('topBtns').style.top=(MH+28)+'px';started=true;startChang(1);
+ setTimeout(()=>{if(!touchMode)setTimeout(()=>$('hint').classList.add('hidden'),12000);},0);};
+setTimeout(boot,30);
+window.__game={S,OBJ,get player(){return player;},get near(){return near;}};
+})();
+</script>
+</body>
+</html>

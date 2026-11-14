@@ -422,7 +422,7 @@ function lanternString(x,zc){W.add(BOX,x,6.3,zc,.05,.05,10,'#222');for(let z=zc-
 const LABELS=[];
 function label(text,x,y,z,o,H=2.4){const s=makeSprite(text,o||{},H);s.position.set(x,y,z);scene.add(s);LABELS.push(s);return s;}
 function buildMarket(){
- const K=1.3,A=(g,x,y,z,sx,sy,sz,col,ry=0,rx=0)=>A(g,x,y*K,z,sx,sy*K,g===PRISM?sz*K:sz,col,ry,rx);
+ const K=1.3,A=(g,x,y,z,sx,sy,sz,col,ry=0,rx=0)=>W.add(g,x,y*K,z,sx,sy*K,g===PRISM?sz*K:sz,col,ry,rx);
  const cx=-10,fz=-88.5;
  A(BOX,cx,4.5,fz-10.5,30,9,21,'#f1e6cf');A(BOX,cx,9.15,fz-10.5,30.6,.3,21.6,'#8f8a84');
  for(const gx of [-10,0,10]){A(PRISM,cx+gx,10.6,fz-.5,5.6,1,3.2,'#f6eedd',0,-PI/2);A(BOX,cx+gx,3.2,fz+.03,5,5.6,.1,'#5a4636');A(BOX,cx+gx,6.4,fz+.06,5.6,.4,.2,'#c49a52');
@@ -433,7 +433,7 @@ function buildMarket(){
  label('Chợ Đồng Xuân',cx,20,fz-6,{bg:'#b71c1c'});
 }
 function buildGate(){
- const K=1.35,A=(g,x,y,z,sx,sy,sz,col,ry=0,rx=0)=>A(g,x,y*K,z,sx,sy*K,g===PRISM?sz*K:sz,col,ry,rx);
+ const K=1.35,A=(g,x,y,z,sx,sy,sz,col,ry=0,rx=0)=>W.add(g,x,y*K,z,sx,sy*K,g===PRISM?sz*K:sz,col,ry,rx);
  const gx=80,c='#9b7a5f',d='#7d604a';
  A(BOX,gx,3.25,-85.25,4,6.5,6.5,c);A(BOX,gx,3.25,-74.75,4,6.5,6.5,c);
  A(BOX,gx,5.6,-80,4,1.8,4.02,c);A(BOX,gx,4.5,-81.6,4.02,.6,.8,c);A(BOX,gx,4.5,-78.4,4.02,.6,.8,c);

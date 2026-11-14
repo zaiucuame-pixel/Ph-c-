@@ -812,6 +812,87 @@ function restoreMissions(){for(const id of MIS_ORDER){const m=MIS[id],st=msState
  if((st.st==='ready'||st.st==='done')&&m.escort&&st.pos){g.mesh.position.set(st.pos[0],0,st.pos[1]);g.pos=st.pos.slice();}}
  refreshHUD();}
 
+// ===== VIỆC TỐT ẨN (không có dấu hiệu, chỉ người tinh ý mới nhận ra) =====
+const HID_IDS=['h1','h2','h3','h4'],HP=[];let HN={};
+const hidDone=id=>!!(S.hid&&S.hid[id]);
+const hidCount=()=>HID_IDS.filter(hidDone).length;
+const hidP=()=>(S.hidP=S.hidP||{h2:[],h3:'',h4:''});
+function hidBonus(d){if(S.chang>=3){for(const k in d)S.stats[k]=clamp(S.stats[k]+d[k],0,100);updStats();}else{S.hb=S.hb||{B:0,S:0,D:0};for(const k in d)S.hb[k]+=d[k];}}
+async function hidFinish(id,title,html,d){S.hid=S.hid||{};S.hid[id]=true;hidBonus(d);refreshHUD();
+ await info('🔍 Việc tốt ẩn: '+title,html+chips(d)+`<div style="margin-top:6px;opacity:.85">Bạn đã tìm ra <b>${hidCount()}/4</b> việc tốt ẩn.${S.chang<3?' (Điểm thưởng sẽ được cộng khi vào Chặng 3.)':''}</div>`,'Tuyệt vời!');}
+function emoSprite(e,s=.8){const c=document.createElement('canvas');c.width=c.height=64;const x=c.getContext('2d');x.font='46px sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(e,32,36);const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthWrite:false,transparent:true}));sp.scale.set(s,s,1);return sp;}
+function graffitiTex(){const c=document.createElement('canvas');c.width=256;c.height=160;const x=c.getContext('2d');x.lineCap='round';
+ for(let k=0;k<7;k++){x.strokeStyle=['#e91e63','#212121','#2979ff','#00c853'][k%4];x.lineWidth=4+Math.random()*6;x.globalAlpha=.85;x.beginPath();x.moveTo(20+Math.random()*60,20+Math.random()*120);for(let j=0;j<5;j++)x.lineTo(20+Math.random()*220,15+Math.random()*130);x.stroke();}
+ x.globalAlpha=1;x.font='800 30px sans-serif';x.fillStyle='#ff1744';x.save();x.translate(128,85);x.rotate(-.12);x.textAlign='center';x.fillText('TÚ ❤ NGA',0,0);x.font='800 22px sans-serif';x.fillStyle='#111';x.fillText('ĐÃ Ở ĐÂY 2026',0,30);x.restore();return new THREE.CanvasTexture(c);}
+function stickerTex(){const c=document.createElement('canvas');c.width=64;c.height=96;const x=c.getContext('2d');x.fillStyle='#fffde7';x.fillRect(0,0,64,96);x.fillStyle='#d50000';x.font='800 11px sans-serif';x.textAlign='center';
+ ['KHOAN','CẮT','BÊ TÔNG','☎ 09xx','xxx.xxx'].forEach((t,i)=>x.fillText(t,32,18+i*17));return new THREE.CanvasTexture(c);}
+function hidNPC(look,pos,emo){const p=makePerson(look);p.position.set(pos[0],0,pos[1]);scene.add(p);const e=emoSprite(emo,.7);e.position.set(pos[0],2.75,pos[1]);scene.add(e);return {mesh:p,emo:e};}
+function buildHidden(){
+ // H1: vết vẽ bậy trên Ô Quan Chưởng
+ const gm=new THREE.Mesh(new THREE.PlaneGeometry(2.4,1.5),new THREE.MeshBasicMaterial({map:graffitiTex(),transparent:true,depthWrite:false}));gm.position.set(77.96,2.3,-85.4);gm.rotation.y=-PI/2;scene.add(gm);HN.graf=gm;
+ HP.push({isHidden:true,id:'h1',pos:[76.3,-85.2],r:2.8,verb:'🔎 Xem kỹ',who:'Bức tường cổ Ô Quan Chưởng',em:'🧱',active:()=>!hidDone('h1'),run:runH1});
+ // H2: 3 tờ quảng cáo dán bậy trên cột đèn phố Hàng Bạc
+ [[20,-5.6,0],[37,5.6,PI],[54,-5.6,0]].forEach((a,i)=>{const m=new THREE.Mesh(new THREE.PlaneGeometry(.36,.54),new THREE.MeshBasicMaterial({map:stickerTex()}));const dz=a[2]===0?.09:-.09;m.position.set(a[0],1.6,a[1]+dz);m.rotation.y=a[2];scene.add(m);
+  HP.push({isHidden:true,id:'h2',part:i,pos:[a[0],a[1]+(a[2]===0?1.2:-1.2)],r:2.2,verb:'🧻 Bóc quảng cáo dán bậy',who:'Tờ quảng cáo dán trên cột đèn',em:'📄',mesh:m,active:()=>!hidDone('h2')&&!hidP().h2.includes(i),run:runH2});});
+ // H3: chiếc ví rơi bên hồ + chủ nhân đang lo lắng
+ const w=new THREE.Group();const wb=new THREE.Mesh(new THREE.BoxGeometry(.32,.07,.22),lam('#6d4c41'));wb.position.y=.05;w.add(wb);const wl=new THREE.Mesh(new THREE.BoxGeometry(.1,.075,.24),lam('#a1887f'));wl.position.set(.08,.05,0);w.add(wl);w.position.set(-59.3,0,92.6);w.rotation.y=.6;scene.add(w);HN.wallet=w;
+ HP.push({isHidden:true,id:'h3w',pos:[-59.3,92.6],r:1.9,verb:'👛 Nhặt chiếc ví',who:'Một chiếc ví nằm trên lối đi',em:'👛',active:()=>!hidDone('h3')&&!hidP().h3,run:runH3w});
+ HN.hana=hidNPC({shirt:'#f48fb1',pants:'#37474f',bag:'#ffffff',hair:'#1b1b1b',skin:'#f6d7c3',longHair:true,dress:true},[41.5,113],'😟');
+ HP.push({isHidden:true,id:'h3',pos:[41.5,113],r:3,verb:'💬 Hỏi thăm',who:'Chị Hana – du khách Nhật Bản',em:'😟',active:()=>!hidDone('h3'),run:runH3});
+ // H4: bà cụ mỏi chân với gánh hàng
+ HN.ba=hidNPC({shirt:'#795548',hat:'non',ganh:true,dress:true,hair:'#9e9e9e',scale:.74},[-23.2,-50],'💦');HN.ba.mesh.rotation.y=-PI/2;
+ HP.push({isHidden:true,id:'h4',pos:[-23.2,-50],r:3,verb:'💬 Hỏi thăm bà',who:'Bà cụ bán hàng',em:'👵',active:()=>!hidDone('h4')&&hidP().h4!=='follow',run:runH4});
+}
+async function pickRetry(o,q,opts){for(;;){const k=await pick(o,q,opts.map(p=>p.t));const p=opts[k];if(p.ok)return k;await say(o,'🤔 '+p.fb);}}
+async function runH1(H){const o={who:'Bạn để ý thấy…',em:'🔎'};
+ await say(o,'Trên bức tường gạch của <b>Ô Quan Chưởng</b>, cửa ô xây từ năm 1749, có ai đó đã <b>xịt sơn vẽ bậy</b>: “TÚ ❤ NGA đã ở đây”...');
+ await pickRetry(o,'Bạn sẽ làm gì?',[
+  {t:'Lấy giấy nhám chà thật mạnh cho sạch',fb:'Khoan đã! Chà mạnh có thể làm <b>bong, vỡ lớp gạch vữa cổ</b> gần 300 năm tuổi. Tự xử lý sai cách còn gây hại hơn.'},
+  {t:'Chụp ảnh lại và báo cho Ban quản lý di tích để xử lý đúng kỹ thuật',ok:true},
+  {t:'Vẽ thêm một trái tim cho đẹp',fb:'Không được! Viết, vẽ lên di tích là hành vi <b>xâm hại di sản</b>.'}]);
+ HN.graf.visible=false;
+ await hidFinish('h1','Báo vết vẽ bậy trên di tích','Bạn đã chụp ảnh và báo Ban quản lý. Các cán bộ đã đến xử lý vết sơn bằng dung dịch chuyên dụng, <b>không làm hỏng</b> tường cổ.<br><br>💡 Gặp di tích bị xâm hại: <b>đừng làm ngơ, cũng đừng tự xử lý sai cách</b>, hãy báo người có chuyên môn.',{B:10,S:0,D:0});}
+async function runH2(H){const pp=hidP();pp.h2.push(H.part);H.mesh.visible=false;
+ if(pp.h2.length<3){toast(`🧻 Đã bóc tờ quảng cáo dán bậy (${pp.h2.length}/3). Hình như trên phố còn nữa…`);refreshHUD();return;}
+ await hidFinish('h2','Bóc quảng cáo dán bậy','Bạn đã bóc sạch <b>3 tờ quảng cáo</b> “khoan cắt bê tông” dán bậy trên cột đèn phố Hàng Bạc.<br><br>💡 Quảng cáo dán bậy làm phố cổ <b>nhếch nhác</b>. Không dán, không tiếp tay, và gỡ bỏ khi có thể là cách giữ mỹ quan chung.',{B:5,S:5,D:0});}
+async function runH3w(H){hidP().h3='have';HN.wallet.visible=false;
+ const o={who:'Bạn nhặt được…',em:'👛'};await say(o,'Một chiếc ví nâu rơi trên lối đi quanh hồ. Bên trong có <b>hộ chiếu</b> mang tên <b>HANA SATO</b>, ít tiền và tấm ảnh gia đình.<br><br>Chắc chủ nhân đang lo lắm. Người đó có thể vẫn ở <b>quanh Hồ Gươm</b>…');refreshHUD();}
+async function runH3(H){const o={who:'Chị Hana – du khách Nhật Bản',em:hidP().h3?'😟':'😟'};
+ if(!hidP().h3){await say(o,'Xin chào… Tôi là Hana. Tôi đi dạo quanh hồ và <b>làm rơi ví</b> ở đâu đó, trong đó có hộ chiếu… Bạn có thấy không? 😢');return;}
+ await say(o,'Ồ! Bạn… đó là ví của tôi?');
+ await pickRetry(o,'Bạn sẽ…',[
+  {t:'Kiểm tra tên trên hộ chiếu cho đúng người rồi trả lại ví nguyên vẹn',ok:true},
+  {t:'Lấy bớt tiền rồi mới trả ví',fb:'Không được! Đó là của người khác. <b>Trung thực</b> là điều tối thiểu.'},
+  {t:'Đòi chị Hana trả tiền công mới đưa ví',fb:'Giúp người mà đòi công thì đâu còn là việc tốt, lại làm xấu hình ảnh người Hà Nội.'}]);
+ HN.hana.emo.material.map=emoSprite('😊').material.map;HN.hana.emo.material.needsUpdate=true;
+ await say({who:'Chị Hana',em:'😊'},'Arigatō! Cảm ơn bạn rất nhiều! Người Hà Nội thật tốt bụng. Tôi nhất định sẽ quay lại Việt Nam!');
+ await hidFinish('h3','Trả lại ví cho du khách','💡 <b>Trung thực, tốt bụng</b> với du khách là cách đẹp nhất để giới thiệu về phố cổ và con người Hà Nội <b>thanh lịch</b>.',{B:0,S:5,D:5});}
+async function runH4(H){const o={who:'Bà cụ bán hàng',em:'👵'};
+ await say(o,'Ối giời, cháu ơi… Bà gánh hàng ra <b>chợ Đồng Xuân</b> mà mỏi chân quá, ngồi nghỉ mãi chưa đi tiếp được. Đường thì đông…');
+ const k=await pick(o,'Bạn sẽ…',['🤝 Để cháu đỡ gánh giúp bà, đưa bà ra chợ','Cháu đang vội, bà nghỉ thêm chút nhé']);
+ if(k!==0){await say(o,'Ừ, cháu cứ đi đi…');return;}
+ hidP().h4='follow';HN.ba.emo.material.map=emoSprite('🙂').material.map;HN.ba.emo.material.needsUpdate=true;
+ await say(o,'Thế thì quý hóa quá! Cháu đi trước, bà theo sau. Ra <b>cổng chợ Đồng Xuân</b> là được rồi.');toast('🤝 Đưa bà cụ ra cổng chợ Đồng Xuân');}
+function hiddenTick(dt,t){if(!HN.ba)return;const px=player.position.x,pz=player.position.z,pp=hidP();
+ if(pp.h4==='follow'&&!hidDone('h4')){const f=HN.ba.mesh.position,dx=px-f.x,dz=pz-f.z,d=Math.hypot(dx,dz);
+  if(d>30){f.x=px-Math.sin(player.rotation.y)*2.5;f.z=pz-Math.cos(player.rotation.y)*2.5;}
+  else if(d>2.4){const sp=Math.min(6.5,d*1.8);np2.set(f.x+dx/d*sp*dt,0,f.z+dz/d*sp*dt);resolve(np2,.6);f.x=np2.x;f.z=np2.z;HN.ba.mesh.rotation.y=Math.atan2(dx,dz);animWalk(HN.ba.mesh,dt,1,sp*1.2);}
+  else animWalk(HN.ba.mesh,dt,0,4);
+  HN.ba.emo.position.set(f.x,2.6,f.z);
+  if(!S.busy&&Math.hypot(px+10,pz+86)<6&&Math.hypot(f.x+10,f.z+86)<8){pp.h4='done';S.busy=true;(async()=>{try{
+    await say({who:'Bà cụ bán hàng',em:'👵'},'Đến chợ rồi! Cảm ơn cháu nhé, cháu ngoan quá. Bà chúc cháu đi chơi vui, mạnh khỏe!');
+    await hidFinish('h4','Giúp bà cụ ra chợ','💡 <b>Kính trọng, giúp đỡ người già</b> là nét đẹp trong nếp sống của người Hà Nội, cũng là một phần “hồn phố” cần gìn giữ.',{B:0,S:10,D:0});}finally{closeD();S.busy=false;lastAct='?';saveGame();}})();}}
+ for(const k of ['hana','ba']){const n=HN[k];if(n&&n.emo)n.emo.position.y=(k==='ba'?2.6:2.75)+Math.sin(t*2.4)*.06;}
+ if(HN.hana&&!hidDone('h3')){const dx=px-41.5,dz=pz-113;if(Math.hypot(dx,dz)<8)HN.hana.mesh.rotation.y+=wrapA(Math.atan2(dx,dz)-HN.hana.mesh.rotation.y)*expK(4,dt);}}
+function applyHiddenState(){const pp=hidP();
+ if(hidDone('h1'))HN.graf.visible=false;
+ for(const H of HP)if(H.id==='h2'&&(hidDone('h2')||pp.h2.includes(H.part)))H.mesh.visible=false;
+ if(pp.h3||hidDone('h3'))HN.wallet.visible=false;
+ if(hidDone('h3')){HN.hana.emo.material.map=emoSprite('😊').material.map;HN.hana.emo.material.needsUpdate=true;}
+ if(pp.h4==='done'&&!hidDone('h4'))pp.h4='follow';
+ if(pp.h4==='follow'&&!hidDone('h4')){HN.ba.mesh.position.set(player.position.x+2,0,player.position.z+2);}
+ if(hidDone('h4')){HN.ba.mesh.position.set(-7,0,-86.8);HN.ba.emo.position.set(-7,2.6,-86.8);HN.ba.emo.material.map=emoSprite('😊').material.map;}}
+
 /* ---------- build everything ---------- */
 const NPCS=[];
 let player, walkers=[], bikes=[];
@@ -850,7 +931,7 @@ function buildWorld(){
  }
  // player
  player=makePerson(PLAYER_LOOK.m);
- player.position.set(START.x,0,START.z);player.rotation.y=START.r;scene.add(player);buildPhone();
+ player.position.set(START.x,0,START.z);player.rotation.y=START.r;scene.add(player);buildPhone();buildHidden();
  // walkers
  const lanes=[];for(const x of XS)for(const s of [-6.8,6.8])lanes.push({ax:'z',c:x+s,a:-82,b:42});for(const z of ZS)for(const s of [-6.8,6.8])lanes.push({ax:'x',c:z+s,a:-92,b:92});
  for(let i=0;i<26;i++){const L=P(lanes);const w=makePerson({hat:rnd()<.3?'non':(rnd()<.3?'cap':null),capC:P(['#e63946','#1d70b8','#fff']),bag:rnd()<.3?P(['#ff7043','#26a69a','#5c6bc0']):null,dress:rnd()<.3});const t=R(L.a,L.b);w.userData.lane=L;w.userData.t=t;w.userData.dir=rnd()<.5?1:-1;w.userData.sp=R(1.6,2.6);scene.add(w);walkers.push(w);}
@@ -947,10 +1028,10 @@ function questLine(o){if(!isUnlocked(o))return `<li style="opacity:.6">🔒 ${o.
  return `<li class="${o.done?'ok':''}">${o.done?'✅':(o.after?'📝':'⭐')} ${o.title}</li>`;}
 function refreshHUD(){
  const names={1:'Chặng 1 · '+C1,2:'Chặng 2 · '+C2,3:'Chặng 3 · '+C3};
- if(S.free){$('chName').textContent='🗺️ Tự do khám phá';$('chProg').textContent='';$('quests').innerHTML='<li>Hoàn thành! Hãy dạo phố tùy thích.</li>';return;}
+ if(S.free){$('chName').textContent='🗺️ Tự do khám phá';$('chProg').textContent='';$('quests').innerHTML=`<li>Hoàn thành! Hãy dạo phố tùy thích.</li><li>🔍 Việc tốt ẩn: ${hidCount()}/4</li>`;return;}
  const list=OBJ.filter(o=>o.ch===S.chang);const d=list.filter(o=>o.done).length;
  $('chName').textContent=names[S.chang];$('chProg').textContent=`${d}/${list.length} ▾`;
- $('quests').innerHTML=list.map(questLine).join('');
+ $('quests').innerHTML=list.map(questLine).join('')+`<li style="opacity:.85;border-top:1px dashed rgba(255,255,255,.3);margin-top:4px;padding-top:5px">🔍 Việc tốt ẩn: ${hidCount()}/4</li>`;
  $('notesBtn').textContent=`📒 Sổ tay ${S.notes.length}`;
  $('cardsBtn').textContent=`🎴 Thẻ ${S.cards.length}/6`;
  for(const o of OBJ){const act=isActive(o);o.marker.visible=act;o.beacon.visible=act;if(o.mid&&act){const sym=msState(o.mid).st==='ready'?'?':'!';if(o.marker.userData.sym!==sym){o.marker.material.map=markerTex(sym,'#f77f00');o.marker.material.needsUpdate=true;o.marker.userData.sym=sym;}}}
@@ -964,12 +1045,13 @@ $('notesBtn').onclick=()=>{if(S.busy)return;openD();
 $('cardsBtn').onclick=()=>{if(S.busy)return;const all=OBJ.filter(o=>o.card);openD();
  dc.innerHTML=`<div class="q">🎴 Bộ sưu tập Thẻ giá trị (${S.cards.length}/6)</div><div class="gal">${all.map(o=>S.cards.includes(o.id)?`<div class="mini"><span class="cat" style="background:${CATS[o.card.cat][1]};color:#fff;border-radius:20px;padding:2px 8px;font-size:11px;font-weight:800">${CATS[o.card.cat][0]}</span><b>${CATS[o.card.cat][2]} ${o.card.t}</b>${o.card.x}</div>`:`<div class="mini lock"><b>🔒 ${o.title}</b>Tìm và trả lời đúng để mở thẻ.</div>`).join('')}</div><div class="btns"><button class="go">Đóng</button></div>`;
  dc.querySelector('.go').onclick=closeD;};
-$('helpBtn').onclick=()=>{if(S.busy)return;S.busy=true;info('❔ Hướng dẫn',`<b>Mục tiêu:</b> đi theo <b>mũi tên vàng</b> ở trên cùng và các <b>cột sáng</b> để tìm nhân vật có dấu <b>!</b> hoặc <b>?</b>.<br><br>📱 <b>Điện thoại:</b> kéo cần điều khiển bên trái để đi · vuốt màn hình để xoay góc nhìn · bấm nút vàng để nói chuyện.<br>💻 <b>Máy tính:</b> WASD / mũi tên để đi · Shift để chạy · kéo chuột để xoay · lăn chuột để phóng to/thu nhỏ · E để nói chuyện · N bật/tắt ban đêm · F toàn màn hình.<br>🌙 Nút <b>Ban đêm</b> ở góc phải: phố cổ lên đèn lồng, đèn đường, cửa hiệu sáng rực!<br>👤 Nút có tên bạn: đổi người chơi (tiến trình lưu theo tên).<br><br>🗺️ Bản đồ nhỏ góc phải: chấm vàng là mục tiêu, tam giác đỏ là bạn.<br>🏮 Bạn có thể tự do dạo phố bất cứ lúc nào!`,'Đã hiểu').then(()=>{closeD();S.busy=false;});};
+$('helpBtn').onclick=()=>{if(S.busy)return;S.busy=true;info('❔ Hướng dẫn',`<b>Mục tiêu:</b> đi theo <b>mũi tên vàng</b> ở trên cùng và các <b>cột sáng</b> để tìm nhân vật có dấu <b>!</b> hoặc <b>?</b>.<br><br>📱 <b>Điện thoại:</b> kéo cần điều khiển bên trái để đi · vuốt màn hình để xoay góc nhìn · bấm nút vàng để nói chuyện.<br>💻 <b>Máy tính:</b> WASD / mũi tên để đi · Shift để chạy · kéo chuột để xoay · lăn chuột để phóng to/thu nhỏ · E để nói chuyện · N bật/tắt ban đêm · F toàn màn hình.<br>🌙 Nút <b>Ban đêm</b> ở góc phải: phố cổ lên đèn lồng, đèn đường, cửa hiệu sáng rực!<br>👤 Nút có tên bạn: đổi người chơi (tiến trình lưu theo tên).<br><br>🗺️ Bản đồ nhỏ góc phải: chấm vàng là mục tiêu, tam giác đỏ là bạn.<br>🏮 Bạn có thể tự do dạo phố bất cứ lúc nào!<br>🕵️ Phố cổ còn <b>4 việc tốt ẩn</b>: không có dấu hiệu, không có trên bản đồ. Hãy để ý những điều bất thường quanh bạn!`,'Đã hiểu').then(()=>{closeD();S.busy=false;});};
 
 /* ---------- interaction & progression ---------- */
 let near=null;
 async function interact(o){
  if(o.isTarget){useTarget(o);return;}
+ if(o.isHidden){S.busy=true;$('act').classList.add('hidden');try{await o.run(o);}finally{closeD();S.busy=false;lastAct='?';saveGame();}return;}
  S.busy=true;$('act').classList.add('hidden');
  try{const rr=await o.run(o);if(rr===false){closeD();refreshHUD();return;}
   if(o.card){S.cards.push(o.id);await showCard(o.card);}
@@ -988,7 +1070,7 @@ async function checkChang(){
   closeD();startChang(2);}
  else if(S.chang===2){await info('🎴 Đủ 6 Thẻ giá trị!','<b>Giá trị vật thể:</b> nhà ống, Ô Quan Chưởng, đền Bạch Mã, đình Kim Ngân, chợ Đồng Xuân…<br><b>Giá trị phi vật thể:</b> nghề truyền thống, ẩm thực, lễ hội, nếp sống thanh lịch.<br><b>Giá trị kinh tế – du lịch:</b> buôn bán, dịch vụ, việc làm.<br><br>Nhưng những giá trị ấy đang chịu nhiều <b>sức ép</b>: nhà cao tầng, dân quá đông, nghề mai một, du lịch quá tải… Liệu chúng có được gìn giữ?','Tiếp tục');
   await info('🙋 Ai cũng có thể giữ gìn phố cổ!','Bảo tồn phố cổ <b>không chỉ là việc của chính quyền</b>. Người dân, du khách như bạn cũng góp phần mỗi ngày bằng những việc làm cụ thể.<br><br>👉 Tìm <b>5 người cần giúp</b> (dấu <b>!</b> màu cam), <b>nhận nhiệm vụ</b>, làm xong thì <b>quay lại báo cáo</b> (dấu <b>?</b>).<br><br>Mỗi việc tốt làm tăng 3 chỉ số: <b>🏛️ Bảo tồn · 🤝 Cộng đồng · 🧳 Du lịch</b>, và phố cổ quanh bạn cũng đổi khác!','Bắt đầu thôi!');
-  S.stats={B:30,S:30,D:30};updStats();
+  {const hb=S.hb||{B:0,S:0,D:0};S.stats={B:clamp(30+hb.B,0,100),S:clamp(30+hb.S,0,100),D:clamp(30+hb.D,0,100)};}updStats();
   closeD();startChang(3);}
  else if(S.chang===3){await info('🎉 Hoàn thành 5 nhiệm vụ!','Phố cổ đang vào mùa lễ hội: <b>phố đi bộ</b> quanh Hồ Gươm treo đầy cờ hoa. Cùng xem những việc làm của bạn đã giúp phố cổ thế nào nhé…','Xem kết quả');closeD();showEnd();}
 }
@@ -1021,9 +1103,9 @@ function ending(){const {B,S:s,D}=S.stats;
 function showEnd(){
  const e=ending();S.chang=4;setTimeout(saveGame,0);
  $('certBox').innerHTML=`<div style="font-size:30px">🏮🎖️🏮</div><h2>GIẤY CHỨNG NHẬN</h2><div style="font-size:14px">Danh hiệu <b>${e[2]}</b> được trao cho</div><div class="nm2">${S.name||'Nhà thám hiểm phố cổ'}</div>
- <div class="mets"><span class="met">Câu đúng ngay lần đầu <b>${S.firstTry}/${S.quizTotal}</b></span><span class="met">Thẻ giá trị <b>${S.cards.length}/6</b></span><span class="met">🔍 Câu hỏi thêm <b>${S.asked}</b></span><span class="met">Dòng thời gian <b>${S.timelineFirst?'✓':'↻'}</b></span></div>
+ <div class="mets"><span class="met">Câu đúng ngay lần đầu <b>${S.firstTry}/${S.quizTotal}</b></span><span class="met">Thẻ giá trị <b>${S.cards.length}/6</b></span><span class="met">🔍 Câu hỏi thêm <b>${S.asked}</b></span><span class="met">🕵️ Việc tốt ẩn <b>${hidCount()}/4</b></span><span class="met">Dòng thời gian <b>${S.timelineFirst?'✓':'↻'}</b></span></div>
  <div class="mets"><span class="met">🏛️ Bảo tồn <b>${S.stats.B}</b></span><span class="met">🤝 Cộng đồng <b>${S.stats.S}</b></span><span class="met">🧳 Du lịch <b>${S.stats.D}</b></span></div>
- <div class="end"><b style="font-size:17px">${e[0]}</b><br>${e[1]}</div>
+ <div class="end"><b style="font-size:17px">${e[0]}</b><br>${e[1]}</div>${hidCount()===4?'<div class="end" style="background:#d8f3dc">🏅 <b>Huy hiệu đặc biệt: Người Hà Nội tinh ý</b><br>Bạn đã phát hiện cả 4 việc tốt ẩn mà không cần ai nhắc!</div>':''}
  <div class="sum"><b>📌 Tổng kết dự án</b><br><b>1. Hình thành &amp; phát triển:</b> Kẻ Chợ phía Đông kinh thành Thăng Long (từ 1010) → phường nghề thành phố “Hàng” thời Lê → biến đổi thời Pháp (chợ Đồng Xuân 1889) → Di tích lịch sử quốc gia (2004).<br><b>2. Giá trị:</b> kiến trúc (nhà ống, đình, đền, cửa ô), lịch sử, văn hóa nghề, ẩm thực – nếp sống (phi vật thể), kinh tế – du lịch.<br><b>3. Bảo tồn:</b> là việc của <b>mọi người</b>: giữ vệ sinh, tôn trọng không gian chung (vỉa hè), không xâm hại di tích, ghi lại tư liệu, giới thiệu đúng cho du khách, ủng hộ nghề truyền thống; bên cạnh đó là quy hoạch, tu bổ đúng kiến trúc gốc của chính quyền.</div>
  <div class="btns" style="justify-content:center;flex-wrap:wrap"><button class="go sec" style="background:#1d3557" id="freeBtn">🗺️ Tiếp tục dạo phố</button><button class="go" id="againBtn">🔄 Chơi lại</button></div>`;
  $('end').classList.remove('hidden');endOpen=true;
@@ -1138,13 +1220,14 @@ function update(dt,t){
  near=null;let nd=1e9;
  for(const o of OBJ){const dx=px-o.pos[0],dz=pz-o.pos[1],d=Math.hypot(dx,dz);
   if(o.marker.visible){o.marker.position.y=3.5+Math.sin(t*3+o.pos[0])*.25;if(d<4.2&&d<nd){nd=d;near=o;}}}
+ if(started)for(const H of HP){if(!H.active())continue;const d=Math.hypot(px-H.pos[0],pz-H.pos[1]);if(d<H.r&&d<nd){nd=d;near=H;}}
  for(const T of TARGETS){if(T.kind!=='use'||T.done)continue;const d=Math.hypot(px-T.pos[0],pz-T.pos[1]);if(d<2.6&&d<nd){nd=d;near=T;}}
  for(const o of OBJ){const dx=px-o.pos[0],dz=pz-o.pos[1],d=Math.hypot(dx,dz);if(o.mobile&&msState(o.mid).st==='active')continue;
   if(d<8){o.mesh.rotation.y+=wrapA(Math.atan2(dx,dz)-o.mesh.rotation.y)*expK(5,dt);}
   o.mesh.userData.arms[1].rotation.x=d<5?Math.sin(t*6)*.5-.6:0;}
  // Chỉ cập nhật DOM khi có thay đổi (tránh giật trên điện thoại)
- const actKey=(near&&!paused)?(near.isTarget?'T'+near.m.id+near.i:near.id):'';
- if(actKey!==lastAct){lastAct=actKey;const act=$('act');if(actKey){act.classList.remove('hidden');$('actWho').textContent=near.who+(touchMode?'':' [E]');act.firstChild.textContent=near.isTarget?near.verb+' ':(near.mid&&msState(near.mid).st==='ready'?'↩️ Báo cáo ':near.mid?'📋 Nhận việc ':'💬 Nói chuyện ');}else act.classList.add('hidden');}
+ const actKey=(near&&!paused)?(near.isTarget?'T'+near.m.id+near.i:near.isHidden?'H'+near.id+(near.part||0)+(hidP().h3||''):near.id):'';
+ if(actKey!==lastAct){lastAct=actKey;const act=$('act');if(actKey){act.classList.remove('hidden');$('actWho').textContent=near.who+(touchMode?'':' [E]');act.firstChild.textContent=(near.isTarget||near.isHidden)?near.verb+' ':(near.mid&&msState(near.mid).st==='ready'?'↩️ Báo cáo ':near.mid?'📋 Nhận việc ':'💬 Nói chuyện ');}else act.classList.add('hidden');}
  if(t-guideT>.12){guideT=t;
   const tg=guideList();
   if(tg.length&&started&&!S.free){let b=null,bd=1e9;for(const o of tg){const d=Math.hypot(o.pos[0]-px,o.pos[1]-pz);if(d<bd){bd=d;b=o;}}
@@ -1162,7 +1245,7 @@ function update(dt,t){
 }
 // Tự giảm độ phân giải nếu máy yếu để giữ chuyển động mượt
 let pr=renderer.getPixelRatio(),fpsAcc=0,fpsN=0,fpsT=0;
-function loop(){requestAnimationFrame(loop);const raw=clock.getDelta(),dt=Math.min(raw,.05),t=clock.elapsedTime;update(dt,t);nightTick(dt);if(started&&!dlgOpen&&!cineCam)missionTick(dt,t);renderer.render(scene,camera);
+function loop(){requestAnimationFrame(loop);const raw=clock.getDelta(),dt=Math.min(raw,.05),t=clock.elapsedTime;update(dt,t);nightTick(dt);if(started&&!dlgOpen&&!cineCam){missionTick(dt,t);hiddenTick(dt,t);}renderer.render(scene,camera);
  if(started&&t-mapT>.1){mapT=t;drawMini(t);}
  if(started&&t-saveT>4){saveT=t;saveGame();}
  if(started){fpsAcc+=raw;fpsN++;if(t-fpsT>2.5){const avg=fpsAcc/fpsN;fpsAcc=0;fpsN=0;fpsT=t;if(avg>1/38&&pr>.75){pr=Math.max(.75,pr-.2);renderer.setPixelRatio(pr);resize();}}}}
@@ -1301,13 +1384,13 @@ function readStore(){let st=null;try{st=JSON.parse(localStorage.getItem(SAVE_KEY
  if(!st||typeof st!=='object')st={profiles:{},last:''};if(!st.profiles)st.profiles={};
  try{const old=JSON.parse(localStorage.getItem(OLD_KEY)||'null');if(old&&old.v===1&&old.S){const nm=cleanName(old.S.name)||'Người chơi',k=nkey(nm);if(!st.profiles[k])st.profiles[k]={name:nm,t:Date.now(),data:old};st.last=st.last||k;localStorage.removeItem(OLD_KEY);writeStore(st);}}catch(e){}
  return st;}
-function snapshot(){return {v:1,S:{chang:S.chang,asked:S.asked,notes:S.notes,firstTry:S.firstTry,quizTotal:S.quizTotal,cards:S.cards,stats:S.stats,dec:S.dec,name:S.name,timelineFirst:S.timelineFirst,free:S.free,gender:S.gender,ms:S.ms},done:OBJ.filter(o=>o.done).map(o=>o.id),p:[player.position.x,player.position.z,player.rotation.y],yaw};}
+function snapshot(){return {v:1,S:{chang:S.chang,asked:S.asked,notes:S.notes,firstTry:S.firstTry,quizTotal:S.quizTotal,cards:S.cards,stats:S.stats,dec:S.dec,name:S.name,timelineFirst:S.timelineFirst,free:S.free,gender:S.gender,ms:S.ms,hid:S.hid,hidP:S.hidP,hb:S.hb},done:OBJ.filter(o=>o.done).map(o=>o.id),p:[player.position.x,player.position.z,player.rotation.y],yaw};}
 function saveGame(){if(!started||!player||!PKEY)return;const st=readStore();st.profiles[PKEY]={name:S.name,t:Date.now(),data:snapshot()};st.last=PKEY;writeStore(st);}
 function loadSave(k){if(!k)return null;const p=readStore().profiles[k];return p&&p.data&&p.data.v===1&&p.data.S?p.data:null;}
 function clearSave(k){const st=readStore();delete st.profiles[k];writeStore(st);}
 function resumeFrom(d){Object.assign(S,d.S);for(const id of d.done){const o=OBJ.find(x=>x.id===id);if(o)o.done=true;}
  for(const id in S.dec)if(VARMAP[id])applyVar(VARMAP[id],S.dec[id]);
- if(d.p){player.position.set(d.p[0],0,d.p[1]);player.rotation.y=d.p[2];}yaw=d.yaw||0;camInit=false;updStats();restoreMissions();}
+ if(d.p){player.position.set(d.p[0],0,d.p[1]);player.rotation.y=d.p[2];}yaw=d.yaw||0;camInit=false;updStats();restoreMissions();applyHiddenState();}
 // ---- màn hình chọn người chơi ----
 const escH=t=>String(t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 function profStatus(d){if(!d||!d.S)return'';if(d.S.free||d.S.chang>=4)return'🏆 Hoàn thành';return'Chặng '+(d.S.chang||1);}
@@ -1361,7 +1444,7 @@ function beginGame(resume){
 $('startBtn').onclick=()=>beginGame(!!loadSave(nkey($('pname').value)));
 $('newBtn').onclick=()=>{const b=$('newBtn');if(!b.dataset.armed){b.dataset.armed='1';b.textContent='Xóa tiến trình cũ? Bấm lần nữa';return;}beginGame(false);};
 setTimeout(boot,30);
-window.__game={S,OBJ,TARGETS,MIS,get player(){return player;},get near(){return near;}};
+window.__game={S,OBJ,TARGETS,MIS,HP,get player(){return player;},get near(){return near;}};
 })();
 </script>
 </body>

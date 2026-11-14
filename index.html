@@ -840,7 +840,8 @@ function buildHidden(){
  HN.hana=hidNPC({shirt:'#f48fb1',pants:'#37474f',bag:'#ffffff',hair:'#1b1b1b',skin:'#f6d7c3',longHair:true,dress:true},[41.5,113],'😟');
  HP.push({isHidden:true,id:'h3',pos:[41.5,113],r:3,verb:'💬 Hỏi thăm',who:'Chị Hana – du khách Nhật Bản',em:'😟',active:()=>!hidDone('h3'),run:runH3});
  // H4: bà cụ mỏi chân với gánh hàng
- HN.ba=hidNPC({shirt:'#795548',hat:'non',ganh:true,dress:true,hair:'#9e9e9e',scale:.74},[-23.2,-50],'💦');HN.ba.mesh.rotation.y=-PI/2;
+ HN.ba=hidNPC({shirt:'#795548',hat:'non',ganh:true,dress:true,hair:'#9e9e9e',scale:.74},[-23.2,-50],'💦');HN.ba.mesh.rotation.y=-PI/2;HN.ba.emo.position.y=2.25;
+ {const mk=new THREE.Sprite(new THREE.SpriteMaterial({map:markerTex('!','#e76f51'),depthWrite:false,fog:false}));mk.scale.set(1.1,1.1,1);mk.position.set(-23.2,3.2,-50);mk.visible=false;scene.add(mk);HN.ba.mark=mk;}
  HP.push({isHidden:true,id:'h4',pos:[-23.2,-50],r:3,verb:'💬 Hỏi thăm bà',who:'Bà cụ bán hàng',em:'👵',active:()=>!hidDone('h4')&&hidP().h4!=='follow',run:runH4});
 }
 async function pickRetry(o,q,opts){for(;;){const k=await pick(o,q,opts.map(p=>p.t));const p=opts[k];if(p.ok)return k;await say(o,'🤔 '+p.fb);}}
@@ -882,7 +883,11 @@ function hiddenTick(dt,t){if(!HN.ba)return;const px=player.position.x,pz=player.
   if(!S.busy&&Math.hypot(px+10,pz+86)<6&&Math.hypot(f.x+10,f.z+86)<8){pp.h4='done';S.busy=true;(async()=>{try{
     await say({who:'Bà cụ bán hàng',em:'👵'},'Đến chợ rồi! Cảm ơn cháu nhé, cháu ngoan quá. Bà chúc cháu đi chơi vui, mạnh khỏe!');
     await hidFinish('h4','Giúp bà cụ ra chợ','💡 <b>Kính trọng, giúp đỡ người già</b> là nét đẹp trong nếp sống của người Hà Nội, cũng là một phần “hồn phố” cần gìn giữ.',{B:0,S:10,D:0});}finally{closeD();S.busy=false;lastAct='?';saveGame();}})();}}
- for(const k of ['hana','ba']){const n=HN[k];if(n&&n.emo)n.emo.position.y=(k==='ba'?2.6:2.75)+Math.sin(t*2.4)*.06;}
+ if(HN.hana&&HN.hana.emo)HN.hana.emo.position.y=2.75+Math.sin(t*2.4)*.06;
+ {const b=HN.ba,f=b.mesh.position,calling=!hidDone('h4')&&!pp.h4,dd=Math.hypot(px-f.x,pz-f.z);b.mark.visible=calling&&dd<16;if(b.mark.visible){b.mark.position.set(f.x,3.15+Math.abs(Math.sin(t*4))*.35,f.z);b.mark.scale.setScalar(1.05+Math.sin(t*8)*.08);}
+  b.emo.position.y=(pp.h4==='follow'?2.6:2.25)+Math.sin(t*2.4)*.06;
+  if(calling&&dd<16&&dd>3.5&&!b.called&&!S.busy){b.called=true;toast('👵 “Cháu ơi… giúp bà một tay với!”');}
+  if(calling&&dd<16){b.mesh.rotation.y+=wrapA(Math.atan2(px-f.x,pz-f.z)-b.mesh.rotation.y)*expK(3,dt);b.mesh.userData.arms[1].rotation.x=Math.sin(t*6)*.5-.9;}}
  if(HN.hana&&!hidDone('h3')){const dx=px-41.5,dz=pz-113;if(Math.hypot(dx,dz)<8)HN.hana.mesh.rotation.y+=wrapA(Math.atan2(dx,dz)-HN.hana.mesh.rotation.y)*expK(4,dt);}}
 function applyHiddenState(){const pp=hidP();
  if(hidDone('h1'))HN.graf.visible=false;

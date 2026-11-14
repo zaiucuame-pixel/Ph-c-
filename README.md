@@ -4,7 +4,7 @@ Game 3D thế giới mở về **Phố cổ Hà Nội**. Bạn vào vai một du
 
 1. **Hình thành & phát triển**: kiến thức trong video + Sổ tay; người dân trong phố đố lại, cuối cùng là bài đố của ông đồ.
 2. **Giá trị**: sưu tầm 6 Thẻ giá trị (kiến trúc, lịch sử, tín ngưỡng, văn hóa nghề, phi vật thể, kinh tế – du lịch).
-3. **Bảo tồn**: nhập vai Trưởng ban quản lý, đưa ra quyết định cân bằng Bảo tồn – Sinh kế – Du lịch.
+3. **Bảo tồn**: làm tình nguyện viên, nhận 5 nhiệm vụ hành động từ người dân (nhặt rác, xếp ghế vỉa hè, chụp ảnh tư liệu, dẫn đường du khách, dán áp phích lớp học nghề).
 
 ▶️ Chơi tại: https://zaiucuame-pixel.github.io/ph-c-/
 

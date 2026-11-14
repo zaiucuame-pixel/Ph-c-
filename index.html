@@ -487,11 +487,36 @@ function buildVariants(){
  variant('nhaco','B',B=>{house(B,-60,-33,PI,8,9,{wall:'#efc86a',floors:2,roofCol:'#9c4a32',roof:'tile',shut:'#2f7d5b',sign:'#c1121f',balcony:true});});
  variant('nhaco','C',B=>{B.add(BOX,-60,10.5,-28.5,8,21,9,'#b0b6bb');for(let y=3;y<21;y+=3)B.add(BOX,-60,y,-33.05,8.05,.25,.1,'#e0e0e0');for(const x of [-62,-58])B.add(BOX,x,11,-33.06,1.4,18,.1,'#78909c');});
  // vỉa hè Tạ Hiện (x=10 street, z -35..-5)
- const stool=(B,x,z,c)=>{B.add(BOX,x,.35,z,.55,.7,.55,c);};
- variant('viahe','old',B=>{for(let z=-33;z<-8;z+=1.3){stool(B,15.6+R(-.3,.3),z,P(['#d62828','#1d70b8']));if(rnd()<.7)stool(B,R(8,13.5),z+R(-.4,.4),P(['#d62828','#1d70b8']));if(rnd()<.4)stool(B,R(5.5,7.5),z,P(['#d62828','#1d70b8']));}for(let z=-30;z<-8;z+=5)B.add(BOX,R(10,13),.5,z,1.2,1,1.2,'#8d6e63');});
- variant('viahe','A',B=>{B.add(BOX,15.5,.2,-20,.1,.1,.1,'#cdbfa5');});
- variant('viahe','B',B=>{for(let z=-33;z<-8;z+=1.3)stool(B,15.7,z,P(['#d62828','#1d70b8']));B.add(BOX,14.2,.04,-20.5,.15,.05,27,'#ffffff');for(let z=-31;z<-9;z+=6)B.add(BOX,16.3,.5,z,.8,1,.8,'#8d6e63');});
- variant('viahe','C',B=>{for(let z=-34;z<-6;z+=1)for(let x=6;x<16;x+=1.4)if(rnd()<.55)stool(B,x+R(-.2,.2),z,P(['#d62828','#1d70b8','#2a9d8f']));});
+ // --- bàn ghế nhựa quán vỉa hè ---
+ const STOOLC=['#d62828','#1d70b8','#d62828','#1d70b8','#2a9d8f','#f4a100'];
+ const stool=(B,x,z,c,ry=0)=>{const put=makePut(B,x,z,ry),dk=new THREE.Color(c).multiplyScalar(.75);
+  put(BOX,0,.5,0,.46,.07,.46,c);put(BOX,0,.43,0,.5,.1,.5,dk);
+  for(const sx of [-1,1])for(const sz of [-1,1])put(BOX,sx*.19,.22,sz*.19,.08,.44,.08,c,sz*.1,-sx*.1);
+  put(BOX,0,.5,0,.16,.075,.06,dk);};
+ const TOPC=['#1d70b8','#d62828','#c9ced3','#2a9d8f','#c9ced3'];
+ const NEAR_NPC=(x,z)=>Math.hypot(x-15.8,z+17)<1.8||Math.hypot(x-10,z+28)<1.8;
+ const table=(B,x,z,ry=0,top)=>{const put=makePut(B,x,z,ry),c=top||P(TOPC),dk=new THREE.Color(c).multiplyScalar(.8);
+  put(BOX,0,.7,0,1.0,.06,.72,c);put(BOX,0,.62,0,.9,.1,.62,dk);
+  for(const sx of [-1,1])for(const sz of [-1,1])put(BOX,sx*.42,.32,sz*.28,.07,.62,.07,dk);
+  const n=1+Math.floor(rnd()*3);for(let k=0;k<n;k++){const bx=-.3+k*.3,bz=R(-.15,.15);put(CYL,bx,.79,bz,.14,.1,.14,'#f5f5f5');put(CYL,bx,.845,bz,.12,.01,.12,P(['#e9a03b','#c86b3c','#f2d16b']));}
+  put(CYL,.38,.82,.22,.05,.18,.05,'#8d6e63');put(CYL,.38,.92,.22,.035,.06,.035,'#f2e3c6');
+  put(CYL,-.38,.8,.24,.04,.14,.04,'#c1272d');
+  for(const gx of [.15,-.05])put(CYL,gx,.79,-.24,.05,.13,.05,'#e8c77a');};
+ // một bộ: bàn + ghế xung quanh (đặt dọc theo trục z)
+ const setT=(B,x,z,ns=4,tidy=false)=>{if(NEAR_NPC(x,z))return;const ry=PI/2+(tidy?0:R(-.25,.25));table(B,x,z,ry);
+  const spots=[[0,.78],[0,-.78],[.62,0],[-.62,0]];for(let k=0;k<ns&&k<4;k++){const [lx,lz]=spots[k];const c=Math.cos(ry),sn=Math.sin(ry);
+   const wx=x+lx*c+lz*sn+(tidy?0:R(-.1,.1)),wz=z-lx*sn+lz*c+(tidy?0:R(-.1,.1));stool(B,wx,wz,P(STOOLC),tidy?0:R(-.5,.5));}};
+ const stack=(B,x,z,n,c)=>{for(let k=0;k<n;k++)stool(B,x,z,c,0);for(let k=1;k<n;k++){B.add(BOX,x,.55+k*.09,z,.5,.08,.5,c);}};
+ const cart=(B,x,z)=>{B.add(BOX,x,.55,z,.8,1.1,1.4,'#b0b7bf');B.add(BOX,x,1.13,z,.86,.06,1.46,'#8d949b');B.add(CYL,x,1.32,z-.3,.28,.34,.28,'#9aa1a8');B.add(CYL,x,1.5,z-.3,.3,.04,.3,'#6c737a');B.add(CYL,x,1.2,z+.35,.22,.12,.22,'#e9a03b');
+  for(let k=0;k<3;k++)B.add(CYL,x-.25+k*.25,1.2,z+.05,.08,.06,.08,'#f5f5f5');};
+ variant('viahe','old',B=>{
+  for(let z=-33;z<-8;z+=3.1){setT(B,15.95,z,3);if(rnd()<.75)setT(B,R(11.5,13.2),z+R(-.6,.6),4);if(rnd()<.35)setT(B,R(8.5,10),z+1.4,3);}
+  for(let k=0;k<10;k++){const x=R(9,15),z=R(-34,-8);if(!NEAR_NPC(x,z))stool(B,x,z,P(STOOLC),R(0,3));}
+  cart(B,16.4,-24.6);cart(B,16.4,-12.5);});
+ variant('viahe','A',B=>{stack(B,16.6,-30,5,'#d62828');stack(B,16.6,-22,6,'#1d70b8');stack(B,16.6,-13,4,'#d62828');});
+ variant('viahe','B',B=>{for(let z=-32;z<-8;z+=3.4)setT(B,16.0,z,2,true);cart(B,16.4,-24.6);
+  B.add(BOX,14.85,.04,-20.5,.12,.05,27,'#ffffff');for(let z=-33;z<-8;z+=4)B.add(BOX,14.85,.05,z,.4,.05,.12,'#ffffff');});
+ variant('viahe','C',B=>{for(let z=-34;z<-6;z+=2.3)for(let x=6.5;x<16.5;x+=2.4)if(rnd()<.7)setT(B,x+R(-.3,.3),z+R(-.3,.3),4);cart(B,16.4,-24.6);cart(B,16.4,-12.5);cart(B,7,-20);});
  // phố đi bộ: cờ dây quanh hồ
  variant('dibo','on',B=>{for(let a=0;a<PI*2;a+=.12){const f=1.16,x=LAKE.cx+LAKE.rx*f*Math.cos(a),z=LAKE.cz+LAKE.rz*f*Math.sin(a);if(z<54||Math.abs(x-8)<3&&z<62)continue;B.add(BOX,x,2,z,.12,4,.12,'#555');B.add(PRISM,x,3.6,z,.45,.05,.7,P(['#e63946','#ffbe0b','#2a9d8f','#3a86ff','#8338ec']),a,PI/2);}
   for(let x=-85;x<=85;x+=7){B.add(PRISM,x,4.2,46,.5,.05,.7,P(['#e63946','#ffbe0b','#2a9d8f','#3a86ff']),0,PI/2);}B.add(BOX,0,4.6,46,170,.05,.05,'#333');});

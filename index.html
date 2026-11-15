@@ -58,6 +58,8 @@ body.touch #hint{display:none}
 .dcard{width:min(680px,100%);max-height:78vh;overflow:auto;padding:14px 16px 14px;background:linear-gradient(180deg,rgba(29,53,87,.97),rgba(20,33,61,.98));border:3px solid var(--gold);border-radius:18px;box-shadow:0 10px 30px rgba(0,0,0,.5);animation:up .25s ease-out;touch-action:pan-y}
 @keyframes up{from{transform:translateY(30px);opacity:0}}
 .who{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.who .rep{margin-left:auto;background:none;border:2px solid var(--gold);border-radius:50%;width:34px;height:34px;font-size:16px;cursor:pointer;flex:none}
+.av.talk{animation:talk .35s ease-in-out infinite alternate}@keyframes talk{from{transform:scale(1)}to{transform:scale(1.1) translateY(-2px)}}
 .av{width:44px;height:44px;border-radius:50%;background:var(--cream);display:flex;align-items:center;justify-content:center;font-size:26px;border:3px solid var(--gold);flex:none}
 .nm{color:var(--gold);font-size:16px}
 .txt{font-size:15.5px;line-height:1.55}
@@ -193,7 +195,7 @@ body.cine #hud,body.cine #mapWrap,body.cine #topBtns,body.cine #guide,body.cine 
 <div id="hud" class="panel hidden"><div class="hd"><div class="ch" id="chName"></div><span class="tg" id="chProg"></span></div><ul id="quests"></ul></div>
 <div id="guide" class="panel hidden"><span class="ar" id="gArrow">➤</span><span id="gText"></span></div>
 <div id="mapWrap" class="panel hidden"><canvas id="mini"></canvas></div>
-<div id="topBtns" class="hidden"><button class="rbtn" id="vidBtn">📱 Video</button><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="nightBtn">🌙 Ban đêm</button><button class="rbtn" id="userBtn">👤 ⇄</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
+<div id="topBtns" class="hidden"><button class="rbtn" id="vidBtn">📱 Video</button><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="voiceBtn">🔊 Lồng tiếng</button><button class="rbtn" id="nightBtn">🌙 Ban đêm</button><button class="rbtn" id="userBtn">👤 ⇄</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
 <div id="stats" class="panel hidden"><div style="font-weight:800;color:var(--gold);margin-bottom:2px">Chỉ số phố cổ</div>
  <div class="row"><span class="lb">🏛️ Bảo tồn</span><span class="bar"><i id="bB" style="background:#f2b705"></i></span><span class="v" id="vB">50</span></div>
  <div class="row"><span class="lb">🤝 Cộng đồng</span><span class="bar"><i id="bS" style="background:#2a9d8f"></i></span><span class="v" id="vS">50</span></div>
@@ -249,7 +251,7 @@ body.cine #hud,body.cine #mapWrap,body.cine #topBtns,body.cine #guide,body.cine 
   <span>📱 <b>Điện thoại:</b> chạm nửa trái màn hình để hiện cần điều khiển, đẩy hết cỡ để chạy · vuốt nửa phải để xoay góc nhìn · chụm 2 ngón để phóng to/thu nhỏ · bấm <b>nút vàng</b> để nói chuyện/hành động.</span>
   <span>💻 <b>Máy tính:</b> WASD hoặc mũi tên để đi · Shift để chạy · kéo chuột để xoay · lăn chuột để phóng to/thu nhỏ · <b>E</b> để nói chuyện · <b>N</b> ngày/đêm · <b>F</b> toàn màn hình.</span></div>
  <div class="gsec"><b>🚲 Phương tiện</b>Có <b>xe đạp</b>, <b>xích lô</b> và <b>xe điện du lịch</b> đỗ quanh Bờ Hồ, chợ Đồng Xuân và một số phố. Đến gần, bấm nút để lên xe; bấm <b>“⬇️ Xuống xe”</b> để xuống. Xe đạp nhanh và linh hoạt nhất; xe điện to nên không đi qua được cầu Thê Húc.</div>
- <div class="gsec"><b>🔘 Các nút góc phải</b><span>📱 Video · 📒 Sổ tay · 🎴 Thẻ giá trị · 🌙 Ban đêm · 👤 Đổi người chơi · ⛶ Toàn màn hình · ❔ Hướng dẫn</span></div>
+ <div class="gsec"><b>🔘 Các nút góc phải</b><span>📱 Video · 📒 Sổ tay · 🎴 Thẻ giá trị · 🔊 Bật/tắt lồng tiếng · 🌙 Ban đêm · 👤 Đổi người chơi · ⛶ Toàn màn hình · ❔ Hướng dẫn</span></div>
  <div class="gsec"><b>💾 Lưu tiến trình</b>Game tự lưu theo <b>tên người chơi</b> trên máy này. Lần sau nhập đúng tên (hoặc chạm vào tên đã lưu) để chơi tiếp.</div>
  <div class="gsec hid"><b>🕵️ Thành tựu ẩn</b>Phố cổ còn <b>4 thành tựu ẩn</b>: <b>không có trong danh sách nhiệm vụ, không có trên bản đồ, không có mũi tên chỉ đường</b>. Chỉ người <b>tinh ý</b>, biết để ý những điều bất thường quanh mình và sẵn lòng giúp đỡ, mới phát hiện ra. Tìm đủ cả 4 để nhận huy hiệu đặc biệt!</div>
  <button class="big" id="guideClose" style="margin-top:12px">Đã hiểu, chơi thôi!</button>
@@ -1189,29 +1191,67 @@ if(innerWidth<600)$('hud').classList.add('collapsed');
 /* ---------- UI helpers ---------- */
 const dlg=$('dlg'),dc=$('dcard');
 function openD(){dlg.classList.remove('hidden');dlgOpen=true;clearKeys();joyReset();vel.set(0,0,0);}
-function closeD(){dlg.classList.add('hidden');dlgOpen=false;dc.innerHTML='';}
-function head(o){return `<div class="who"><span class="av">${o.em}</span><b class="nm">${o.who}</b></div>`;}
-function say(o,text){return new Promise(res=>{openD();dc.innerHTML=head(o)+`<div class="txt">${text}</div><div class="btns"><button class="go">Tiếp ▸</button></div>`;dc.scrollTop=0;dc.querySelector('.go').onclick=()=>res();});}
+function closeD(){hush();dlg.classList.add('hidden');dlgOpen=false;dc.innerHTML='';}
+function head(o){return `<div class="who"><span class="av">${o.em}</span><b class="nm">${o.who}</b>${HAS_TTS?'<button class="rep" title="Nghe lại">🔊</button>':''}</div>`;}
+
+/* ---------- Lồng tiếng nhân vật (giọng đọc tiếng Việt của trình duyệt) ---------- */
+const HAS_TTS=(()=>{try{return 'speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined';}catch(e){return false;}})();
+let VOICE_ON=(()=>{try{return localStorage.getItem('phoco3d_voice')!=='0';}catch(e){return true;}})();
+let viList=[],ttsTok=0,lastV=null,warnedVoice=false;
+function loadVoices(){try{viList=(speechSynthesis.getVoices()||[]).filter(v=>/^vi/i.test(v.lang));}catch(e){viList=[];}}
+if(HAS_TTS){loadVoices();try{speechSynthesis.addEventListener('voiceschanged',loadVoices);}catch(e){}}
+const isMaleV=v=>/NamMinh|\bAn\b|\bmale\b/i.test(v.name)&&!/female/i.test(v.name);
+const isFemV=v=>/HoaiMy|Linh|female|\bMy\b/i.test(v.name);
+function pickVoice(g){if(!viList.length)return null;const nat=viList.filter(v=>/Natural|Online|Neural|Google/i.test(v.name));const pool=nat.length?nat:viList;
+ return pool.find(g==='m'?isMaleV:isFemV)||pool.find(g==='m'?isMaleV:isFemV)||viList.find(g==='m'?isMaleV:isFemV)||pool[0];}
+// Mỗi nhân vật một chất giọng: giới tính + cao độ + tốc độ theo cách xưng hô
+function voiceOf(o){if(o&&o.voice)return o.voice;const w=((o&&o.who)||'').toLowerCase();
+ if(!w||/^bạn |^một |^tờ |^bức /.test(w))return {g:S.gender==='f'?'f':'m',p:1,r:1.05};
+ if(/^cụ/.test(w))return {g:'m',p:.7,r:.86};
+ if(/^ông|^bác|nghệ nhân|pierre/.test(w))return {g:'m',p:.82,r:.93};
+ if(/^bà/.test(w))return {g:'f',p:.8,r:.86};
+ if(/^anh/.test(w))return {g:'m',p:1.05,r:1.04};
+ if(/^chị|^cô|emma|hana/.test(w))return {g:'f',p:1.12,r:1.03};
+ return {g:'f',p:1,r:1};}
+function cleanTTS(h){return String(h).replace(/<div class="me"[\s\S]*?<\/div>/,'').replace(/<br\s*\/?>/gi,'. ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&[a-z]+;/g,' ')
+ .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}\u{200D}]/gu,'').replace(/[“”"]/g,'').replace(/\s*[–—]\s*/g,', ').replace(/→/g,', rồi ').replace(/\s+/g,' ').replace(/(\.\s*){2,}/g,'. ').replace(/\s+([,.!?;:])/g,'$1').replace(/([!?…:;,])\./g,'$1').trim();}
+function chunks(t){const out=[];let cur='';for(const s of t.split(/(?<=[.!?…;:])\s+/)){if((cur+' '+s).length>180&&cur){out.push(cur);cur=s;}else cur=cur?cur+' '+s:s;}if(cur)out.push(cur);
+ return out.flatMap(c=>c.length<=220?[c]:c.match(/.{1,200}(\s|$)/g));}
+function hush(){ttsTok++;try{if(HAS_TTS)speechSynthesis.cancel();}catch(e){}document.querySelectorAll('.av.talk').forEach(a=>a.classList.remove('talk'));}
+function voice(o,html){lastV=[o,html];if(!HAS_TTS||!VOICE_ON)return;const t=cleanTTS(html);hush();if(!t)return;const tok=ttsTok,pr=voiceOf(o),v=pickVoice(pr.g);
+ if(!v&&!warnedVoice){warnedVoice=true;loadVoices();if(!viList.length)toast('Máy chưa cài giọng đọc tiếng Việt – sẽ dùng giọng mặc định');}
+ const av=dc.querySelector('.av');const parts=chunks(t);
+ parts.forEach((c,i)=>{const u=new SpeechSynthesisUtterance(c);u.lang='vi-VN';if(v)u.voice=v;
+  // chỉ có 1 giọng thì đổi cao độ mạnh hơn để phân biệt nam/nữ
+  const one=viList.length<2;u.pitch=Math.max(.1,Math.min(2,pr.p*(one&&pr.g==='m'?.85:1)*(one&&pr.g==='f'?1.08:1)));u.rate=pr.r;
+  u.onstart=()=>{if(tok===ttsTok&&av)av.classList.add('talk');};
+  if(i===parts.length-1)u.onend=u.onerror=()=>{if(av)av.classList.remove('talk');};
+  try{speechSynthesis.speak(u);}catch(e){}});}
+dc.addEventListener('click',e=>{if(e.target.closest('.rep')&&lastV){const was=VOICE_ON;VOICE_ON=true;voice(lastV[0],lastV[1]);VOICE_ON=was;}});
+function updVoiceBtn(){const b=$('voiceBtn');if(!b)return;if(!HAS_TTS){b.classList.add('hidden');return;}b.textContent=VOICE_ON?'🔊 Lồng tiếng':'🔇 Lồng tiếng';}
+$('voiceBtn').onclick=()=>{VOICE_ON=!VOICE_ON;try{localStorage.setItem('phoco3d_voice',VOICE_ON?'1':'0');}catch(e){}updVoiceBtn();if(!VOICE_ON)hush();toast(VOICE_ON?'🔊 Đã bật lồng tiếng nhân vật':'🔇 Đã tắt lồng tiếng');};
+updVoiceBtn();
+function say(o,text){return new Promise(res=>{openD();dc.innerHTML=head(o)+`<div class="txt">${text}</div><div class="btns"><button class="go">Tiếp ▸</button></div>`;dc.scrollTop=0;voice(o,text);dc.querySelector('.go').onclick=()=>res();});}
 function quiz(o,q){return new Promise(res=>{openD();S.quizTotal++;let tries=0;const opts=shuffle(q.o.map((t,i)=>({t,ok:i===0})));
- dc.innerHTML=head(o)+`<div class="q">❓ ${q.q}</div><div class="opts">${opts.map((p,i)=>`<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}. ${p.t}</button>`).join('')}</div><div class="fb"></div><div class="btns"></div>`;dc.scrollTop=0;
- dc.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const p=opts[+b.dataset.i];if(p.ok){if(tries===0)S.firstTry++;b.classList.add('good');dc.querySelectorAll('.opt').forEach(x=>x.disabled=true);
+ dc.innerHTML=head(o)+`<div class="q">❓ ${q.q}</div><div class="opts">${opts.map((p,i)=>`<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}. ${p.t}</button>`).join('')}</div><div class="fb"></div><div class="btns"></div>`;dc.scrollTop=0;voice(o,q.q);
+ dc.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const p=opts[+b.dataset.i];if(p.ok){voice(o,(tries===0?'Chính xác! ':'Đúng rồi! ')+q.x);if(tries===0)S.firstTry++;b.classList.add('good');dc.querySelectorAll('.opt').forEach(x=>x.disabled=true);
    dc.querySelector('.fb').innerHTML=`<div class="ex">✅ ${tries===0?'Chính xác ngay lần đầu!':'Đúng rồi!'}<br>${q.x}</div>`;dc.querySelector('.btns').innerHTML='<button class="go">Tiếp ▸</button>';dc.querySelector('.btns .go').onclick=()=>res(tries===0);dc.querySelector('.btns .go').scrollIntoView({block:'nearest'});}
-  else{tries++;b.classList.add('bad');b.disabled=true;dc.querySelector('.fb').innerHTML='<span class="no">Chưa đúng rồi, thử lại nhé! 💪</span>';}});});}
+  else{tries++;voice(o,'Chưa đúng rồi, thử lại nhé!');b.classList.add('bad');b.disabled=true;dc.querySelector('.fb').innerHTML='<span class="no">Chưa đúng rồi, thử lại nhé! 💪</span>';}});});}
 function ask(o,qs){return new Promise(res=>{const done=new Set();
  const draw=()=>{openD();dc.innerHTML=head(o)+`<div class="q">💬 Hỏi thêm ${o.who.toLowerCase()} <span style="font-weight:600;opacity:.75;font-size:13px">(${done.size}/${qs.length} · không bắt buộc)</span></div><div class="opts">${qs.map((q,i)=>`<button class="opt ask${done.has(i)?' seen':''}" data-i="${i}">${done.has(i)?'✓':'❔'} ${q[0]}</button>`).join('')}</div><div class="btns"><button class="go">${done.size===qs.length?'⭐ Hỏi hết rồi! Giải đố ▸':'Giải đố thôi ▸'}</button></div>`;dc.scrollTop=0;
-  dc.querySelectorAll('.opt').forEach(b=>b.onclick=async()=>{const i=+b.dataset.i;if(!done.has(i)){done.add(i);S.asked++;}await say(o,`<div style="opacity:.75;font-style:italic;margin-bottom:6px">🙋 Bạn: ${qs[i][0]}</div>${qs[i][1]}`);draw();});
+  dc.querySelectorAll('.opt').forEach(b=>b.onclick=async()=>{const i=+b.dataset.i;if(!done.has(i)){done.add(i);S.asked++;}await say(o,`<div class="me" style="opacity:.75;font-style:italic;margin-bottom:6px">🙋 Bạn: ${qs[i][0]}</div>${qs[i][1]}`);draw();});
   dc.querySelector('.go').onclick=()=>res();};draw();});}
 function chips(d){const nm={B:'🏛️ Bảo tồn',S:'🤝 Cộng đồng',D:'🧳 Du lịch'};return `<div class="chips">${['B','S','D'].map(k=>`<span class="chip ${d[k]>0?'p':d[k]<0?'m':'z'}">${nm[k]} ${d[k]>0?'+':''}${d[k]}</span>`).join('')}</div>`;}
 function choose(o,q,opts,varName){return new Promise(res=>{openD();
- dc.innerHTML=head(o)+`<div class="q">🧭 ${q}</div><div class="opts">${opts.map((p,i)=>`<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}. ${p.t}</button>`).join('')}</div><div class="fb"></div><div class="btns"></div>`;dc.scrollTop=0;
- dc.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const p=opts[+b.dataset.i];dc.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x!==b)x.style.opacity=.45;});b.classList.add('good');
+ dc.innerHTML=head(o)+`<div class="q">🧭 ${q}</div><div class="opts">${opts.map((p,i)=>`<button class="opt" data-i="${i}">${String.fromCharCode(65+i)}. ${p.t}</button>`).join('')}</div><div class="fb"></div><div class="btns"></div>`;dc.scrollTop=0;voice(o,q);
+ dc.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{const p=opts[+b.dataset.i];voice(o,p.fb);dc.querySelectorAll('.opt').forEach(x=>{x.disabled=true;if(x!==b)x.style.opacity=.45;});b.classList.add('good');
   for(const k in p.d)S.stats[k]=clamp(S.stats[k]+p.d[k],0,100);S.dec[o.id]=p.v;updStats();applyVar(varName,p.v);
   dc.querySelector('.fb').innerHTML=chips(p.d)+`<div class="ex">${p.fb}</div>`;dc.querySelector('.btns').innerHTML='<button class="go">Tiếp ▸</button>';const g=dc.querySelector('.btns .go');g.onclick=()=>res(p.v);g.scrollIntoView({block:'nearest'});});});}
 function applyVar(n,v){if(n==='tower')setVar('tower',v);else if(n==='nhaco')setVar('nhaco',v==='C'?'C':v);else if(n==='viahe')setVar('viahe',v);else if(n==='dibo'){if(v==='A'||v==='B')setVar('dibo','on');}
  else if(n==='hangbac'&&v==='B'){label('✨ Xưởng bạc trình diễn',44,7.5,-11,{bg:'#7b2cbf'},1.6);}}
 function cardHTML(c){const k=CATS[c.cat];return `<div class="vcard"><span class="ic">${k[2]}</span><span class="cat" style="background:${k[1]}">${k[0]}</span><h3>${c.t}</h3><p>${c.x}</p></div>`;}
-function showCard(c){return new Promise(res=>{openD();dc.innerHTML=`<div class="q" style="text-align:center">🎴 Bạn nhận được Thẻ giá trị!</div>${cardHTML(c)}<div class="btns" style="justify-content:center"><button class="go">Cất vào bộ sưu tập ✓</button></div>`;dc.scrollTop=0;dc.querySelector('.go').onclick=()=>res();});}
-function info(title,html,btn='Tiếp ▸'){return new Promise(res=>{openD();dc.innerHTML=`<div class="q">${title}</div><div class="txt">${html}</div><div class="btns"><button class="go">${btn}</button></div>`;dc.scrollTop=0;dc.querySelector('.go').onclick=()=>res();});}
+function showCard(c){return new Promise(res=>{openD();dc.innerHTML=`<div class="q" style="text-align:center">🎴 Bạn nhận được Thẻ giá trị!</div>${cardHTML(c)}<div class="btns" style="justify-content:center"><button class="go">Cất vào bộ sưu tập ✓</button></div>`;dc.scrollTop=0;voice(null,'Thẻ giá trị: '+c.t+'. '+c.x);dc.querySelector('.go').onclick=()=>res();});}
+function info(title,html,btn='Tiếp ▸'){return new Promise(res=>{openD();dc.innerHTML=`<div class="q">${title}</div><div class="txt">${html}</div><div class="btns"><button class="go">${btn}</button></div>`;dc.scrollTop=0;voice(null,title+'. '+html);dc.querySelector('.go').onclick=()=>res();});}
 let toastT;function toast(t){const el=$('toast');el.textContent=t;el.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>el.classList.remove('on'),2200);}
 function banner(t,s){const b=$('banner');$('bnT').textContent=t;$('bnS').textContent=s||'';b.classList.remove('show');void b.offsetWidth;b.classList.add('show');}
 function updStats(){for(const k of ['B','S','D']){$('b'+k).style.width=S.stats[k]+'%';$('v'+k).textContent=S.stats[k];}}
@@ -1481,7 +1521,7 @@ const SLIDES=[
 const VTOTAL=SLIDES.reduce((a,s)=>a+s.d,0);
 let VP=null; // trạng thái trình phát
 const fmtT=s=>{s=Math.max(0,Math.floor(s));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
-function viVoice(){try{return (speechSynthesis.getVoices()||[]).find(v=>/^vi/i.test(v.lang));}catch(e){return null;}}
+function viVoice(){try{loadVoices();return pickVoice('f');}catch(e){return null;}}
 function speak(html){if(!VP||!VP.tts)return;try{speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(html.replace(/<[^>]+>/g,''));u.lang='vi-VN';const v=viVoice();if(v)u.voice=v;u.rate=1.05;speechSynthesis.speak(u);}catch(e){}}
 function probeVideo(){return new Promise(res=>{const v=$('vid');let done=false;const fin=ok=>{if(done)return;done=true;res(ok);};
  v.onloadedmetadata=()=>fin(true);v.onerror=()=>fin(false);setTimeout(()=>fin(false),3500);v.src=VIDEO_SRC;v.load();});}

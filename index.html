@@ -186,6 +186,38 @@ body.cine #hud,body.cine #mapWrap,body.cine #topBtns,body.cine #guide,body.cine 
  .txt{font-size:14.5px}
  .chs{grid-template-columns:1fr}
 }
+
+/* ---- Thu gọn giao diện ---- */
+#topBtns{max-height:calc(100vh - var(--tbTop,150px) - 10px);overflow-y:auto;overflow-x:hidden;scrollbar-width:none;padding:2px}
+#topBtns::-webkit-scrollbar{display:none}
+#menuBtn{background:linear-gradient(180deg,#ffd447,#f2a705);color:#3b2600;border-color:#fff}
+#topBtns.fold .rbtn:not(#menuBtn){display:none}
+#topBtns.fold #menuBtn{border-radius:50%;width:46px;height:46px;padding:0;font-size:20px;margin-left:auto}
+#mapWrap{cursor:pointer}
+#mapWrap .mtg{display:none;font-size:22px;width:36px;height:36px;align-items:center;justify-content:center}
+#mapWrap.fold #mini{display:none}#mapWrap.fold .mtg{display:flex}
+#stats .sh{display:flex;justify-content:space-between;gap:8px;cursor:pointer;font-weight:800;color:var(--gold);margin-bottom:2px}
+#stats.fold .row{display:none}#stats.fold{width:auto}
+@media (max-width:700px),(max-height:500px){
+ .rbtn{padding:5px 9px;font-size:12px}
+ #hint{display:none!important}
+}
+@media (max-height:500px){#mini{width:80px!important;height:auto!important}#mapWrap{padding:4px}
+ #topBtns{max-height:calc(100vh - var(--tbTop,150px) - 96px)}
+ #topBtns:not(.fold){display:grid;grid-template-columns:1fr 1fr;gap:5px;width:250px}
+ #topBtns:not(.fold) #menuBtn{grid-column:1/3}
+ #guide{top:auto;bottom:12px;left:50%;transform:translateX(-50%);max-width:46vw;font-size:12px}
+}
+@media (orientation:landscape) and (max-height:520px){
+ .phone{height:auto;width:min(96vw,190vh);aspect-ratio:19/9;border-radius:28px;padding:8px}
+ .notch{display:none}
+ .pscreen{border-radius:22px;display:grid;grid-template-columns:56% 1fr;grid-template-rows:auto auto auto minmax(0,1fr)}
+ .ptop{display:none}
+ .pvid{grid-column:1;grid-row:1/5;aspect-ratio:auto;height:100%}
+ .pinfo,.pbar,.pctl,.psub{grid-column:2}
+ .pinfo{padding-top:8px}.psub{margin:6px 10px 10px;font-size:13.5px;padding:9px 11px}
+ #dlg .dcard{max-height:92vh}
+}
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 </head>
@@ -194,9 +226,9 @@ body.cine #hud,body.cine #mapWrap,body.cine #topBtns,body.cine #guide,body.cine 
 
 <div id="hud" class="panel hidden"><div class="hd"><div class="ch" id="chName"></div><span class="tg" id="chProg"></span></div><ul id="quests"></ul></div>
 <div id="guide" class="panel hidden"><span class="ar" id="gArrow">➤</span><span id="gText"></span></div>
-<div id="mapWrap" class="panel hidden"><canvas id="mini"></canvas></div>
-<div id="topBtns" class="hidden"><button class="rbtn" id="vidBtn">📱 Video</button><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="voiceBtn">🔊 Lồng tiếng</button><button class="rbtn" id="nightBtn">🌙 Ban đêm</button><button class="rbtn" id="userBtn">👤 ⇄</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
-<div id="stats" class="panel hidden"><div style="font-weight:800;color:var(--gold);margin-bottom:2px">Chỉ số phố cổ</div>
+<div id="mapWrap" class="panel hidden"><canvas id="mini"></canvas><span class="mtg">🗺️</span></div>
+<div id="topBtns" class="hidden"><button class="rbtn" id="menuBtn" title="Thu gọn / mở rộng">✕ Thu gọn</button><button class="rbtn" id="vidBtn">📱 Video</button><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="voiceBtn">🔊 Lồng tiếng</button><button class="rbtn" id="nightBtn">🌙 Ban đêm</button><button class="rbtn" id="userBtn">👤 ⇄</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
+<div id="stats" class="panel hidden"><div class="sh"><span>Chỉ số phố cổ</span><span class="stg">▾</span></div>
  <div class="row"><span class="lb">🏛️ Bảo tồn</span><span class="bar"><i id="bB" style="background:#f2b705"></i></span><span class="v" id="vB">50</span></div>
  <div class="row"><span class="lb">🤝 Cộng đồng</span><span class="bar"><i id="bS" style="background:#2a9d8f"></i></span><span class="v" id="vS">50</span></div>
  <div class="row"><span class="lb">🧳 Du lịch</span><span class="bar"><i id="bD" style="background:#e76f51"></i></span><span class="v" id="vD">50</span></div>
@@ -251,7 +283,7 @@ body.cine #hud,body.cine #mapWrap,body.cine #topBtns,body.cine #guide,body.cine 
   <span>📱 <b>Điện thoại:</b> chạm nửa trái màn hình để hiện cần điều khiển, đẩy hết cỡ để chạy · vuốt nửa phải để xoay góc nhìn · chụm 2 ngón để phóng to/thu nhỏ · bấm <b>nút vàng</b> để nói chuyện/hành động.</span>
   <span>💻 <b>Máy tính:</b> WASD hoặc mũi tên để đi · Shift để chạy · kéo chuột để xoay · lăn chuột để phóng to/thu nhỏ · <b>E</b> để nói chuyện · <b>N</b> ngày/đêm · <b>F</b> toàn màn hình.</span></div>
  <div class="gsec"><b>🚲 Phương tiện</b>Có <b>xe đạp</b>, <b>xích lô</b> và <b>xe điện du lịch</b> đỗ quanh Bờ Hồ, chợ Đồng Xuân và một số phố. Đến gần, bấm nút để lên xe; bấm <b>“⬇️ Xuống xe”</b> để xuống. Xe đạp nhanh và linh hoạt nhất; xe điện to nên không đi qua được cầu Thê Húc.</div>
- <div class="gsec"><b>🔘 Các nút góc phải</b><span>📱 Video · 📒 Sổ tay · 🎴 Thẻ giá trị · 🔊 Bật/tắt lồng tiếng · 🌙 Ban đêm · 👤 Đổi người chơi · ⛶ Toàn màn hình · ❔ Hướng dẫn</span></div>
+ <div class="gsec"><b>🔘 Các nút góc phải</b><span>📱 Video · 📒 Sổ tay · 🎴 Thẻ giá trị · 🔊 Bật/tắt lồng tiếng · 🌙 Ban đêm · 👤 Đổi người chơi · ⛶ Toàn màn hình · ❔ Hướng dẫn · Trên điện thoại các nút gom vào <b>☰</b>; chạm bản đồ nhỏ, bảng nhiệm vụ hoặc bảng chỉ số để thu gọn / mở ra</span></div>
  <div class="gsec"><b>💾 Lưu tiến trình</b>Game tự lưu theo <b>tên người chơi</b> trên máy này. Lần sau nhập đúng tên (hoặc chạm vào tên đã lưu) để chơi tiếp.</div>
  <div class="gsec hid"><b>🕵️ Thành tựu ẩn</b>Phố cổ còn <b>4 thành tựu ẩn</b>: <b>không có trong danh sách nhiệm vụ, không có trên bản đồ, không có mũi tên chỉ đường</b>. Chỉ người <b>tinh ý</b>, biết để ý những điều bất thường quanh mình và sẵn lòng giúp đỡ, mới phát hiện ra. Tìm đủ cả 4 để nhận huy hiệu đặc biệt!</div>
  <button class="big" id="guideClose" style="margin-top:12px">Đã hiểu, chơi thôi!</button>
@@ -1186,6 +1218,22 @@ cv.addEventListener('pointerup',dEnd);cv.addEventListener('pointercancel',dEnd);
 cv.addEventListener('wheel',e=>{camDist=clamp(camDist+e.deltaY*.01,5,22);e.preventDefault();},{passive:false});
 $('act').addEventListener('click',()=>{if(near&&!S.busy)interact(near);});
 $('hud').addEventListener('click',()=>$('hud').classList.toggle('collapsed'));
+/* Thu gọn: menu nút, bản đồ nhỏ, bảng chỉ số – tự gọn trên màn hình nhỏ, nhớ lựa chọn */
+const SMALL=()=>innerWidth<700||innerHeight<500;
+const uiPref=(()=>{try{return JSON.parse(localStorage.getItem('phoco3d_ui')||'{}');}catch(e){return {};}})();
+function saveUI(){try{localStorage.setItem('phoco3d_ui',JSON.stringify(uiPref));}catch(e){}}
+function placeRight(){const m=$('mapWrap');const t=(m.classList.contains('hidden')?10:m.offsetTop+m.offsetHeight+8);$('topBtns').style.top=t+'px';$('topBtns').style.setProperty('--tbTop',t+'px');}
+function setFold(id,on,save){const el=$(id);el.classList.toggle('fold',on);if(id==='topBtns')$('menuBtn').textContent=on?'☰':'✕ Thu gọn';if(id==='stats')el.querySelector('.stg').textContent=on?'▸':'▾';
+ if(save){uiPref[id]=on;saveUI();}placeRight();}
+function applyUIFold(){const sm=SMALL();setFold('topBtns',uiPref.topBtns??sm);setFold('mapWrap',uiPref.mapWrap??false);setFold('stats',uiPref.stats??sm);if(sm&&uiPref.hud===undefined)$('hud').classList.add('collapsed');}
+$('menuBtn').addEventListener('click',e=>{e.stopPropagation();setFold('topBtns',!$('topBtns').classList.contains('fold'),true);});
+// bấm một nút trong menu trên màn hình nhỏ thì tự thu gọn lại
+$('topBtns').addEventListener('click',e=>{const b=e.target.closest('.rbtn');if(b&&b.id!=='menuBtn'&&b.id!=='voiceBtn'&&SMALL())setTimeout(()=>setFold('topBtns',true),50);});
+$('mapWrap').addEventListener('click',()=>setFold('mapWrap',!$('mapWrap').classList.contains('fold'),true));
+$('stats').addEventListener('click',()=>setFold('stats',!$('stats').classList.contains('fold'),true));
+$('hud').addEventListener('click',()=>{uiPref.hud=$('hud').classList.contains('collapsed');saveUI();});
+let rzT;addEventListener('resize',()=>{clearTimeout(rzT);rzT=setTimeout(placeRight,120);});
+try{new ResizeObserver(()=>placeRight()).observe($('mapWrap'));}catch(e){setInterval(placeRight,700);}
 if(innerWidth<600)$('hud').classList.add('collapsed');
 
 /* ---------- UI helpers ---------- */
@@ -1670,7 +1718,7 @@ function beginGame(resume){
  PKEY=nkey(nm);const d=resume?loadSave(PKEY):null;if(!resume)clearSave(PKEY);
  S.gender=G_SEL;setPlayerLook(G_SEL);
  $('start').classList.add('hidden');['hud','mapWrap','topBtns'].forEach(id=>$(id).classList.remove('hidden'));if(!touchMode)$('hint').classList.remove('hidden');
- $('topBtns').style.top=(MH+28)+'px';started=true;$('userBtn').textContent='👤 '+nm+' ⇄';
+ applyUIFold();requestAnimationFrame(placeRight);started=true;$('userBtn').textContent='👤 '+nm+' ⇄';
  if(touchMode&&!isFS())toggleFS();
  if(d){resumeFrom(d);S.name=nm;S.gender=G_SEL;
   if(S.free){refreshHUD();$('stats').classList.remove('hidden');}

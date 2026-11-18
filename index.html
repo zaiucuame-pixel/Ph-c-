@@ -1254,11 +1254,11 @@ function pickVoice(g){if(!viList.length)return null;const nat=viList.filter(v=>/
  return pool.find(g==='m'?isMaleV:isFemV)||pool.find(g==='m'?isMaleV:isFemV)||viList.find(g==='m'?isMaleV:isFemV)||pool[0];}
 // Mỗi nhân vật một chất giọng: giới tính + cao độ + tốc độ theo cách xưng hô
 function voiceOf(o){if(o&&o.voice)return o.voice;const w=((o&&o.who)||'').toLowerCase();
- if(!w||/^bạn |^một |^tờ |^bức /.test(w))return {g:S.gender==='f'?'f':'m',p:1,r:1.05};
- if(/^cụ/.test(w))return {g:'m',p:.7,r:.86};
- if(/^ông|^bác|nghệ nhân|pierre/.test(w))return {g:'m',p:.82,r:.93};
+ if(!w||/^bạn |^một |^tờ |^bức /.test(w))return S.gender==='f'?{g:'f',p:1,r:1.03}:{g:'m',p:.75,r:.98};
+ if(/^cụ/.test(w))return {g:'m',p:.5,r:.84};
+ if(/^ông|^bác|nghệ nhân|pierre/.test(w))return {g:'m',p:.6,r:.9};
  if(/^bà/.test(w))return {g:'f',p:.8,r:.86};
- if(/^anh/.test(w))return {g:'m',p:1.05,r:1.04};
+ if(/^anh/.test(w))return {g:'m',p:.74,r:.97};
  if(/^chị|^cô|emma|hana/.test(w))return {g:'f',p:1.12,r:1.03};
  return {g:'f',p:1,r:1};}
 function cleanTTS(h){return String(h).replace(/<div class="me"[\s\S]*?<\/div>/,'').replace(/<br\s*\/?>/gi,'. ').replace(/<[^>]+>/g,' ').replace(/&nbsp;/g,' ').replace(/&[a-z]+;/g,' ')
@@ -1271,7 +1271,7 @@ function voice(o,html){lastV=[o,html];if(!HAS_TTS||!VOICE_ON)return;const t=clea
  const av=dc.querySelector('.av');const parts=chunks(t);
  parts.forEach((c,i)=>{const u=new SpeechSynthesisUtterance(c);u.lang='vi-VN';if(v)u.voice=v;
   // chỉ có 1 giọng thì đổi cao độ mạnh hơn để phân biệt nam/nữ
-  const one=viList.length<2;u.pitch=Math.max(.1,Math.min(2,pr.p*(one&&pr.g==='m'?.85:1)*(one&&pr.g==='f'?1.08:1)));u.rate=pr.r;
+  const one=viList.length<2;u.pitch=Math.max(.1,Math.min(2,pr.p*(pr.g==='m'&&(one||!isMaleV(v||{name:''}))?.85:1)*(one&&pr.g==='f'?1.08:1)));u.rate=pr.r;
   u.onstart=()=>{if(tok===ttsTok&&av)av.classList.add('talk');};
   if(i===parts.length-1)u.onend=u.onerror=()=>{if(av)av.classList.remove('talk');};
   try{speechSynthesis.speak(u);}catch(e){}});}

@@ -227,7 +227,7 @@ body.cine #hud,body.cine #mapWrap,body.cine #topBtns,body.cine #guide,body.cine 
 <div id="hud" class="panel hidden"><div class="hd"><div class="ch" id="chName"></div><span class="tg" id="chProg"></span></div><ul id="quests"></ul></div>
 <div id="guide" class="panel hidden"><span class="ar" id="gArrow">➤</span><span id="gText"></span></div>
 <div id="mapWrap" class="panel hidden"><canvas id="mini"></canvas><span class="mtg">🗺️</span></div>
-<div id="topBtns" class="hidden"><button class="rbtn" id="menuBtn" title="Thu gọn / mở rộng">✕ Thu gọn</button><button class="rbtn" id="vidBtn">📱 Video</button><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="voiceBtn">🔊 Lồng tiếng</button><button class="rbtn" id="nightBtn">🌙 Ban đêm</button><button class="rbtn" id="userBtn">👤 ⇄</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
+<div id="topBtns" class="hidden"><button class="rbtn" id="menuBtn" title="Thu gọn / mở rộng">✕ Thu gọn</button><button class="rbtn" id="vidBtn">📱 Video</button><button class="rbtn" id="notesBtn">📒 Sổ tay 0</button><button class="rbtn" id="cardsBtn">🎴 Thẻ 0/6</button><button class="rbtn" id="voiceBtn">🔊 Lồng tiếng</button><button class="rbtn" id="gqBtn">🖼️ Đồ họa: Tự động</button><button class="rbtn" id="nightBtn">🌙 Ban đêm</button><button class="rbtn" id="userBtn">👤 ⇄</button><button class="rbtn" id="fsBtn">⛶ Toàn màn hình</button><button class="rbtn" id="helpBtn">❔ Hướng dẫn</button></div>
 <div id="stats" class="panel hidden"><div class="sh"><span>Chỉ số phố cổ</span><span class="stg">▾</span></div>
  <div class="row"><span class="lb">🏛️ Bảo tồn</span><span class="bar"><i id="bB" style="background:#f2b705"></i></span><span class="v" id="vB">50</span></div>
  <div class="row"><span class="lb">🤝 Cộng đồng</span><span class="bar"><i id="bS" style="background:#2a9d8f"></i></span><span class="v" id="vS">50</span></div>
@@ -283,7 +283,7 @@ body.cine #hud,body.cine #mapWrap,body.cine #topBtns,body.cine #guide,body.cine 
   <span>📱 <b>Điện thoại:</b> chạm nửa trái màn hình để hiện cần điều khiển, đẩy hết cỡ để chạy · vuốt nửa phải để xoay góc nhìn · chụm 2 ngón để phóng to/thu nhỏ · bấm <b>nút vàng</b> để nói chuyện/hành động.</span>
   <span>💻 <b>Máy tính:</b> WASD hoặc mũi tên để đi · Shift để chạy · kéo chuột để xoay · lăn chuột để phóng to/thu nhỏ · <b>E</b> để nói chuyện · <b>N</b> ngày/đêm · <b>F</b> toàn màn hình.</span></div>
  <div class="gsec"><b>🚲 Phương tiện</b>Có <b>xe đạp</b>, <b>xích lô</b> và <b>xe điện du lịch</b> đỗ quanh Bờ Hồ, chợ Đồng Xuân và một số phố. Đến gần, bấm nút để lên xe; bấm <b>“⬇️ Xuống xe”</b> để xuống. Xe đạp nhanh và linh hoạt nhất; xe điện to nên không đi qua được cầu Thê Húc.</div>
- <div class="gsec"><b>🔘 Các nút góc phải</b><span>📱 Video · 📒 Sổ tay · 🎴 Thẻ giá trị · 🔊 Bật/tắt lồng tiếng · 🌙 Ban đêm · 👤 Đổi người chơi · ⛶ Toàn màn hình · ❔ Hướng dẫn · Trên điện thoại các nút gom vào <b>☰</b>; chạm bản đồ nhỏ, bảng nhiệm vụ hoặc bảng chỉ số để thu gọn / mở ra</span></div>
+ <div class="gsec"><b>🔘 Các nút góc phải</b><span>📱 Video · 📒 Sổ tay · 🎴 Thẻ giá trị · 🔊 Bật/tắt lồng tiếng · 🖼️ Đồ họa: hình bị mờ/nhiễu thì chọn Cao, máy giật thì chọn Vừa/Thấp · 🌙 Ban đêm · 👤 Đổi người chơi · ⛶ Toàn màn hình · ❔ Hướng dẫn · Trên điện thoại các nút gom vào <b>☰</b>; chạm bản đồ nhỏ, bảng nhiệm vụ hoặc bảng chỉ số để thu gọn / mở ra</span></div>
  <div class="gsec"><b>💾 Lưu tiến trình</b>Game tự lưu theo <b>tên người chơi</b> trên máy này. Lần sau nhập đúng tên (hoặc chạm vào tên đã lưu) để chơi tiếp.</div>
  <div class="gsec hid"><b>🕵️ Thành tựu ẩn</b>Phố cổ còn <b>4 thành tựu ẩn</b>: <b>không có trong danh sách nhiệm vụ, không có trên bản đồ, không có mũi tên chỉ đường</b>. Chỉ người <b>tinh ý</b>, biết để ý những điều bất thường quanh mình và sẵn lòng giúp đỡ, mới phát hiện ra. Tìm đủ cả 4 để nhận huy hiệu đặc biệt!</div>
  <button class="big" id="guideClose" style="margin-top:12px">Đã hiểu, chơi thôi!</button>
@@ -308,12 +308,16 @@ const isTouch=matchMedia('(pointer:coarse)').matches&&!matchMedia('(pointer:fine
 let touchMode=isTouch;document.body.classList.toggle('touch',touchMode);
 // Tự chuyển chế độ theo thiết bị thật đang dùng (laptop cảm ứng: chuột -> bàn phím, chạm -> cần điều khiển)
 addEventListener('pointerdown',e=>{const t=e.pointerType==='touch'||e.pointerType==='pen';if(t!==touchMode){touchMode=t;document.body.classList.toggle('touch',t);}},true);
-const renderer=new THREE.WebGLRenderer({canvas:$('c'),antialias:!isTouch||devicePixelRatio<2});
-renderer.setPixelRatio(Math.min(devicePixelRatio,isTouch?1.4:1.75));
+/* Chất lượng đồ họa: tự động (mặc định) / cao / vừa / thấp – không bao giờ tự hạ dưới độ phân giải gốc của màn hình */
+let GQ=(()=>{try{return localStorage.getItem('phoco3d_gq')||'auto';}catch(e){return 'auto';}})();
+const DPR=devicePixelRatio||1,PR_MAX=Math.min(DPR,isTouch?1.75:2),PR_MIN=Math.min(DPR,1);
+const GQ_PR={high:Math.min(DPR,2),mid:Math.min(DPR,1.25),low:Math.min(DPR,.85)},GQ_NAME={auto:'Tự động',high:'Cao',mid:'Vừa',low:'Thấp'};
+const renderer=new THREE.WebGLRenderer({canvas:$('c'),antialias:true,powerPreference:'high-performance'});
+renderer.setPixelRatio(GQ==='auto'?PR_MAX:GQ_PR[GQ]);
 const scene=new THREE.Scene();
 scene.background=new THREE.Color('#bfe0f5');
 scene.fog=new THREE.Fog('#d3e8f4',70,240);
-const camera=new THREE.PerspectiveCamera(60,1,0.3,600);
+const camera=new THREE.PerspectiveCamera(60,1,0.5,600);
 const hemi=new THREE.HemisphereLight('#ffffff','#8d7b62',0.88);scene.add(hemi);
 const sun=new THREE.DirectionalLight('#fff0d0',0.72); sun.position.set(-60,100,40); scene.add(sun);
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
@@ -1533,10 +1537,15 @@ function update(dt,t){
 }
 // Tự giảm độ phân giải nếu máy yếu để giữ chuyển động mượt
 let pr=renderer.getPixelRatio(),fpsAcc=0,fpsN=0,fpsT=0;
+function updGQ(){$('gqBtn').textContent='🖼️ Đồ họa: '+GQ_NAME[GQ];}
+$('gqBtn').onclick=()=>{const L=['auto','high','mid','low'];GQ=L[(L.indexOf(GQ)+1)%4];try{localStorage.setItem('phoco3d_gq',GQ);}catch(e){}
+ pr=GQ==='auto'?PR_MAX:GQ_PR[GQ];renderer.setPixelRatio(pr);resize();updGQ();
+ toast({auto:'🖼️ Tự động: nét nhất mà máy vẫn chạy mượt',high:'🖼️ Cao: nét nhất (máy yếu có thể giật)',mid:'🖼️ Vừa: cân bằng nét và mượt',low:'🖼️ Thấp: mượt nhất cho máy yếu'}[GQ]);};
+updGQ();
 function loop(){requestAnimationFrame(loop);const raw=clock.getDelta(),dt=Math.min(raw,.05),t=clock.elapsedTime;update(dt,t);nightTick(dt);if(started&&!dlgOpen&&!cineCam){missionTick(dt,t);hiddenTick(dt,t);}renderer.render(scene,camera);
  if(started&&t-mapT>.1){mapT=t;drawMini(t);}
  if(started&&t-saveT>4){saveT=t;saveGame();}
- if(started){fpsAcc+=raw;fpsN++;if(t-fpsT>2.5){const avg=fpsAcc/fpsN;fpsAcc=0;fpsN=0;fpsT=t;if(avg>1/38&&pr>.75){pr=Math.max(.75,pr-.2);renderer.setPixelRatio(pr);resize();}}}}
+ if(started){fpsAcc+=raw;fpsN++;if(t-fpsT>2.5){const avg=fpsAcc/fpsN;fpsAcc=0;fpsN=0;fpsT=t;if(GQ==='auto'){let np=pr;if(avg>1/32&&pr>PR_MIN)np=Math.max(PR_MIN,pr-.15);else if(avg<1/52&&pr<PR_MAX)np=Math.min(PR_MAX,pr+.1);if(np!==pr){pr=np;renderer.setPixelRatio(pr);resize();}}}}}
 
 /* ---------- boot ---------- */
 async function boot(){
